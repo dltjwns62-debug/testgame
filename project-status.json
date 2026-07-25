@@ -4,11 +4,11 @@
   "totalStages": 10,
   "currentStage": 4,
   "currentStageName": "플레이어와 몬스터 접촉 시 전투 화면 전환",
-  "stageStatus": "review_pending",
-  "activeTask": "4단계 구현 완료 — 사용자 실행 테스트 및 코드 검수 대기",
-  "workingBranch": "stage-04-battle-transition",
-  "completedStages": [1, 2, 3],
-  "approvedStages": [1, 2, 3],
+  "stageStatus": "completed",
+  "activeTask": "4단계 완료 — 5단계 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4],
+  "approvedStages": [1, 2, 3, 4],
   "nextStage": 5,
   "nextStageName": "기본 자동전투",
   "reviewSubmission": {
@@ -23,9 +23,13 @@
       "branch": "stage-04-battle-transition",
       "tag": "review-stage-04-v1",
       "version": 1,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-26T03:03:02+09:00",
+      "commit": "0fd7e3c88d35350ada4050ae6c9448ec5a9e02c2",
+      "userRunTest": "passed",
+      "mainBranchMerged": true
     },
     {
       "stage": 3,
@@ -83,9 +87,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-26T03:03:02+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -94,10 +98,10 @@
     "responsiveViewport": "passed",
     "devServer": "passed",
     "browserAutomation": "passed",
-    "userRunTest": "not_tested",
-    "chatGptCodeReview": "not_reviewed"
+    "userRunTest": "passed",
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-07-26T02:40:34+09:00"
+  "lastUpdated": "2026-07-26T03:03:02+09:00"
 }

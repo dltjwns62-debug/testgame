@@ -24,7 +24,11 @@ body {
 }
 
 #game-container {
-  width: min(960px, calc(100vw - 32px));
+  width: min(
+    960px,
+    calc(100vw - 32px),
+    calc((100vh - 32px) * 16 / 9)
+  );
   aspect-ratio: 16 / 9;
 }
 

@@ -91,8 +91,9 @@
 - 현재 단계: 2단계 — 필드 화면에 플레이어와 몬스터 표시
 - 현재 단계 상태: 검수 대기 (`review_pending`)
 - 작업 브랜치: `stage-02-field-rendering`
-- 검수 기준 태그: `review-stage-01-v1`
-- 2단계 검수 태그: `review-stage-02-v1`
+- 1단계 승인 태그: `review-stage-01-v1`
+- 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
+- 2단계 현재 검수 태그: `review-stage-02-v2`
 - 다음 단계: 3단계 — 몬스터 우클릭 선택 및 자동 접근
 - 완료된 단계: 1단계
 - 검수 승인: 승인

@@ -3,6 +3,9 @@
   "version": "0.2.0",
   "private": true,
   "description": "A staged idle auto-hunting web game prototype.",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

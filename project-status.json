@@ -13,11 +13,20 @@
   "nextStageName": "몬스터 우클릭 선택 및 자동 접근",
   "reviewSubmission": {
     "branch": "stage-02-field-rendering",
-    "tag": "review-stage-02-v1",
-    "version": 1,
+    "tag": "review-stage-02-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 2,
+      "branch": "stage-02-field-rendering",
+      "tag": "review-stage-02-v1",
+      "version": 1,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT"
+    },
     {
       "stage": 1,
       "branch": "stage-01-project-setup",
@@ -43,12 +52,14 @@
     "reviewedAt": null
   },
   "testing": {
+    "npmCi": "passed",
     "typecheck": "passed",
     "build": "passed",
+    "responsiveViewport": "passed",
     "userRunTest": "not_tested",
     "chatGptCodeReview": "not_reviewed"
   },
   "mainBranchMerged": false,
   "knownIssues": [],
-  "lastUpdated": "2026-07-26T01:19:42+09:00"
+  "lastUpdated": "2026-07-26T01:32:07+09:00"
 }

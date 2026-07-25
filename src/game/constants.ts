@@ -6,6 +6,15 @@ export const CONTACT_DISTANCE = PLAYER_RADIUS + MONSTER_RADIUS;
 export const PLAYER_MOVE_SPEED = 180;
 export const PLAYER_MAX_HP = 100;
 export const MONSTER_MAX_HP = 50;
+export const PLAYER_ATTACK_DAMAGE = 10;
+export const MONSTER_ATTACK_DAMAGE = 8;
+export const PLAYER_ATTACK_INTERVAL_MS = 1000;
+export const MONSTER_ATTACK_INTERVAL_MS = 1400;
+export const MAX_COMBAT_DELTA_MS = 100;
+export const COMBAT_LOG_LIMIT = 4;
+export const COMBAT_HP_BAR_WIDTH = 240;
+export const COMBAT_HP_BAR_HEIGHT = 18;
+export const COMBAT_BUTTON_Y = 480;
 
 export type MonsterDefinition = {
   id: string;

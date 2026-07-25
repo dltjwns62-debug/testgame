@@ -1,0 +1,14 @@
+{
+  "projectName": "Test Game",
+  "repository": "dltjwns62-debug/testgame",
+  "totalStages": 10,
+  "currentStage": 1,
+  "currentStageName": "프로젝트 기반 및 개발단계 관리",
+  "stageStatus": "completed",
+  "activeTask": "1단계 완료 — 다음 단계 명령 대기 중",
+  "completedStages": [],
+  "nextStage": 2,
+  "nextStageName": "필드 화면에 플레이어와 몬스터 표시",
+  "knownIssues": [],
+  "lastUpdated": "2026-07-26T00:00:00+09:00"
+}

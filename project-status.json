@@ -2,21 +2,44 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 10,
-  "currentStage": 1,
-  "currentStageName": "프로젝트 기반 및 개발단계 관리",
-  "stageStatus": "completed",
-  "activeTask": "1단계 완료 — 2단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 2,
+  "currentStageName": "필드 화면에 플레이어와 몬스터 표시",
+  "stageStatus": "review_pending",
+  "activeTask": "2단계 구현 완료 — 사용자 실행 테스트 및 코드 검수 대기",
+  "workingBranch": "stage-02-field-rendering",
   "completedStages": [1],
   "approvedStages": [1],
-  "nextStage": 2,
-  "nextStageName": "필드 화면에 플레이어와 몬스터 표시",
+  "nextStage": 3,
+  "nextStageName": "몬스터 우클릭 선택 및 자동 접근",
   "reviewSubmission": {
-    "branch": "stage-01-project-setup",
-    "tag": "review-stage-01-v1",
-    "version": 1,
+    "branch": "stage-02-field-rendering",
+    "tag": "review-stage-02-v2",
+    "version": 2,
     "submitted": true
   },
+  "reviewHistory": [
+    {
+      "stage": 2,
+      "branch": "stage-02-field-rendering",
+      "tag": "review-stage-02-v1",
+      "version": 1,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT"
+    },
+    {
+      "stage": 1,
+      "branch": "stage-01-project-setup",
+      "tag": "review-stage-01-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": true,
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-26T01:06:44+09:00",
+      "commit": "87edf1f8fad331e79a17dc60e698daae9814fb58",
+      "mainBranchMerged": true
+    }
+  ],
   "bootstrapMainException": {
     "occurred": true,
     "approvedStageCompletion": false,
@@ -24,11 +47,19 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-26T01:06:44+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
-  "mainBranchMerged": true,
+  "testing": {
+    "npmCi": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "responsiveViewport": "passed",
+    "userRunTest": "not_tested",
+    "chatGptCodeReview": "not_reviewed"
+  },
+  "mainBranchMerged": false,
   "knownIssues": [],
-  "lastUpdated": "2026-07-26T01:06:44+09:00"
+  "lastUpdated": "2026-07-26T01:32:07+09:00"
 }

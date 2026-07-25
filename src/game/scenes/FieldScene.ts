@@ -4,14 +4,17 @@ import {
   GAME_HEIGHT,
   GAME_WIDTH,
   MONSTERS,
+  MONSTER_MAX_HP,
   MONSTER_RADIUS,
+  PLAYER_MAX_HP,
   PLAYER_POSITION,
   PLAYER_MOVE_SPEED,
   PLAYER_RADIUS,
   type MonsterDefinition,
 } from "../constants";
+import type { BattleSceneData } from "../battleTypes";
 
-type FieldState = "IDLE" | "MOVING";
+type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
 type MonsterView = {
   definition: MonsterDefinition;
@@ -25,6 +28,7 @@ export class FieldScene extends Phaser.Scene {
   private targetMonster: MonsterView | null = null;
   private state: FieldState = "IDLE";
   private stateText!: Phaser.GameObjects.Text;
+  private battleTransitionStarted = false;
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
@@ -69,14 +73,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 3: Monster Targeting", {
+    this.add.text(48, 36, "Stage 4: Battle Transition", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Right-click a monster to approach it.", {
+    this.add.text(50, 66, "Right-click a monster and approach it to enter battle.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -173,6 +177,10 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private selectMonster(monsterId: string): void {
+    if (this.battleTransitionStarted) {
+      return;
+    }
+
     const nextTarget = this.monsterViews.get(monsterId);
     if (!nextTarget) {
       return;
@@ -191,7 +199,12 @@ export class FieldScene extends Phaser.Scene {
       nextTarget.container.x,
       nextTarget.container.y,
     );
-    this.state = distance <= CONTACT_DISTANCE ? "IDLE" : "MOVING";
+    if (distance <= CONTACT_DISTANCE) {
+      this.startBattleTransition();
+      return;
+    }
+
+    this.state = "MOVING";
   }
 
   private movePlayer(delta: number): void {
@@ -205,7 +218,7 @@ export class FieldScene extends Phaser.Scene {
     const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
 
     if (distance <= CONTACT_DISTANCE) {
-      this.state = "IDLE";
+      this.startBattleTransition();
       return;
     }
 
@@ -217,7 +230,7 @@ export class FieldScene extends Phaser.Scene {
         this.player.x + deltaX * ratio,
         this.player.y + deltaY * ratio,
       );
-      this.state = "IDLE";
+      this.startBattleTransition();
       return;
     }
 
@@ -225,6 +238,42 @@ export class FieldScene extends Phaser.Scene {
     const directionY = deltaY / distance;
     this.player.x += directionX * travelDistance;
     this.player.y += directionY * travelDistance;
+  }
+
+  private startBattleTransition(): void {
+    if (this.battleTransitionStarted || !this.targetMonster) {
+      return;
+    }
+
+    this.battleTransitionStarted = true;
+    this.state = "BATTLE";
+    this.updateStatusText();
+
+    const target = this.targetMonster.definition;
+    const battleData: BattleSceneData = {
+      playerName: "Player",
+      playerCurrentHp: PLAYER_MAX_HP,
+      playerMaxHp: PLAYER_MAX_HP,
+      monsterId: target.id,
+      monsterName: target.name,
+      monsterCurrentHp: MONSTER_MAX_HP,
+      monsterMaxHp: MONSTER_MAX_HP,
+    };
+
+    this.scene.pause();
+    this.scene.launch("BattleScene", battleData);
+  }
+
+  public returnFromBattle(): void {
+    if (!this.battleTransitionStarted) {
+      return;
+    }
+
+    this.battleTransitionStarted = false;
+    this.state = "IDLE";
+    this.scene.stop("BattleScene");
+    this.scene.resume();
+    this.updateStatusText();
   }
 
   private updateStatusText(): void {

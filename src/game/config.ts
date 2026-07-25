@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { BattleScene } from "./scenes/BattleScene";
 import { FieldScene } from "./scenes/FieldScene";
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
@@ -13,5 +14,5 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 960,
     height: 540,
   },
-  scene: [FieldScene],
+  scene: [FieldScene, BattleScene],
 };

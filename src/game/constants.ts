@@ -1,5 +1,9 @@
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 540;
+export const PLAYER_RADIUS = 28;
+export const MONSTER_RADIUS = 27;
+export const CONTACT_DISTANCE = PLAYER_RADIUS + MONSTER_RADIUS;
+export const PLAYER_MOVE_SPEED = 180;
 
 export type MonsterDefinition = {
   id: string;

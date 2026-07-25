@@ -4,11 +4,11 @@
   "totalStages": 10,
   "currentStage": 2,
   "currentStageName": "필드 화면에 플레이어와 몬스터 표시",
-  "stageStatus": "review_pending",
-  "activeTask": "2단계 구현 완료 — 사용자 실행 테스트 및 코드 검수 대기",
-  "workingBranch": "stage-02-field-rendering",
-  "completedStages": [1],
-  "approvedStages": [1],
+  "stageStatus": "completed",
+  "activeTask": "2단계 완료 — 3단계 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2],
+  "approvedStages": [1, 2],
   "nextStage": 3,
   "nextStageName": "몬스터 우클릭 선택 및 자동 접근",
   "reviewSubmission": {
@@ -18,6 +18,19 @@
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 2,
+      "branch": "stage-02-field-rendering",
+      "tag": "review-stage-02-v2",
+      "version": 2,
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-26T01:53:51+09:00",
+      "commit": "98da2757670ab2502b1edc2dc6ecf0b1d427cb7f",
+      "userRunTest": "passed",
+      "mainBranchMerged": true
+    },
     {
       "stage": 2,
       "branch": "stage-02-field-rendering",
@@ -47,19 +60,19 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-26T01:53:51+09:00"
   },
   "testing": {
     "npmCi": "passed",
     "typecheck": "passed",
     "build": "passed",
     "responsiveViewport": "passed",
-    "userRunTest": "not_tested",
-    "chatGptCodeReview": "not_reviewed"
+    "userRunTest": "passed",
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-07-26T01:32:07+09:00"
+  "lastUpdated": "2026-07-26T01:53:51+09:00"
 }

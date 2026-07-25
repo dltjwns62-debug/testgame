@@ -11,6 +11,17 @@
   "approvedStages": [],
   "nextStage": 2,
   "nextStageName": "필드 화면에 플레이어와 몬스터 표시",
+  "reviewSubmission": {
+    "branch": "stage-01-project-setup",
+    "tag": "review-stage-01-v1",
+    "version": 1,
+    "submitted": true
+  },
+  "bootstrapMainException": {
+    "occurred": true,
+    "approvedStageCompletion": false,
+    "note": "저장소 최초 생성 과정에서 검수 전에 초기 문서 커밋이 main에 반영됨"
+  },
   "review": {
     "required": true,
     "approved": false,
@@ -19,6 +30,5 @@
   },
   "mainBranchMerged": false,
   "knownIssues": [],
-  "lastCommit": "5b665a3750033162eb61f34dd072ccede24be28f",
   "lastUpdated": "2026-07-26T00:00:00+09:00"
 }

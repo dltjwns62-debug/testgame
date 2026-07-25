@@ -1,0 +1,17 @@
+import Phaser from "phaser";
+import { FieldScene } from "./scenes/FieldScene";
+
+export const gameConfig: Phaser.Types.Core.GameConfig = {
+  type: Phaser.AUTO,
+  width: 960,
+  height: 540,
+  parent: "game-container",
+  backgroundColor: "#315f55",
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 960,
+    height: 540,
+  },
+  scene: [FieldScene],
+};

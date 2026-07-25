@@ -24,7 +24,7 @@
 ## 마지막 작업 커밋
 
 - 커밋 메시지: `docs: prepare project roadmap for review`
-- 마지막 작업 커밋 해시: (커밋 후 기록할 자리)
+- 마지막 작업 커밋 해시: `5b665a3750033162eb61f34dd072ccede24be28f`
 
 ## 현재 알려진 문제
 

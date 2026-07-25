@@ -4,11 +4,11 @@
   "totalStages": 10,
   "currentStage": 3,
   "currentStageName": "몬스터 우클릭 선택 및 자동 접근",
-  "stageStatus": "review_pending",
-  "activeTask": "3단계 구현 완료 — 사용자 실행 테스트 및 코드 검수 대기",
-  "workingBranch": "stage-03-monster-targeting",
-  "completedStages": [1, 2],
-  "approvedStages": [1, 2],
+  "stageStatus": "completed",
+  "activeTask": "3단계 완료 — 4단계 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3],
+  "approvedStages": [1, 2, 3],
   "nextStage": 4,
   "nextStageName": "플레이어와 몬스터 접촉 시 전투 화면 전환",
   "reviewSubmission": {
@@ -23,9 +23,14 @@
       "branch": "stage-03-monster-targeting",
       "tag": "review-stage-03-v1",
       "version": 1,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-26T02:27:16+09:00",
+      "commit": "d4acc8dab457cc23f3fa2993143b421c5b599aab",
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자의 명시적 요청으로 생략",
+      "mainBranchMerged": true
     },
     {
       "stage": 2,
@@ -69,9 +74,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-26T02:27:16+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -79,10 +84,10 @@
     "build": "passed",
     "responsiveViewport": "passed",
     "devServer": "passed",
-    "userRunTest": "not_tested",
-    "chatGptCodeReview": "not_reviewed"
+    "userRunTest": "skipped_by_user",
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-07-26T02:17:01+09:00"
+  "lastUpdated": "2026-07-26T02:27:16+09:00"
 }

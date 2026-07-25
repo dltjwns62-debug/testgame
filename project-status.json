@@ -2,22 +2,31 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 10,
-  "currentStage": 3,
-  "currentStageName": "몬스터 우클릭 선택 및 자동 접근",
-  "stageStatus": "completed",
-  "activeTask": "3단계 완료 — 4단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 4,
+  "currentStageName": "플레이어와 몬스터 접촉 시 전투 화면 전환",
+  "stageStatus": "review_pending",
+  "activeTask": "4단계 구현 완료 — 사용자 실행 테스트 및 코드 검수 대기",
+  "workingBranch": "stage-04-battle-transition",
   "completedStages": [1, 2, 3],
   "approvedStages": [1, 2, 3],
-  "nextStage": 4,
-  "nextStageName": "플레이어와 몬스터 접촉 시 전투 화면 전환",
+  "nextStage": 5,
+  "nextStageName": "기본 자동전투",
   "reviewSubmission": {
-    "branch": "stage-03-monster-targeting",
-    "tag": "review-stage-03-v1",
+    "branch": "stage-04-battle-transition",
+    "tag": "review-stage-04-v1",
     "version": 1,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 4,
+      "branch": "stage-04-battle-transition",
+      "tag": "review-stage-04-v1",
+      "version": 1,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null
+    },
     {
       "stage": 3,
       "branch": "stage-03-monster-targeting",
@@ -74,9 +83,9 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-26T02:27:16+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
@@ -84,10 +93,11 @@
     "build": "passed",
     "responsiveViewport": "passed",
     "devServer": "passed",
-    "userRunTest": "skipped_by_user",
-    "chatGptCodeReview": "approved"
+    "browserAutomation": "passed",
+    "userRunTest": "not_tested",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [],
-  "lastUpdated": "2026-07-26T02:27:16+09:00"
+  "lastUpdated": "2026-07-26T02:40:34+09:00"
 }

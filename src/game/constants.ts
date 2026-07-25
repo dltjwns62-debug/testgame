@@ -4,6 +4,8 @@ export const PLAYER_RADIUS = 28;
 export const MONSTER_RADIUS = 27;
 export const CONTACT_DISTANCE = PLAYER_RADIUS + MONSTER_RADIUS;
 export const PLAYER_MOVE_SPEED = 180;
+export const PLAYER_MAX_HP = 100;
+export const MONSTER_MAX_HP = 50;
 
 export type MonsterDefinition = {
   id: string;

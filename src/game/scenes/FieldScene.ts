@@ -291,6 +291,7 @@ export class FieldScene extends Phaser.Scene {
 
   public applyBattleResult(result: BattleResult): void {
     if (
+      !result ||
       !this.battleTransitionStarted ||
       this.battleResultApplied ||
       !this.targetMonster ||
@@ -304,15 +305,33 @@ export class FieldScene extends Phaser.Scene {
       return;
     }
 
-    this.battleResultApplied = true;
+    if (result.outcome !== "VICTORY" && result.outcome !== "DEFEAT") {
+      return;
+    }
 
     if (result.outcome === "VICTORY") {
-      const reward = this.sanitizeGold(result.goldReward);
-      this.playerGold += reward;
+      const expectedReward = targetMonster.definition.goldReward;
+      if (
+        !Number.isSafeInteger(expectedReward) ||
+        expectedReward < 0 ||
+        result.goldReward !== expectedReward
+      ) {
+        return;
+      }
+
+      this.battleResultApplied = true;
+      this.playerGold += expectedReward;
       this.hideMonster(targetMonster);
       this.targetMonster = null;
       this.scheduleRespawn(targetMonster);
+      return;
     }
+
+    if (result.goldReward !== 0) {
+      return;
+    }
+
+    this.battleResultApplied = true;
   }
 
   private enableMonsterInteraction(monster: MonsterView): void {
@@ -356,10 +375,6 @@ export class FieldScene extends Phaser.Scene {
         monster.respawnEvent = null;
       }
     });
-  }
-
-  private sanitizeGold(value: number): number {
-    return Number.isSafeInteger(value) && value >= 0 ? value : 0;
   }
 
   private updateStatusText(): void {

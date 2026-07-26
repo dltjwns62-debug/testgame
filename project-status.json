@@ -4,11 +4,11 @@
   "totalStages": 17,
   "currentStage": 8,
   "currentStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
-  "stageStatus": "review_pending",
-  "activeTask": "8단계 동료 지원 타깃 기억 수정 완료 — review-stage-08-v3 검수 대기 중",
-  "workingBranch": "stage-08-auto-hunt-controls",
-  "completedStages": [1, 2, 3, 4, 5, 6, 7],
-  "approvedStages": [1, 2, 3, 4, 5, 6, 7],
+  "stageStatus": "completed",
+  "activeTask": "8단계 완료 — 9단계 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8],
+  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8],
   "nextStage": 9,
   "nextStageName": "유닛 스킬과 단일 선택 전용 스킬 UI",
   "reviewSubmission": {
@@ -24,13 +24,14 @@
       "tag": "review-stage-08-v3",
       "version": 3,
       "submitted": true,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
-      "commit": null,
-      "userRunTest": "not_tested",
-      "mainBranchMerged": false
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-26T22:22:07+09:00",
+      "commit": "80bb01a6c4857ace14b1ebc619d3082a497f482e",
+      "reason": "Auto Hunt ON/OFF, 수동 명령 우선 처리, 지역 동료 지원, 근접 사거리 조정과 지원 타깃 분산이 코드 검수 및 사용자 실행 테스트를 통과함",
+      "userRunTest": "passed",
+      "mainBranchMerged": true
     },
     {
       "stage": 8,
@@ -259,9 +260,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-26T22:22:07+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -269,12 +270,12 @@
     "build": "passed",
     "devServer": "passed",
     "browserAutomation": "not_tested",
-    "userRunTest": "not_tested",
-    "chatGptCodeReview": "not_reviewed"
+    "userRunTest": "passed",
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T21:41:39+09:00"
+  "lastUpdated": "2026-07-26T22:22:07+09:00"
 }

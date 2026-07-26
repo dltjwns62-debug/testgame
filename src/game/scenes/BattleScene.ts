@@ -141,6 +141,11 @@ export class BattleScene extends Phaser.Scene {
     this.combatState = "RUNNING";
     this.resultCommitted = false;
     this.dataError = null;
+    this.sourceWorldMonsterId = "unknown-monster";
+    this.enemyDefinitionId = "unknown-enemy";
+    this.enemyDisplayName = "Unknown enemy";
+    this.enemyColor = 0x64748b;
+    this.goldReward = 0;
     this.units.clear();
     this.unitVisuals.clear();
     this.slotVisuals.clear();
@@ -258,13 +263,13 @@ export class BattleScene extends Phaser.Scene {
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "14px",
     });
-    this.statusText = this.add.text(670, 18, "", {
+    this.statusText = this.add.text(730, 14, "", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "15px",
       fontStyle: "bold",
       align: "right",
-    }).setOrigin(0, 0);
+    }).setOrigin(1, 0);
   }
 
   private addArenaInteraction(): void {

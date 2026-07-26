@@ -19,7 +19,7 @@
 - 6단계 최초 검수 태그: `review-stage-06-v1` — 수정 요청
 - 6단계 현재 검수 태그: `review-stage-06-v2`
 - 6단계 완료 태그: `stage-06-completed`
-- 7단계 현재 검수 태그: `review-stage-07-v1`
+- 7단계 현재 검수 태그: `review-stage-07-v2`
 - 다음 단계: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계
@@ -299,7 +299,7 @@
 
 ### 단계 상태
 
-`review_pending` — 구현 완료, 사용자 실행 테스트 및 ChatGPT 코드 검수 대기. 작업 브랜치: `stage-07-rts-battle-core`
+`review_pending` — 구현 완료, 사용자 실행 테스트 및 ChatGPT 코드 검수 대기. 작업 브랜치: `stage-07-rts-battle-core`, 재검수 태그: `review-stage-07-v2`
 
 ### 목표
 

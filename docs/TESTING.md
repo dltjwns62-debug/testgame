@@ -283,7 +283,7 @@ http://localhost:5173
 
 7단계 자동 브라우저 검사: 통과
 7단계 사용자 실행 테스트: 미실시 (`not_tested`)
-7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v2`
 7단계 `main` 반영: 미반영
 
 자동 브라우저 확인 내용:

@@ -5,7 +5,7 @@
   "currentStage": 7,
   "currentStageName": "10대10 RTS 핵심 전투",
   "stageStatus": "review_pending",
-  "activeTask": "7단계 구현 완료 — 사용자 실행 테스트 및 코드 검수 대기",
+  "activeTask": "7단계 검수 지적 사항 수정 완료 — 재검수 대기",
   "workingBranch": "stage-07-rts-battle-core",
   "completedStages": [1, 2, 3, 4, 5, 6],
   "approvedStages": [1, 2, 3, 4, 5, 6],
@@ -13,21 +13,33 @@
   "nextStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
   "reviewSubmission": {
     "branch": "stage-07-rts-battle-core",
-    "tag": "review-stage-07-v1",
-    "version": 1,
+    "tag": "review-stage-07-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
     {
       "stage": 7,
       "branch": "stage-07-rts-battle-core",
-      "tag": "review-stage-07-v1",
-      "version": 1,
+      "tag": "review-stage-07-v2",
+      "version": 2,
       "approved": false,
       "result": "review_pending",
       "reviewer": null,
       "commit": null,
       "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v1",
+      "version": 1,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "0d47a93bd30d8c84e80ace9f577e3ad48fd56d93",
+      "reason": "월드맵 몬스터와 전투 적군 ID가 단일 기준으로 보장되지 않고, 가장자리 대형 좌표 중복 및 하단 UI 겹침 문제가 있음",
       "mainBranchMerged": false
     },
     {

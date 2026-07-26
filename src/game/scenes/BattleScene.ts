@@ -417,10 +417,16 @@ export class BattleScene extends Phaser.Scene {
       const hadTarget = Boolean(unit.currentTargetId);
       const currentTarget = this.getAliveEnemy(unit.currentTargetId);
       let targetLost = false;
+      if (!currentTarget && unit.commandMode === "FOCUS_ATTACK") {
+        unit.commandMode = "LOCAL_ENGAGE";
+      }
       if (unit.currentTargetId && !currentTarget) {
         targetLost = true;
         unit.currentTargetId = null;
         unit.attackElapsedMs = 0;
+        if (unit.commandMode === "FOCUS_ATTACK") {
+          unit.commandMode = "LOCAL_ENGAGE";
+        }
         if (unit.commandMode === "ATTACK_MOVE" && unit.commandDestination) {
           unit.moveDestination = unit.commandDestination;
         }
@@ -467,7 +473,7 @@ export class BattleScene extends Phaser.Scene {
 
   private chooseAllyTarget(unit: RTSBattleUnit, targetLost: boolean): RTSBattleUnit | null {
     if (unit.commandMode === "FOCUS_ATTACK") {
-      return this.findPreferredEnemyTarget(unit);
+      return null;
     }
 
     const retaliationTarget = this.getRetaliationTarget(unit);
@@ -609,13 +615,16 @@ export class BattleScene extends Phaser.Scene {
     target.currentHp = Math.max(0, target.currentHp - attacker.attackDamage);
     target.lastAttackerId = attacker.battleUnitId;
     target.lastAttackedAt = this.combatTimeMs;
-    if (target.team === "ALLY" &&
-      !this.getAliveEnemy(target.currentTargetId) &&
-      target.commandMode !== "FOCUS_ATTACK") {
+    const activeTarget = this.getAliveEnemy(target.currentTargetId);
+    if (target.team === "ALLY" && !activeTarget) {
       target.currentTargetId = attacker.battleUnitId;
-      target.commandMode = "LOCAL_ENGAGE";
-      target.commandDestination = null;
-      target.moveDestination = null;
+      if (target.commandMode === "ATTACK_MOVE") {
+        target.moveDestination = null;
+      } else {
+        target.commandMode = "LOCAL_ENGAGE";
+        target.commandDestination = null;
+        target.moveDestination = null;
+      }
       target.attackElapsedMs = 0;
     }
     this.addAttackLog(`${attacker.displayName} dealt ${attacker.attackDamage} to ${target.displayName}.`);

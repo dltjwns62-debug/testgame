@@ -4,7 +4,7 @@ export type UnitRole = "MAIN_CHARACTER" | "MERCENARY";
 export type BattleTeam = "ALLY" | "ENEMY";
 export type BattleUnitState = "IDLE" | "MOVING" | "CHASING" | "ATTACKING" | "DEAD";
 export type BattleOutcome = "VICTORY" | "DEFEAT";
-export type AllyCommandMode = "NONE" | "ATTACK_MOVE" | "FOCUS_ATTACK" | "LOCAL_ENGAGE";
+export type AllyCommandMode = "NONE" | "MOVE" | "ATTACK_MOVE" | "FOCUS_ATTACK" | "LOCAL_ENGAGE";
 
 export type BattlePosition = {
   x: number;

@@ -414,6 +414,11 @@ export class BattleScene extends Phaser.Scene {
         continue;
       }
 
+      if (unit.commandMode === "MOVE") {
+        this.updateUnitOnMoveCommand(unit, deltaMs);
+        continue;
+      }
+
       const hadTarget = Boolean(unit.currentTargetId);
       const currentTarget = this.getAliveEnemy(unit.currentTargetId);
       let targetLost = false;
@@ -460,6 +465,33 @@ export class BattleScene extends Phaser.Scene {
         unit.state = "IDLE";
       }
     }
+  }
+
+  private updateUnitOnMoveCommand(unit: RTSBattleUnit, deltaMs: number): void {
+    unit.currentTargetId = null;
+    unit.attackElapsedMs = 0;
+    unit.state = "MOVING";
+
+    if (!unit.commandDestination) {
+      this.finishMoveCommand(unit);
+      return;
+    }
+
+    unit.moveDestination = unit.commandDestination;
+    if (moveToward(unit, unit.commandDestination, deltaMs)) {
+      this.finishMoveCommand(unit);
+    }
+  }
+
+  private finishMoveCommand(unit: RTSBattleUnit): void {
+    unit.moveDestination = null;
+    unit.commandDestination = null;
+    unit.currentTargetId = null;
+    unit.attackElapsedMs = 0;
+    unit.commandMode = "NONE";
+    unit.lastAttackerId = null;
+    unit.lastAttackedAt = 0;
+    unit.state = "IDLE";
   }
 
   private getAliveEnemy(unitId: string | null): RTSBattleUnit | null {
@@ -616,7 +648,7 @@ export class BattleScene extends Phaser.Scene {
     target.lastAttackerId = attacker.battleUnitId;
     target.lastAttackedAt = this.combatTimeMs;
     const activeTarget = this.getAliveEnemy(target.currentTargetId);
-    if (target.team === "ALLY" && !activeTarget) {
+    if (target.team === "ALLY" && target.commandMode !== "MOVE" && !activeTarget) {
       target.currentTargetId = attacker.battleUnitId;
       if (target.commandMode === "ATTACK_MOVE") {
         target.moveDestination = null;
@@ -707,9 +739,11 @@ export class BattleScene extends Phaser.Scene {
     selected.forEach((unit, index) => {
       unit.currentTargetId = null;
       unit.attackElapsedMs = 0;
-      unit.commandMode = "ATTACK_MOVE";
+      unit.commandMode = "MOVE";
       unit.commandDestination = destinations[index];
       unit.moveDestination = destinations[index];
+      unit.lastAttackerId = null;
+      unit.lastAttackedAt = 0;
       unit.state = "MOVING";
     });
     this.addAttackLog(`Move order issued to ${selected.length} allied units.`);
@@ -728,6 +762,8 @@ export class BattleScene extends Phaser.Scene {
       unit.commandDestination = null;
       unit.moveDestination = null;
       unit.attackElapsedMs = 0;
+      unit.lastAttackerId = null;
+      unit.lastAttackedAt = 0;
       unit.state = "CHASING";
     });
     this.addAttackLog(`Attack order issued against ${enemy.displayName}.`);

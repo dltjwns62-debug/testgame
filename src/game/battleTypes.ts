@@ -6,4 +6,16 @@ export type BattleSceneData = {
   monsterName: string;
   monsterCurrentHp: number;
   monsterMaxHp: number;
+  monsterAttackDamage: number;
+  monsterAttackIntervalMs: number;
+  goldReward: number;
+};
+
+export type BattleOutcome = "VICTORY" | "DEFEAT";
+
+export type BattleResult = {
+  outcome: BattleOutcome;
+  monsterId: string;
+  monsterName: string;
+  goldReward: number;
 };

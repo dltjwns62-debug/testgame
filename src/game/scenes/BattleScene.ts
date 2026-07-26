@@ -6,7 +6,9 @@ import {
   RTS_ALLY_COUNT,
   RTS_ARENA_BOUNDS,
   RTS_ENEMY_COUNT,
+  RTS_LOCAL_ENGAGEMENT_RANGE,
   RTS_MAX_COMBAT_DELTA_MS,
+  RTS_RETALIATION_MEMORY_MS,
   RTS_SELECTION_DRAG_THRESHOLD_PX,
 } from "../constants";
 import { createEnemyIds, getEnemyDefinition, getTrialUnitStats } from "../rtsBattleDefinitions";
@@ -26,6 +28,7 @@ import {
   findNearestAliveUnit,
   isPointInRectangle,
   moveToward,
+  requiredAttackDistance,
   separateNearbyUnits,
 } from "../rtsBattleUtils";
 import type { FieldScene } from "./FieldScene";
@@ -55,6 +58,7 @@ export class BattleScene extends Phaser.Scene {
   private combatState: CombatState = "RUNNING";
   private dataError: string | null = null;
   private resultCommitted = false;
+  private combatTimeMs = 0;
   private sourceWorldMonsterId = "unknown-monster";
   private enemyDefinitionId = "slime-1";
   private enemyDisplayName = "Slime 1";
@@ -124,6 +128,7 @@ export class BattleScene extends Phaser.Scene {
     const safeDelta = Number.isFinite(delta)
       ? Math.min(Math.max(delta, 0), RTS_MAX_COMBAT_DELTA_MS)
       : 0;
+    this.combatTimeMs += safeDelta;
     this.updateAllies(safeDelta);
     if (this.combatState === "RUNNING") {
       this.updateEnemies(safeDelta);
@@ -141,6 +146,7 @@ export class BattleScene extends Phaser.Scene {
     this.combatState = "RUNNING";
     this.resultCommitted = false;
     this.dataError = null;
+    this.combatTimeMs = 0;
     this.sourceWorldMonsterId = "unknown-monster";
     this.enemyDefinitionId = "unknown-enemy";
     this.enemyDisplayName = "Unknown enemy";
@@ -207,6 +213,10 @@ export class BattleScene extends Phaser.Scene {
       state: "IDLE",
       currentTargetId: null,
       moveDestination: null,
+      commandMode: "NONE",
+      commandDestination: null,
+      lastAttackerId: null,
+      lastAttackedAt: 0,
       isAlive: true,
       slotIndex: entry.slotIndex,
       skills: [],
@@ -238,6 +248,10 @@ export class BattleScene extends Phaser.Scene {
       state: "IDLE",
       currentTargetId: null,
       moveDestination: null,
+      commandMode: "NONE",
+      commandDestination: null,
+      lastAttackerId: null,
+      lastAttackedAt: 0,
       isAlive: true,
       slotIndex: null,
       skills: [],
@@ -400,28 +414,124 @@ export class BattleScene extends Phaser.Scene {
         continue;
       }
 
-      if (unit.currentTargetId) {
-        const target = this.units.get(unit.currentTargetId);
-        if (!target?.isAlive) {
-          unit.currentTargetId = null;
-          unit.state = "IDLE";
-          unit.attackElapsedMs = 0;
-        } else {
-          this.updateUnitAgainstTarget(unit, target, deltaMs);
-          continue;
+      const hadTarget = Boolean(unit.currentTargetId);
+      const currentTarget = this.getAliveEnemy(unit.currentTargetId);
+      let targetLost = false;
+      if (unit.currentTargetId && !currentTarget) {
+        targetLost = true;
+        unit.currentTargetId = null;
+        unit.attackElapsedMs = 0;
+        if (unit.commandMode === "ATTACK_MOVE" && unit.commandDestination) {
+          unit.moveDestination = unit.commandDestination;
         }
       }
 
-      if (unit.moveDestination) {
+      if (currentTarget) {
+        this.updateUnitAgainstTarget(unit, currentTarget, deltaMs);
+        continue;
+      }
+
+      const nextTarget = this.chooseAllyTarget(unit, targetLost && hadTarget);
+      if (nextTarget) {
+        this.assignAllyTarget(unit, nextTarget);
+        this.updateUnitAgainstTarget(unit, nextTarget, deltaMs);
+        continue;
+      }
+
+      if (unit.commandMode === "ATTACK_MOVE" && unit.commandDestination) {
         unit.state = "MOVING";
-        if (moveToward(unit, unit.moveDestination, deltaMs)) {
+        if (moveToward(unit, unit.commandDestination, deltaMs)) {
           unit.moveDestination = null;
+          unit.commandDestination = null;
+          unit.commandMode = "NONE";
           unit.state = "IDLE";
         }
       } else {
+        unit.moveDestination = null;
+        if (unit.commandMode === "LOCAL_ENGAGE") {
+          unit.commandMode = "NONE";
+        }
         unit.state = "IDLE";
       }
     }
+  }
+
+  private getAliveEnemy(unitId: string | null): RTSBattleUnit | null {
+    if (!unitId) {
+      return null;
+    }
+
+    const unit = this.units.get(unitId);
+    return unit?.isAlive && unit.team === "ENEMY" ? unit : null;
+  }
+
+  private chooseAllyTarget(unit: RTSBattleUnit, targetLost: boolean): RTSBattleUnit | null {
+    if (unit.commandMode === "FOCUS_ATTACK") {
+      return this.findPreferredEnemyTarget(unit);
+    }
+
+    const retaliationTarget = this.getRetaliationTarget(unit);
+    if (retaliationTarget) {
+      return retaliationTarget;
+    }
+
+    if (targetLost || unit.commandMode === "ATTACK_MOVE" || unit.commandMode === "LOCAL_ENGAGE") {
+      return this.findPreferredEnemyTarget(unit, RTS_LOCAL_ENGAGEMENT_RANGE);
+    }
+
+    return null;
+  }
+
+  private getRetaliationTarget(unit: RTSBattleUnit): RTSBattleUnit | null {
+    if (!unit.lastAttackerId ||
+      this.combatTimeMs - unit.lastAttackedAt > RTS_RETALIATION_MEMORY_MS) {
+      return null;
+    }
+
+    const attacker = this.getAliveEnemy(unit.lastAttackerId);
+    if (!attacker || distanceBetween(unit.position, attacker.position) > RTS_LOCAL_ENGAGEMENT_RANGE) {
+      return null;
+    }
+
+    return attacker;
+  }
+
+  private findPreferredEnemyTarget(
+    unit: RTSBattleUnit,
+    maxDistance = Number.POSITIVE_INFINITY,
+  ): RTSBattleUnit | null {
+    const targetCounts = new Map<string, number>();
+    for (const ally of this.getAliveUnits("ALLY")) {
+      if (ally.currentTargetId && this.getAliveEnemy(ally.currentTargetId)) {
+        targetCounts.set(ally.currentTargetId, (targetCounts.get(ally.currentTargetId) ?? 0) + 1);
+      }
+    }
+
+    const candidates = this.getAliveUnits("ENEMY")
+      .map((candidate) => ({
+        candidate,
+        distance: distanceBetween(unit.position, candidate.position),
+        assignedCount: targetCounts.get(candidate.battleUnitId) ?? 0,
+      }))
+      .filter(({ distance }) => Number.isFinite(distance) && distance <= maxDistance)
+      .sort((first, second) => (
+        first.assignedCount - second.assignedCount ||
+        first.distance - second.distance ||
+        first.candidate.battleUnitId.localeCompare(second.candidate.battleUnitId)
+      ));
+
+    return candidates[0]?.candidate ?? null;
+  }
+
+  private assignAllyTarget(unit: RTSBattleUnit, target: RTSBattleUnit): void {
+    if (!unit.isAlive || unit.team !== "ALLY" || !target.isAlive || target.team !== "ENEMY") {
+      return;
+    }
+
+    unit.currentTargetId = target.battleUnitId;
+    unit.moveDestination = null;
+    unit.attackElapsedMs = 0;
+    unit.state = "CHASING";
   }
 
   private updateEnemies(deltaMs: number): void {
@@ -448,11 +558,11 @@ export class BattleScene extends Phaser.Scene {
 
   private updateUnitAgainstTarget(unit: RTSBattleUnit, target: RTSBattleUnit, deltaMs: number): void {
     const distance = distanceBetween(unit.position, target.position);
-    const attackDistance = unit.attackRange + target.collisionRadius;
+    const attackDistance = requiredAttackDistance(unit, target);
     if (distance > attackDistance) {
       unit.state = "CHASING";
       unit.attackElapsedMs = 0;
-      moveToward(unit, target.position, deltaMs);
+      moveToward(unit, this.getAttackApproachPosition(unit, target, attackDistance), deltaMs);
       return;
     }
 
@@ -464,18 +574,50 @@ export class BattleScene extends Phaser.Scene {
     }
   }
 
+  private getAttackApproachPosition(
+    attacker: RTSBattleUnit,
+    target: RTSBattleUnit,
+    requiredDistance: number,
+  ): BattlePosition {
+    const targetPosition = constrainToArena(target.position, target.collisionRadius);
+    const attackerPosition = constrainToArena(attacker.position, attacker.collisionRadius);
+    const deltaX = targetPosition.x - attackerPosition.x;
+    const deltaY = targetPosition.y - attackerPosition.y;
+    const distance = Math.hypot(deltaX, deltaY);
+    if (!Number.isFinite(distance) || distance <= 0) {
+      return targetPosition;
+    }
+
+    const safeDistance = Number.isFinite(requiredDistance) ? Math.max(0, requiredDistance) : 0;
+    return constrainToArena({
+      x: targetPosition.x - (deltaX / distance) * safeDistance,
+      y: targetPosition.y - (deltaY / distance) * safeDistance,
+    }, attacker.collisionRadius);
+  }
+
   private applyDamage(attacker: RTSBattleUnit, target: RTSBattleUnit): void {
     if (
       this.combatState !== "RUNNING" ||
       !attacker.isAlive ||
       !target.isAlive ||
       this.units.get(target.battleUnitId) !== target ||
-      distanceBetween(attacker.position, target.position) > attacker.attackRange + target.collisionRadius
+      distanceBetween(attacker.position, target.position) > requiredAttackDistance(attacker, target)
     ) {
       return;
     }
 
     target.currentHp = Math.max(0, target.currentHp - attacker.attackDamage);
+    target.lastAttackerId = attacker.battleUnitId;
+    target.lastAttackedAt = this.combatTimeMs;
+    if (target.team === "ALLY" &&
+      !this.getAliveEnemy(target.currentTargetId) &&
+      target.commandMode !== "FOCUS_ATTACK") {
+      target.currentTargetId = attacker.battleUnitId;
+      target.commandMode = "LOCAL_ENGAGE";
+      target.commandDestination = null;
+      target.moveDestination = null;
+      target.attackElapsedMs = 0;
+    }
     this.addAttackLog(`${attacker.displayName} dealt ${attacker.attackDamage} to ${target.displayName}.`);
     if (target.currentHp === 0) {
       target.isAlive = false;
@@ -556,6 +698,8 @@ export class BattleScene extends Phaser.Scene {
     selected.forEach((unit, index) => {
       unit.currentTargetId = null;
       unit.attackElapsedMs = 0;
+      unit.commandMode = "ATTACK_MOVE";
+      unit.commandDestination = destinations[index];
       unit.moveDestination = destinations[index];
       unit.state = "MOVING";
     });
@@ -571,6 +715,8 @@ export class BattleScene extends Phaser.Scene {
 
     selected.forEach((unit) => {
       unit.currentTargetId = enemyId;
+      unit.commandMode = "FOCUS_ATTACK";
+      unit.commandDestination = null;
       unit.moveDestination = null;
       unit.attackElapsedMs = 0;
       unit.state = "CHASING";

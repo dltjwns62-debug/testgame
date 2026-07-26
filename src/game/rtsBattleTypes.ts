@@ -4,6 +4,7 @@ export type UnitRole = "MAIN_CHARACTER" | "MERCENARY";
 export type BattleTeam = "ALLY" | "ENEMY";
 export type BattleUnitState = "IDLE" | "MOVING" | "CHASING" | "ATTACKING" | "DEAD";
 export type BattleOutcome = "VICTORY" | "DEFEAT";
+export type AllyCommandMode = "NONE" | "ATTACK_MOVE" | "FOCUS_ATTACK" | "LOCAL_ENGAGE";
 
 export type BattlePosition = {
   x: number;
@@ -37,6 +38,10 @@ export type RTSBattleUnit = {
   state: BattleUnitState;
   currentTargetId: string | null;
   moveDestination: BattlePosition | null;
+  commandMode: AllyCommandMode;
+  commandDestination: BattlePosition | null;
+  lastAttackerId: string | null;
+  lastAttackedAt: number;
   isAlive: boolean;
   slotIndex: number | null;
   skills: string[];

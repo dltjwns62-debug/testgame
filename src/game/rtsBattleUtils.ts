@@ -82,6 +82,7 @@ export function createFormationDestinations(
 export function findNearestAliveUnit(
   source: RTSBattleUnit,
   candidates: Iterable<RTSBattleUnit>,
+  maxDistance = Number.POSITIVE_INFINITY,
 ): RTSBattleUnit | null {
   let nearest: RTSBattleUnit | null = null;
   let nearestDistance = Number.POSITIVE_INFINITY;
@@ -92,13 +93,28 @@ export function findNearestAliveUnit(
     }
 
     const distance = distanceBetween(source.position, candidate.position);
-    if (distance < nearestDistance) {
+    if (distance > maxDistance) {
+      continue;
+    }
+
+    if (distance < nearestDistance ||
+      (distance === nearestDistance && candidate.battleUnitId < (nearest?.battleUnitId ?? ""))) {
       nearest = candidate;
       nearestDistance = distance;
     }
   }
 
   return nearest;
+}
+
+export function requiredAttackDistance(
+  attacker: RTSBattleUnit,
+  target: RTSBattleUnit,
+): number {
+  const attackRange = Number.isFinite(attacker.attackRange) ? Math.max(0, attacker.attackRange) : 0;
+  const attackerRadius = Number.isFinite(attacker.collisionRadius) ? Math.max(0, attacker.collisionRadius) : 0;
+  const targetRadius = Number.isFinite(target.collisionRadius) ? Math.max(0, target.collisionRadius) : 0;
+  return attackRange + attackerRadius + targetRadius;
 }
 
 export function moveToward(
@@ -134,6 +150,9 @@ export function separateNearbyUnits(units: Iterable<RTSBattleUnit>): void {
     for (let secondIndex = firstIndex + 1; secondIndex < aliveUnits.length; secondIndex += 1) {
       const first = aliveUnits[firstIndex];
       const second = aliveUnits[secondIndex];
+      if (first.team !== second.team) {
+        continue;
+      }
       first.position = constrainToArena(first.position, first.collisionRadius);
       second.position = constrainToArena(second.position, second.collisionRadius);
       const deltaX = second.position.x - first.position.x;

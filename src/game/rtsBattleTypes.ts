@@ -5,6 +5,7 @@ export type BattleTeam = "ALLY" | "ENEMY";
 export type BattleUnitState = "IDLE" | "MOVING" | "CHASING" | "ATTACKING" | "DEAD";
 export type BattleOutcome = "VICTORY" | "DEFEAT";
 export type AllyCommandMode = "NONE" | "MOVE" | "ATTACK_MOVE" | "FOCUS_ATTACK" | "LOCAL_ENGAGE" | "AUTO_HUNT";
+export type UnitSkillId = "whirlwind" | "first-aid";
 
 export type BattlePosition = {
   x: number;
@@ -25,6 +26,7 @@ export type RTSBattleUnit = {
   unitRole: UnitRole;
   definitionId: string;
   displayName: string;
+  color: number;
   sourceWorldMonsterId: string | null;
   currentHp: number;
   maxHp: number;
@@ -44,7 +46,8 @@ export type RTSBattleUnit = {
   lastAttackedAt: number;
   isAlive: boolean;
   slotIndex: number | null;
-  skills: string[];
+  skills: UnitSkillId[];
+  skillReadyAtMs: Partial<Record<UnitSkillId, number>>;
 };
 
 export type RTSBattleSceneData = {

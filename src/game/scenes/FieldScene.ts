@@ -79,14 +79,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 7: 10v10 RTS Battle Core", {
+    this.add.text(48, 36, "Stage 9: Unit Skills", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Command a trial squad against the selected monster group.", {
+    this.add.text(50, 66, "Enter battle to test single-unit skill controls.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",

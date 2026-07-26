@@ -397,3 +397,37 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 [x] Auto Hunt is not present.
 [x] Skills and squad assignment are not present.
 ```
+
+## 8단계 Auto Hunt ON/OFF와 수동 명령 우선 처리 — v1
+
+- 현재 작업 브랜치: `stage-08-auto-hunt-controls`
+- 현재 검수 태그: `review-stage-08-v1`
+- 8단계 상태: 검수 대기 (`review_pending`)
+
+자동 브라우저 확인:
+
+- [x] 기본 Auto Hunt가 OFF로 시작한다.
+- [x] Auto Hunt ON 상태에서 생존 아군 전체가 전역 자동 전투를 수행한다.
+- [x] 수동 MOVE 명령이 Auto Hunt보다 우선 처리된다.
+- [x] Auto Hunt ON/OFF UI와 활성화·비활성화 로그가 표시된다.
+- [x] 브라우저 콘솔에 치명적인 오류·경고가 없다.
+
+사용자 수동 테스트 대기:
+
+```text
+[ ] 필드로 돌아갔다가 다시 전투에 들어와도 Auto Hunt 상태가 유지된다.
+[ ] Auto Hunt OFF에서 수동 MOVE 명령이 정상적으로 유지된다.
+[ ] Auto Hunt OFF에서 수동 FOCUS_ATTACK 명령이 정상적으로 유지된다.
+[ ] Auto Hunt ON에서 수동 MOVE 후 자동 전투가 재개된다.
+[ ] Auto Hunt ON에서 수동 FOCUS_ATTACK 후 지정 대상 우선순위가 유지된다.
+[ ] Auto Hunt ON/OFF 전환 시 수동 명령이 임의로 취소되지 않는다.
+[ ] Auto Hunt OFF에서 자동 유닛만 해제되고 주변 반격은 유지된다.
+[ ] 전투 종료 상태에서 Auto Hunt 버튼이 잘못된 명령을 만들지 않는다.
+[ ] 작은 창에서도 Auto Hunt UI와 전투 화면이 정상적으로 보인다.
+[ ] 게임에 Auto Hunt 외 9단계 스킬 기능이 추가되지 않았다.
+[ ] 브라우저에 치명적인 콘솔 오류가 없다.
+```
+
+8단계 사용자 실행 테스트: 미실시 (`not_tested`)
+8단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 제출 태그: `review-stage-08-v1`
+8단계 `main` 반영: 미반영

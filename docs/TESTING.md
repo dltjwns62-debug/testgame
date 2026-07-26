@@ -283,7 +283,7 @@ http://localhost:5173
 
 7단계 자동 브라우저 검사: 통과
 7단계 사용자 실행 테스트: 미실시 (`not_tested`)
-7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v6`
+7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v7`
 
 ## Stage 7 manual combat response checks — v5
 
@@ -335,6 +335,36 @@ v6 자동 브라우저 확인:
 
 v6 사용자 수동 실행 테스트: 미실시 (`not_tested`)
 7단계 `main` 반영: 미반영
+
+## Stage 7 direct movement controls — v7
+
+```text
+[ ] A selected ally stops its current attack immediately after a floor right-click.
+[ ] The previous attack target is cleared immediately.
+[ ] The selected squad moves to the formation-adjusted destination.
+[ ] An ally keeps moving toward the destination after taking damage.
+[ ] A MOVE ally does not automatically pursue its attacker.
+[ ] A MOVE ally does not acquire nearby enemies before reaching the destination.
+[ ] A MOVE ally becomes IDLE after reaching the destination.
+[ ] After arrival, a newly received attack can use the existing NONE retaliation rule.
+[ ] A floor right-click cancels FOCUS_ATTACK and starts MOVE.
+[ ] An enemy right-click cancels MOVE and starts FOCUS_ATTACK.
+[ ] Direct enemy focus attack remains available.
+[ ] Focus-target loss still uses local engagement rules only.
+[ ] A floor right-click never creates ATTACK_MOVE.
+[ ] No A-key or attack-move UI input is implemented in Stage 7.
+[ ] Auto Hunt remains absent.
+[ ] Allies and enemies are not pushed apart by cross-team separation.
+```
+
+v7 자동 브라우저 확인:
+
+- 바닥 우클릭 직후 전체 선택 아군 슬롯이 `MOVING`으로 표시됨
+- 기존 공격 로그 뒤에 `Move order issued to 10 allied units.`가 기록됨
+- 목적지 도착 후 `IDLE` 상태와 도착 후 새 피격 반응 확인
+- 브라우저 콘솔 오류·경고 없음
+
+v7 사용자 수동 실행 테스트: 미실시 (`not_tested`)
 
 자동 브라우저 확인 내용:
 

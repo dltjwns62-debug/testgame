@@ -5,7 +5,7 @@
   "currentStage": 7,
   "currentStageName": "10대10 RTS 핵심 전투",
   "stageStatus": "review_pending",
-  "activeTask": "7단계 검수 이력 복구 완료 — v4 재검수 대기",
+  "activeTask": "7단계 수동 전투 반응 수정 완료 — v5 재검수 대기",
   "workingBranch": "stage-07-rts-battle-core",
   "completedStages": [1, 2, 3, 4, 5, 6],
   "approvedStages": [1, 2, 3, 4, 5, 6],
@@ -13,22 +13,34 @@
   "nextStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
   "reviewSubmission": {
     "branch": "stage-07-rts-battle-core",
-    "tag": "review-stage-07-v4",
-    "version": 4,
+    "tag": "review-stage-07-v5",
+    "version": 5,
     "submitted": true
   },
   "reviewHistory": [
     {
       "stage": 7,
       "branch": "stage-07-rts-battle-core",
-      "tag": "review-stage-07-v4",
-      "version": 4,
+      "tag": "review-stage-07-v5",
+      "version": 5,
       "approved": false,
       "result": "review_pending",
       "reviewer": null,
-      "commit": "5b74cfbc48517e2e59d2586d0e77bc3cac118d55",
-      "reason": "누락된 review-stage-07-v1 검수 이력을 복구하고 7단계를 재제출함",
+      "commit": "d3a13209bdbfd3b01f987f49e1680d2babaa4498",
+      "reason": "수동 전투 반응과 로컬 교전, 반격, 공격 이동, 팀별 분리 동작을 수정하고 7단계를 재제출함",
       "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v4",
+      "version": 4,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "9626fa14badee0502c34a5c776970829e3cb928c",
+      "reason": "집중 공격 대상 사망 후 재탐색, 반격, 로컬 교전, 공격 이동, 부대 간 분리 동작이 요구사항과 다르게 동작함",
       "mainBranchMerged": false
     },
     {
@@ -191,5 +203,5 @@
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T17:03:22+09:00"
+  "lastUpdated": "2026-07-26T17:30:02+09:00"
 }

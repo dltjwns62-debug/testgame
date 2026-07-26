@@ -283,7 +283,27 @@ http://localhost:5173
 
 7단계 자동 브라우저 검사: 통과
 7단계 사용자 실행 테스트: 미실시 (`not_tested`)
-7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v4`
+7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v5`
+
+## Stage 7 manual combat response checks — v5
+
+```text
+[ ] Selecting all 10 allies and directly right-clicking one enemy focuses the attack on that enemy.
+[ ] A focused target remains selected while it is alive.
+[ ] When the focused target dies, a nearest valid target is selected again.
+[ ] An ally retaliates against the enemy that just attacked it when the attacker is locally valid.
+[ ] Local engagement search is limited to the configured range around the unit.
+[ ] Attack-move orders move toward the destination and scan only nearby enemies while moving.
+[ ] If the attack-move target disappears, the unit resumes its original destination.
+[ ] Without a command, an ally does not scan the entire field for enemies.
+[ ] Multiple allies distribute local targets deterministically when possible.
+[ ] Allies and enemies are not pushed apart by the same-team separation routine.
+[ ] Attack distance includes attacker radius and target radius.
+[ ] Only the attacker moves during approach; the target position is not directly changed.
+[ ] No NaN or Infinity positions occur during movement or combat.
+[ ] VICTORY and DEFEAT still work with one Gold reward or zero Gold.
+[ ] Auto Hunt, skills, shop, formation editing, squads, and experience remain absent.
+```
 7단계 `main` 반영: 미반영
 
 자동 브라우저 확인 내용:

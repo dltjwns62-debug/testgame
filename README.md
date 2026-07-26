@@ -9,7 +9,7 @@
 - 현재 단계 이름: 10대10 RTS 핵심 전투
 - 현재 상태: 검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-07-rts-battle-core`
-- 검수 태그: `review-stage-07-v4`
+- 검수 태그: `review-stage-07-v5`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계
 - 다음 단계: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
 

@@ -28,13 +28,18 @@ export const RTS_SELECTION_DRAG_THRESHOLD_PX = 6;
 export const RTS_MAX_COMBAT_DELTA_MS = 100;
 export const RTS_FORMATION_SPACING = 34;
 export const RTS_LOCAL_ENGAGEMENT_RANGE = 180;
+export const RTS_ALLY_ASSIST_RANGE = 140;
 export const RTS_RETALIATION_MEMORY_MS = 2500;
+export const AUTO_HUNT_REGISTRY_KEY = "testgame.autoHuntEnabled";
+
+// attackRange is the additional melee reach beyond the unit's body radius.
+// The center-to-center attack distance also includes both collision radii.
 export const RTS_TRIAL_MAIN_CHARACTER = {
   maxHp: 120,
   attackDamage: 15,
   attackIntervalMs: 900,
   moveSpeed: 120,
-  attackRange: 34,
+  attackRange: 10,
   collisionRadius: 13,
 };
 export const RTS_TRIAL_MERCENARY = {
@@ -42,14 +47,14 @@ export const RTS_TRIAL_MERCENARY = {
   attackDamage: 8,
   attackIntervalMs: 1100,
   moveSpeed: 100,
-  attackRange: 30,
+  attackRange: 8,
   collisionRadius: 12,
 };
 export const RTS_SLIME_STATS = {
-  slime1: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 26, collisionRadius: 12 },
-  slime2: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 26, collisionRadius: 12 },
-  slime3: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 26, collisionRadius: 12 },
-  slime4: { maxHp: 70, attackDamage: 10, attackIntervalMs: 1000, moveSpeed: 85, attackRange: 28, collisionRadius: 14 },
+  slime1: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
+  slime2: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
+  slime3: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
+  slime4: { maxHp: 70, attackDamage: 10, attackIntervalMs: 1000, moveSpeed: 85, attackRange: 10, collisionRadius: 14 },
 } as const;
 
 export type MonsterDefinition = {

@@ -1,6 +1,6 @@
 # 프로젝트 결정 사항
 
-현재 단계 기준: 6단계 — 승리·패배, 보상, 몬스터 재생성
+현재 단계 기준: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
 
 ## 결정 목록
 
@@ -301,12 +301,52 @@
 - 결정: 7단계 이후 경험치·아이템·저장·온라인 관련 단계는 뒤로 이동한다.
 - 상태: 확정
 
+## 8단계 Auto Hunt 및 수동 명령 결정
+
+- 결정: Auto Hunt의 기본값은 OFF로 시작한다.
+- 결정: Auto Hunt ON은 전투 중 생존 아군 전체에 적용하고, 전역 적 탐색과 자동 전투를 허용한다.
+- 결정: Auto Hunt OFF에서는 자동 명령 유닛만 해제하며 수동 MOVE·FOCUS_ATTACK·ATTACK_MOVE·LOCAL_ENGAGE 명령은 취소하지 않는다.
+- 결정: 수동 MOVE 명령은 Auto Hunt보다 우선하고, 목적지 도착 전에는 자동 타깃 획득을 하지 않는다.
+- 결정: 수동 FOCUS_ATTACK 명령은 Auto Hunt보다 우선하며 지정 대상 생존 중에는 해당 대상을 우선한다.
+- 결정: 수동 명령이 종료된 뒤 Auto Hunt가 ON이면 자동 전투를 재개한다.
+- 결정: Auto Hunt 상태는 Phaser 전역 registry에 저장해 필드 왕복 세션에서 유지한다.
+- 결정: localStorage 기반 영구 저장은 후속 저장 단계로 연기한다.
+- 결정: 월드맵 자동 몬스터 선택, A 키 공격 이동, 스킬·상점·편성·부대 지정·경험치 기능은 이번 단계에서 구현하지 않는다.
+- 결정: 사용자 수동 테스트와 ChatGPT 코드 검수 전까지 8단계는 `review_pending`으로 유지한다.
+- 상태: 확정
+
+## 8단계 v2 동료 지원 및 근접 범위 결정
+
+- 결정: Auto Hunt OFF에서도 공격받은 아군을 중심으로 `RTS_ALLY_ASSIST_RANGE` 안의 대기 아군이 지역 전투에 참여한다.
+- 결정: 동료 지원 범위는 `RTS_ALLY_ASSIST_RANGE = 140`으로 조절 가능하게 관리한다.
+- 결정: 지원 대상은 `RTS_LOCAL_ENGAGEMENT_RANGE` 안의 적만 사용하며 전장 전체 탐색으로 확장하지 않는다.
+- 결정: `NONE`과 유효한 적 대상이 없는 `LOCAL_ENGAGE`만 동료 지원 대상으로 허용한다.
+- 결정: MOVE·FOCUS_ATTACK·ATTACK_MOVE는 동료 지원보다 우선하고, AUTO_HUNT는 기존 자동 전투를 유지한다.
+- 결정: 이미 유효한 적과 싸우는 LOCAL_ENGAGE 유닛의 대상은 불필요하게 변경하지 않는다.
+- 결정: 지원 대상은 현재 타깃 수, 공격자 우선, 지원 유닛과의 거리, battleUnitId 순으로 결정적으로 분산한다.
+- 결정: 현재 모든 전투 유닛은 근접 유닛이며, 원거리 유닛과 투사체는 후속 단계로 연기한다.
+- 결정: attackRange는 몸 반지름을 제외한 추가 무기 도달 거리이며 현재 주인공 10px, 일반 유닛 8px, Slime 4 10px로 설정한다.
+- 결정: 실제 중심점 공격 판정은 공격자 attackRange와 양쪽 collisionRadius를 합산하고 피해 직전에 다시 확인한다.
+- 결정: 정확히 한 명의 생존 아군을 선택했을 때만 `collisionRadius + attackRange` 공격 범위 원과 `Melee reach` 정보를 표시한다.
+- 결정: `review-stage-08-v1`은 수정 요청으로 보존하고 `review-stage-08-v2`로 재제출한다.
+- 상태: 확정
+
+## 8단계 v3 동료 지원 타깃 기억 결정
+
+- 결정: 실제로 공격받은 `attackedAlly` 본인의 `lastAttackerId`와 `lastAttackedAt`은 반격을 위해 유지한다.
+- 결정: 동료 지원으로 참여하는 아군은 실제 피해를 받은 당사자가 아니므로 공격자를 `lastAttackerId`로 기록하지 않는다.
+- 결정: 지원 아군 배정 시 `lastAttackerId = null`, `lastAttackedAt = 0`으로 이전 피격 기억을 제거한다.
+- 결정: 지원 아군의 최초 타깃이 사망해도 최초 공격자 기억 때문에 하나의 적에게 강제 재집결하지 않는다.
+- 결정: 지원 아군은 기존 지역 타깃 분산 규칙으로 `RTS_LOCAL_ENGAGEMENT_RANGE` 안의 다음 적을 탐색한다.
+- 결정: `review-stage-08-v2`는 수정 요청으로 보존하고 `review-stage-08-v3`로 재제출한다.
+- 상태: 확정
+
 ## 공통 단계 정보
 
 - 전체 단계: 17단계
-- 현재 단계: 7단계 — 10대10 RTS 핵심 전투
+- 현재 단계: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
 - 현재 단계 상태: 검수 대기 (`review_pending`)
-- 작업 브랜치: `stage-07-rts-battle-core`
+- 작업 브랜치: `stage-08-auto-hunt-controls`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -320,7 +360,8 @@
 - 6단계 현재 검수 태그: `review-stage-06-v2`
 - 6단계 완료 태그: `stage-06-completed`
 - 7단계 현재 검수 태그: `review-stage-07-v7`
-- 다음 단계: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
+- 8단계 현재 검수 태그: `review-stage-08-v3`
+- 다음 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계
 - 검수 승인: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계 승인
 - `main` 반영: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계 반영 완료

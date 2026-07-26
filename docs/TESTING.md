@@ -397,3 +397,131 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 [x] Auto Hunt is not present.
 [x] Skills and squad assignment are not present.
 ```
+
+## 8단계 Auto Hunt ON/OFF와 수동 명령 우선 처리 — v1
+
+- 현재 작업 브랜치: `stage-08-auto-hunt-controls`
+- 현재 검수 태그: `review-stage-08-v1`
+- 8단계 상태: 검수 대기 (`review_pending`)
+
+자동 브라우저 확인:
+
+- [x] 기본 Auto Hunt가 OFF로 시작한다.
+- [x] Auto Hunt ON 상태에서 생존 아군 전체가 전역 자동 전투를 수행한다.
+- [x] 수동 MOVE 명령이 Auto Hunt보다 우선 처리된다.
+- [x] Auto Hunt ON/OFF UI와 활성화·비활성화 로그가 표시된다.
+- [x] 브라우저 콘솔에 치명적인 오류·경고가 없다.
+
+사용자 수동 테스트 대기:
+
+```text
+[ ] 필드로 돌아갔다가 다시 전투에 들어와도 Auto Hunt 상태가 유지된다.
+[ ] Auto Hunt OFF에서 수동 MOVE 명령이 정상적으로 유지된다.
+[ ] Auto Hunt OFF에서 수동 FOCUS_ATTACK 명령이 정상적으로 유지된다.
+[ ] Auto Hunt ON에서 수동 MOVE 후 자동 전투가 재개된다.
+[ ] Auto Hunt ON에서 수동 FOCUS_ATTACK 후 지정 대상 우선순위가 유지된다.
+[ ] Auto Hunt ON/OFF 전환 시 수동 명령이 임의로 취소되지 않는다.
+[ ] Auto Hunt OFF에서 자동 유닛만 해제되고 주변 반격은 유지된다.
+[ ] 전투 종료 상태에서 Auto Hunt 버튼이 잘못된 명령을 만들지 않는다.
+[ ] 작은 창에서도 Auto Hunt UI와 전투 화면이 정상적으로 보인다.
+[ ] 게임에 Auto Hunt 외 9단계 스킬 기능이 추가되지 않았다.
+[ ] 브라우저에 치명적인 콘솔 오류가 없다.
+```
+
+8단계 사용자 실행 테스트: 미실시 (`not_tested`)
+8단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 제출 태그: `review-stage-08-v1`
+8단계 `main` 반영: 미반영
+
+## 8단계 검수 피드백 수정 — v2
+
+- 현재 작업 브랜치: `stage-08-auto-hunt-controls`
+- 현재 검수 태그: `review-stage-08-v2`
+- 8단계 상태: 검수 대기 (`review_pending`)
+
+자동 검사:
+
+- [x] `npm ci` 통과
+- [x] `npm run typecheck` 통과
+- [x] `npm run build` 통과
+- [x] 개발 서버 HTTP 200 응답 확인 후 종료
+
+브라우저에서 확인한 항목:
+
+- [x] 10대10 전투 화면 진입과 `RUNNING` 상태
+- [x] Auto Hunt 기본값 OFF
+- [x] VICTORY와 DEFEAT 화면 표시
+- [x] 단일 Hero 선택 시 `Hero · Melee reach: 10px` 표시
+- [x] 단일 선택 시 얇은 공격 범위 원 표시
+- [x] 브라우저 콘솔 치명적 오류·경고 없음
+
+사용자 수동 테스트 대기:
+
+```text
+[ ] Auto Hunt OFF에서 한 아군이 공격받으면 주변 대기 아군이 지원한다.
+[ ] 공격받은 아군만 혼자 싸우지 않는다.
+[ ] 지원 범위 밖의 먼 아군은 가만히 있는다.
+[ ] 지원 아군은 지역 전투 범위를 벗어나 전장 전체를 추적하지 않는다.
+[ ] 여러 지원 아군의 대상이 가능한 범위에서 분산된다.
+[ ] MOVE 중인 아군은 동료 지원 때문에 이동을 취소하지 않는다.
+[ ] FOCUS_ATTACK 중인 아군은 동료 지원 때문에 대상을 바꾸지 않는다.
+[ ] 이미 다른 적과 싸우는 아군은 불필요하게 대상을 바꾸지 않는다.
+[ ] Auto Hunt ON 상태의 유닛은 기존 자동전투를 유지한다.
+[ ] 일반 용병과 슬라임이 몸 표면 약 8px 거리에서만 공격한다.
+[ ] 주인공과 Slime 4가 몸 표면 약 10px 거리에서만 공격한다.
+[ ] 사거리 밖에서는 HP가 감소하지 않는다.
+[ ] 공격자가 실제 근접 거리까지 접근한 후 피해가 발생한다.
+[ ] 단일 아군 선택 시 공격 범위 원이 표시된다.
+[ ] 공격 범위 원이 유닛 이동을 따라간다.
+[ ] 다중 선택 시 공격 범위 원이 숨겨진다.
+[ ] 선택 정보에 Melee reach가 표시된다.
+[ ] 공격 범위 원이 마우스 입력을 방해하지 않는다.
+[ ] 10대10 근접 전투가 멈추거나 교착되지 않고 승패까지 진행된다.
+[ ] 아군과 적군이 서로 밀려나지 않는다.
+[ ] Auto Hunt ON/OFF와 수동 명령 우선순위가 계속 정상 작동한다.
+[ ] 필드 왕복 후 Auto Hunt 설정이 유지된다.
+[ ] 콘솔 치명 오류가 없다.
+```
+
+8단계 v2 사용자 실행 테스트: 미실시 (`not_tested`)
+8단계 v2 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+8단계 v2 `main` 반영: 미반영
+
+브라우저에서 직접 확인하지 못한 항목은 통과로 추정하지 않고 사용자 수동 테스트 대기로 유지한다.
+
+## 8단계 동료 지원 타깃 기억 수정 — v3
+
+- 현재 작업 브랜치: `stage-08-auto-hunt-controls`
+- 현재 검수 태그: `review-stage-08-v3`
+- 8단계 상태: 검수 대기 (`review_pending`)
+
+자동 검사:
+
+- [x] `npm ci` 통과
+- [x] `npm run typecheck` 통과
+- [x] `npm run build` 통과
+- [x] 개발 서버 HTTP 200 응답 확인 후 종료
+
+코드 확인:
+
+- [x] 실제 공격받은 `attackedAlly`의 `lastAttackerId`·`lastAttackedAt` 기록은 유지한다.
+- [x] 지원 아군 배정 시 `lastAttackerId = null`, `lastAttackedAt = 0`으로 초기화한다.
+- [x] 지원 아군의 최초 타깃 분산 규칙과 지역 탐색 범위를 유지한다.
+- [x] MOVE·FOCUS_ATTACK·AUTO_HUNT 보호 규칙을 유지한다.
+
+사용자 수동 테스트 대기:
+
+```text
+[ ] Auto Hunt OFF에서 한 아군이 공격받는다.
+[ ] 주변 지원 아군들이 여러 지역 적에게 분산된다.
+[ ] 각 지원 아군의 최초 대상이 사망한다.
+[ ] 지원 아군들이 최초 공격자 하나로 강제 집결하지 않는다.
+[ ] 지원 아군들이 지역 범위 안에서 결정적으로 다음 적을 탐색한다.
+[ ] MOVE 중인 아군은 지원 요청으로 명령을 취소하지 않는다.
+[ ] FOCUS_ATTACK 중인 아군은 지원 요청으로 대상을 바꾸지 않는다.
+[ ] 사거리 밖에서 HP가 감소하지 않는다.
+[ ] 치명적인 콘솔 오류가 없다.
+```
+
+8단계 v3 사용자 실행 테스트: 미실시 (`not_tested`)
+8단계 v3 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+8단계 v3 `main` 반영: 미반영

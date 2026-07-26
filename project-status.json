@@ -2,22 +2,68 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 7,
-  "currentStageName": "10대10 RTS 핵심 전투",
-  "stageStatus": "completed",
-  "activeTask": "7단계 완료 — 8단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 8,
+  "currentStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
+  "stageStatus": "review_pending",
+  "activeTask": "8단계 동료 지원 타깃 기억 수정 완료 — review-stage-08-v3 검수 대기 중",
+  "workingBranch": "stage-08-auto-hunt-controls",
   "completedStages": [1, 2, 3, 4, 5, 6, 7],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7],
-  "nextStage": 8,
-  "nextStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
+  "nextStage": 9,
+  "nextStageName": "유닛 스킬과 단일 선택 전용 스킬 UI",
   "reviewSubmission": {
-    "branch": "stage-07-rts-battle-core",
-    "tag": "review-stage-07-v7",
-    "version": 7,
+    "branch": "stage-08-auto-hunt-controls",
+    "tag": "review-stage-08-v3",
+    "version": 3,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 8,
+      "branch": "stage-08-auto-hunt-controls",
+      "tag": "review-stage-08-v3",
+      "version": 3,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 8,
+      "branch": "stage-08-auto-hunt-controls",
+      "tag": "review-stage-08-v2",
+      "version": 2,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": null,
+      "commit": "e07f8d35735f318868d73798f60cd4c3dc66689e",
+      "codeCommit": "904f9332bc9fee808361793d4c71bcea6d2a12d6",
+      "reason": "동료 지원 아군 전체에 최초 공격자를 lastAttackerId로 기록해, 분산된 지원 대상이 사망한 뒤 반격 우선순위 때문에 다시 한 공격자에게 몰릴 수 있음",
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 8,
+      "branch": "stage-08-auto-hunt-controls",
+      "tag": "review-stage-08-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": null,
+      "commit": "af4a009349efb8c12ac87a0767f7950e697cdc3b",
+      "codeCommit": "d4154bc6d985a7778294ba88c747abdf25c4172b",
+      "reason": "Auto Hunt OFF 상태에서 한 아군이 공격받아도 주변 대기 아군이 지역 전투에 참여하지 않으며, 현재 근접 유닛의 추가 공격 사거리가 26~34px로 넓어 시각적으로 원거리 공격처럼 느껴질 수 있음",
+      "userRunTest": "failed",
+      "mainBranchMerged": false
+    },
     {
       "stage": 7,
       "branch": "stage-07-rts-battle-core",
@@ -213,22 +259,22 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-26T19:20:52+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
     "typecheck": "passed",
     "build": "passed",
     "devServer": "passed",
-    "browserAutomation": "passed",
-    "userRunTest": "passed",
-    "chatGptCodeReview": "approved"
+    "browserAutomation": "not_tested",
+    "userRunTest": "not_tested",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T19:20:52+09:00"
+  "lastUpdated": "2026-07-26T21:41:39+09:00"
 }

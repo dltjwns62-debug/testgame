@@ -283,7 +283,7 @@ http://localhost:5173
 
 7단계 자동 브라우저 검사: 통과
 7단계 사용자 실행 테스트: 미실시 (`not_tested`)
-7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v5`
+7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v6`
 
 ## Stage 7 manual combat response checks — v5
 
@@ -304,6 +304,36 @@ http://localhost:5173
 [ ] VICTORY and DEFEAT still work with one Gold reward or zero Gold.
 [ ] Auto Hunt, skills, shop, formation editing, squads, and experience remain absent.
 ```
+
+## Stage 7 command state transition checks — v6
+
+```text
+[ ] A focused attack keeps the explicitly selected enemy while it is alive.
+[ ] When the focused target dies, FOCUS_ATTACK ends before any retargeting occurs.
+[ ] Focus-target loss searches only within RTS_LOCAL_ENGAGEMENT_RANGE.
+[ ] No focused-target loss causes an immediate full-field enemy search.
+[ ] If no local enemy remains after focus loss, the ally becomes IDLE.
+[ ] An attack-move unit keeps its original commandDestination after being hit.
+[ ] An attack-move unit temporarily stops movement to engage its attacker.
+[ ] After the attacker dies or disappears, the attack-move destination is resumed.
+[ ] A NONE unit changes to LOCAL_ENGAGE when it is attacked.
+[ ] A LOCAL_ENGAGE unit can retaliate without acquiring a full-field target.
+[ ] FOCUS_ATTACK does not switch to a retaliating attacker while its focus target is alive.
+[ ] Cross-team separation and target-position immobility remain unchanged.
+[ ] Attack distance still includes attacker and target collision radii.
+[ ] No NaN or Infinity positions occur during the command transitions.
+[ ] Auto Hunt, skills, shops, formations, squads, and experience remain absent.
+[ ] Browser console has no new fatal errors during the command checks.
+```
+
+v6 자동 브라우저 확인:
+
+- 초기 전투에서 Allies 10/10, Enemies 10/10, `RUNNING` 상태 확인
+- 집중 공격 명령 로그와 공격 이동 명령 로그 확인
+- 브라우저 콘솔 오류·경고 없음 확인
+- 집중 공격 대상 사망 후 지역 재탐색, 공격 이동 중 피격 후 목적지 복귀는 사용자 수동 테스트 필요
+
+v6 사용자 수동 실행 테스트: 미실시 (`not_tested`)
 7단계 `main` 반영: 미반영
 
 자동 브라우저 확인 내용:

@@ -5,7 +5,7 @@
   "currentStage": 7,
   "currentStageName": "10대10 RTS 핵심 전투",
   "stageStatus": "review_pending",
-  "activeTask": "7단계 수동 전투 반응 수정 완료 — v5 재검수 대기",
+  "activeTask": "7단계 집중 공격 종료 및 공격 이동 복귀 상태 수정 완료 — v6 재검수 대기",
   "workingBranch": "stage-07-rts-battle-core",
   "completedStages": [1, 2, 3, 4, 5, 6],
   "approvedStages": [1, 2, 3, 4, 5, 6],
@@ -13,21 +13,34 @@
   "nextStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
   "reviewSubmission": {
     "branch": "stage-07-rts-battle-core",
-    "tag": "review-stage-07-v5",
-    "version": 5,
+    "tag": "review-stage-07-v6",
+    "version": 6,
     "submitted": true
   },
   "reviewHistory": [
     {
       "stage": 7,
       "branch": "stage-07-rts-battle-core",
-      "tag": "review-stage-07-v5",
-      "version": 5,
+      "tag": "review-stage-07-v6",
+      "version": 6,
       "approved": false,
       "result": "review_pending",
       "reviewer": null,
-      "commit": "d3a13209bdbfd3b01f987f49e1680d2babaa4498",
-      "reason": "수동 전투 반응과 로컬 교전, 반격, 공격 이동, 팀별 분리 동작을 수정하고 7단계를 재제출함",
+      "commit": "8294951be4df8db51680d7c5fe85f63d9a8fb5b9",
+      "reason": "집중 공격 종료와 공격 이동 목적지 보존을 수정하고 7단계를 재제출함",
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v5",
+      "version": 5,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "4fcce6eaca971ed155a148fe86ecd6987c4372ed",
+      "reason": "집중 공격 대상 사망 후 FOCUS_ATTACK 상태가 유지되어 전장 전체 적을 추적할 수 있고, 공격 이동 중 피격되면 원래 commandDestination이 삭제됨",
       "userRunTest": "not_tested",
       "mainBranchMerged": false
     },
@@ -203,5 +216,5 @@
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T17:30:02+09:00"
+  "lastUpdated": "2026-07-26T18:12:00+09:00"
 }

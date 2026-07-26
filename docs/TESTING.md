@@ -251,3 +251,124 @@ http://localhost:5173
 - `main` 반영: 완료
 - 치명적인 게임 코드 오류: 없음
 - 비차단 리소스 404: `favicon.ico` 1건
+
+## 7단계 수동 테스트 목록 — 사용자 테스트 미실시
+
+```text
+[ ] 게임이 정상 실행된다.
+[ ] Slime 1 선택 시 Slime 1 적군만 10마리 등장한다.
+[ ] Slime 2 선택 시 Slime 2 적군만 10마리 등장한다.
+[ ] Slime 3 선택 시 Slime 3 적군만 10마리 등장한다.
+[ ] Slime 4 선택 시 Slime 4 적군만 10마리 등장한다.
+[ ] 아군 10마리와 적군 10마리가 서로 다른 진영으로 배치된다.
+[ ] 하단에 1~0 슬롯 10개와 유닛명·상태·HP가 표시된다.
+[ ] 아군 하나를 클릭하면 단일 선택된다.
+[ ] 빈 전장 드래그로 살아 있는 아군만 다중 선택된다.
+[ ] 적군과 죽은 유닛이 다중 선택에 포함되지 않는다.
+[ ] 빈 전장 우클릭으로 선택 아군이 대형을 유지하며 이동한다.
+[ ] 적군 우클릭으로 선택 아군이 해당 적을 추격하고 공격한다.
+[ ] 사거리 밖에서는 피해가 발생하지 않는다.
+[ ] 적군이 가까운 아군을 찾아 자동으로 추격·공격한다.
+[ ] HP 0 유닛은 사망하고 선택에서 제거된다.
+[ ] 적군 전멸 시 VICTORY가 표시된다.
+[ ] 아군 전멸 시 DEFEAT가 표시된다.
+[ ] 주인공만 사망하고 다른 아군이 생존하면 전투가 계속된다.
+[ ] 승리 Gold는 전투당 한 번만 지급된다.
+[ ] 승리 후 월드맵의 선택한 몬스터만 제거되고 약 3초 후 재생성된다.
+[ ] 전투 중 Return to Field 시 보상과 제거가 없다.
+[ ] 자동사냥·스킬·상점·부대 단축키가 아직 없다.
+[ ] 콘솔에 치명적인 게임 오류가 없다.
+[ ] favicon.ico 404 외 새로운 리소스 오류가 없다.
+```
+
+7단계 자동 브라우저 검사: 통과
+7단계 사용자 실행 테스트: 미실시 (`not_tested`)
+7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v7`
+
+## Stage 7 manual combat response checks — v5
+
+```text
+[ ] Selecting all 10 allies and directly right-clicking one enemy focuses the attack on that enemy.
+[ ] A focused target remains selected while it is alive.
+[ ] When the focused target dies, a nearest valid target is selected again.
+[ ] An ally retaliates against the enemy that just attacked it when the attacker is locally valid.
+[ ] Local engagement search is limited to the configured range around the unit.
+[ ] Attack-move orders move toward the destination and scan only nearby enemies while moving.
+[ ] If the attack-move target disappears, the unit resumes its original destination.
+[ ] Without a command, an ally does not scan the entire field for enemies.
+[ ] Multiple allies distribute local targets deterministically when possible.
+[ ] Allies and enemies are not pushed apart by the same-team separation routine.
+[ ] Attack distance includes attacker radius and target radius.
+[ ] Only the attacker moves during approach; the target position is not directly changed.
+[ ] No NaN or Infinity positions occur during movement or combat.
+[ ] VICTORY and DEFEAT still work with one Gold reward or zero Gold.
+[ ] Auto Hunt, skills, shop, formation editing, squads, and experience remain absent.
+```
+
+## Stage 7 command state transition checks — v6
+
+```text
+[ ] A focused attack keeps the explicitly selected enemy while it is alive.
+[ ] When the focused target dies, FOCUS_ATTACK ends before any retargeting occurs.
+[ ] Focus-target loss searches only within RTS_LOCAL_ENGAGEMENT_RANGE.
+[ ] No focused-target loss causes an immediate full-field enemy search.
+[ ] If no local enemy remains after focus loss, the ally becomes IDLE.
+[ ] An attack-move unit keeps its original commandDestination after being hit.
+[ ] An attack-move unit temporarily stops movement to engage its attacker.
+[ ] After the attacker dies or disappears, the attack-move destination is resumed.
+[ ] A NONE unit changes to LOCAL_ENGAGE when it is attacked.
+[ ] A LOCAL_ENGAGE unit can retaliate without acquiring a full-field target.
+[ ] FOCUS_ATTACK does not switch to a retaliating attacker while its focus target is alive.
+[ ] Cross-team separation and target-position immobility remain unchanged.
+[ ] Attack distance still includes attacker and target collision radii.
+[ ] No NaN or Infinity positions occur during the command transitions.
+[ ] Auto Hunt, skills, shops, formations, squads, and experience remain absent.
+[ ] Browser console has no new fatal errors during the command checks.
+```
+
+v6 자동 브라우저 확인:
+
+- 초기 전투에서 Allies 10/10, Enemies 10/10, `RUNNING` 상태 확인
+- 집중 공격 명령 로그와 공격 이동 명령 로그 확인
+- 브라우저 콘솔 오류·경고 없음 확인
+- 집중 공격 대상 사망 후 지역 재탐색, 공격 이동 중 피격 후 목적지 복귀는 사용자 수동 테스트 필요
+
+v6 사용자 수동 실행 테스트: 미실시 (`not_tested`)
+7단계 `main` 반영: 미반영
+
+## Stage 7 direct movement controls — v7
+
+```text
+[ ] A selected ally stops its current attack immediately after a floor right-click.
+[ ] The previous attack target is cleared immediately.
+[ ] The selected squad moves to the formation-adjusted destination.
+[ ] An ally keeps moving toward the destination after taking damage.
+[ ] A MOVE ally does not automatically pursue its attacker.
+[ ] A MOVE ally does not acquire nearby enemies before reaching the destination.
+[ ] A MOVE ally becomes IDLE after reaching the destination.
+[ ] After arrival, a newly received attack can use the existing NONE retaliation rule.
+[ ] A floor right-click cancels FOCUS_ATTACK and starts MOVE.
+[ ] An enemy right-click cancels MOVE and starts FOCUS_ATTACK.
+[ ] Direct enemy focus attack remains available.
+[ ] Focus-target loss still uses local engagement rules only.
+[ ] A floor right-click never creates ATTACK_MOVE.
+[ ] No A-key or attack-move UI input is implemented in Stage 7.
+[ ] Auto Hunt remains absent.
+[ ] Allies and enemies are not pushed apart by cross-team separation.
+```
+
+v7 자동 브라우저 확인:
+
+- 바닥 우클릭 직후 전체 선택 아군 슬롯이 `MOVING`으로 표시됨
+- 기존 공격 로그 뒤에 `Move order issued to 10 allied units.`가 기록됨
+- 목적지 도착 후 `IDLE` 상태와 도착 후 새 피격 반응 확인
+- 브라우저 콘솔 오류·경고 없음
+
+v7 사용자 수동 실행 테스트: 미실시 (`not_tested`)
+
+자동 브라우저 확인 내용:
+
+- 10대10 전투장, 하단 슬롯 10개, Slime 1·Slime 4 종류 연결: 통과
+- 드래그 10마리 선택과 대형 이동: 통과
+- 우클릭 공격 명령, 적군 AI, 아군 전멸 `DEFEAT`: 통과
+- 브라우저 콘솔 치명적 오류·경고: 없음

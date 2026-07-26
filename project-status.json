@@ -1,23 +1,110 @@
 {
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
-  "totalStages": 10,
-  "currentStage": 6,
-  "currentStageName": "승리·패배, 보상, 몬스터 재생성",
-  "stageStatus": "completed",
-  "activeTask": "6단계 완료 — 7단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "totalStages": 17,
+  "currentStage": 7,
+  "currentStageName": "10대10 RTS 핵심 전투",
+  "stageStatus": "review_pending",
+  "activeTask": "7단계 순수 MOVE 명령과 수동 명령 우선순위 수정 완료 — v7 재검수 대기",
+  "workingBranch": "stage-07-rts-battle-core",
   "completedStages": [1, 2, 3, 4, 5, 6],
   "approvedStages": [1, 2, 3, 4, 5, 6],
-  "nextStage": 7,
-  "nextStageName": "경험치, 레벨, 능력치 성장",
+  "nextStage": 8,
+  "nextStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
   "reviewSubmission": {
-    "branch": "stage-06-results-rewards-respawn",
-    "tag": "review-stage-06-v2",
-    "version": 2,
+    "branch": "stage-07-rts-battle-core",
+    "tag": "review-stage-07-v7",
+    "version": 7,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v7",
+      "version": 7,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "commit": "2dde1e75c2e059d489ac46ab8cb85e42baa1cbc9",
+      "reason": "바닥 우클릭을 순수 MOVE 명령으로 변경하고 이동 중 수동 명령 우선순위를 보장하도록 수정함",
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v6",
+      "version": 6,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "1a45dc64d2ba0d6143add433b3153a4fd7e290ea",
+      "reason": "바닥 우클릭이 순수 이동이 아니라 ATTACK_MOVE로 처리되고, 이동 중 피격 시 자동 반격하여 사용자의 이동 명령이 우선되지 않음",
+      "userRunTest": "failed",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v5",
+      "version": 5,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "4fcce6eaca971ed155a148fe86ecd6987c4372ed",
+      "reason": "집중 공격 대상 사망 후 FOCUS_ATTACK 상태가 유지되어 전장 전체 적을 추적할 수 있고, 공격 이동 중 피격되면 원래 commandDestination이 삭제됨",
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v4",
+      "version": 4,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "9626fa14badee0502c34a5c776970829e3cb928c",
+      "reason": "집중 공격 대상 사망 후 재탐색, 반격, 로컬 교전, 공격 이동, 부대 간 분리 동작이 요구사항과 다르게 동작함",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v3",
+      "version": 3,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "commit": null,
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v2",
+      "version": 2,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "b49a4c67fc168cc6830c20ea712b5d1f34787df8",
+      "reason": "핵심 검수 지적 사항은 수정됐으나 우측 상단 상태 문구와 Return to Field 버튼의 겹침 가능성이 남아 있음",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v1",
+      "version": 1,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "0d47a93bd30d8c84e80ace9f577e3ad48fd56d93",
+      "reason": "월드맵 몬스터와 전투 적군 ID가 단일 기준으로 보장되지 않고, 가장자리 대형 좌표 중복 및 하단 UI 겹침 문제가 있음",
+      "mainBranchMerged": false
+    },
     {
       "stage": 6,
       "branch": "stage-06-results-rewards-respawn",
@@ -125,9 +212,9 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-26T15:29:00+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
@@ -135,13 +222,12 @@
     "build": "passed",
     "devServer": "passed",
     "browserAutomation": "passed",
-    "browserAutomation": "기존 실제 결과 유지",
-    "userRunTest": "passed",
-    "chatGptCodeReview": "approved"
+    "userRunTest": "not_tested",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T15:29:00+09:00"
+  "lastUpdated": "2026-07-26T18:36:15+09:00"
 }

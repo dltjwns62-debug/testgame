@@ -856,8 +856,8 @@ export class BattleScene extends Phaser.Scene {
       ally.commandDestination = null;
       ally.moveDestination = null;
       ally.attackElapsedMs = 0;
-      ally.lastAttackerId = attacker.battleUnitId;
-      ally.lastAttackedAt = this.combatTimeMs;
+      ally.lastAttackerId = null;
+      ally.lastAttackedAt = 0;
       ally.state = "CHASING";
       targetCounts.set(target.battleUnitId, (targetCounts.get(target.battleUnitId) ?? 0) + 1);
     }

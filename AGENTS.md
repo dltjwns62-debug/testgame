@@ -47,7 +47,7 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 6단계 최초 검수 태그: `review-stage-06-v1` — 수정 요청
 - 6단계 현재 검수 태그: `review-stage-06-v2`
 - 6단계 완료 태그: `stage-06-completed`
-- 7단계 검수 태그: `review-stage-07-v2`
+- 7단계 검수 태그: `review-stage-07-v3`
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계

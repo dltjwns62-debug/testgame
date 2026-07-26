@@ -4,11 +4,11 @@
   "totalStages": 10,
   "currentStage": 6,
   "currentStageName": "승리·패배, 보상, 몬스터 재생성",
-  "stageStatus": "review_pending",
-  "activeTask": "6단계 검수 수정 완료 — 사용자 실행 테스트 및 코드 검수 대기",
-  "workingBranch": "stage-06-results-rewards-respawn",
-  "completedStages": [1, 2, 3, 4, 5],
-  "approvedStages": [1, 2, 3, 4, 5],
+  "stageStatus": "completed",
+  "activeTask": "6단계 완료 — 7단계 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6],
+  "approvedStages": [1, 2, 3, 4, 5, 6],
   "nextStage": 7,
   "nextStageName": "경험치, 레벨, 능력치 성장",
   "reviewSubmission": {
@@ -23,12 +23,13 @@
       "branch": "stage-06-results-rewards-respawn",
       "tag": "review-stage-06-v2",
       "version": 2,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "commit": null,
-      "userRunTest": "not_tested",
-      "mainBranchMerged": false
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-26T15:29:00+09:00",
+      "commit": "d5fe39174aaf1d96e194f858992253f8f311f4be",
+      "userRunTest": "passed",
+      "mainBranchMerged": true
     },
     {
       "stage": 6,
@@ -124,9 +125,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-26T15:29:00+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -134,10 +135,13 @@
     "build": "passed",
     "devServer": "passed",
     "browserAutomation": "passed",
-    "userRunTest": "not_tested",
-    "chatGptCodeReview": "not_reviewed"
+    "browserAutomation": "기존 실제 결과 유지",
+    "userRunTest": "passed",
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
-  "knownIssues": [],
-  "lastUpdated": "2026-07-26T14:58:42+09:00"
+  "mainBranchMerged": true,
+  "knownIssues": [
+    "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
+  ],
+  "lastUpdated": "2026-07-26T15:29:00+09:00"
 }

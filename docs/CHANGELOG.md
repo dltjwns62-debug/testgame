@@ -378,3 +378,17 @@
 - 완료된 단계: 없음
 - 검수 승인: 미승인
 - `main` 반영: 미반영
+## 2026-07-26 — 9단계 유닛 스킬과 단일 선택 전용 스킬 UI — 검수 대기
+
+- 유닛 정의에 `UnitSkillId`와 스킬 목록을 연결하고 Skill Mercenary를 추가
+- Skill Mercenary에 Q `Whirlwind`와 W `First Aid`를 정의
+- 생존 스킬 유닛을 정확히 1개 선택했을 때만 스킬 패널을 표시
+- 수동 Q/W 입력과 유닛별·스킬별 전투 쿨다운을 추가
+- Auto Hunt가 스킬을 자동으로 사용하지 않으며 MOVE·FOCUS_ATTACK 우선순위를 유지
+- 공통 사망 처리를 사용해 스킬 처치도 기존 전투 결과 처리를 따름
+- 자동 검사와 개발 서버, 일부 브라우저 UI 확인 완료
+- 사용자 수동 테스트는 아직 미실시 (`not_tested`)
+- ChatGPT 코드 검수는 아직 미실시 (`not_reviewed`)
+- 현재 상태는 `review_pending`
+- 새 검수 태그는 `review-stage-09-v1`
+- 9단계는 아직 `main`에 반영되지 않았고 10단계 기능은 구현하지 않음

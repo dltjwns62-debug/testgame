@@ -8,8 +8,10 @@ import {
   RTS_ALLY_ASSIST_RANGE,
   RTS_ARENA_BOUNDS,
   RTS_ENEMY_COUNT,
+  RTS_ALLY_ASSIST_THREAT_MEMORY_MS,
   RTS_LOCAL_ENGAGEMENT_RANGE,
   RTS_MAX_COMBAT_DELTA_MS,
+  RTS_MOVE_ARRIVAL_EPSILON,
   RTS_RETALIATION_MEMORY_MS,
   RTS_SELECTION_DRAG_THRESHOLD_PX,
 } from "../constants";
@@ -75,6 +77,12 @@ type PointerPosition = {
 
 type CombatState = "RUNNING" | "VICTORY" | "DEFEAT";
 
+type AllyAssistThreat = {
+  threatenedAllyId: string;
+  primaryAttackerId: string;
+  expiresAtMs: number;
+};
+
 export class BattleScene extends Phaser.Scene {
   private returnStarted = false;
   private combatState: CombatState = "RUNNING";
@@ -88,6 +96,7 @@ export class BattleScene extends Phaser.Scene {
   private enemyColor = 0xe67e91;
   private goldReward = 0;
   private readonly units = new Map<string, RTSBattleUnit>();
+  private readonly allyAssistThreats = new Map<string, AllyAssistThreat>();
   private readonly unitVisuals = new Map<string, UnitVisual>();
   private readonly slotVisuals = new Map<number, SlotVisual>();
   private readonly selectedUnitIds = new Set<string>();
@@ -170,11 +179,20 @@ export class BattleScene extends Phaser.Scene {
       ? Math.min(Math.max(delta, 0), RTS_MAX_COMBAT_DELTA_MS)
       : 0;
     this.combatTimeMs += safeDelta;
+    for (const ally of this.getAliveUnits("ALLY")) {
+      this.normalizeCompletedMoveCommand(ally);
+    }
+    this.refreshAssistThreatsFromEnemyTargets();
+    this.pruneExpiredAllyAssistThreats();
+    this.processActiveAllyAssistThreats();
     this.updateAllies(safeDelta);
     if (this.combatState === "RUNNING") {
       this.updateEnemies(safeDelta);
     }
     if (this.combatState === "RUNNING") {
+      this.refreshAssistThreatsFromEnemyTargets();
+      this.pruneExpiredAllyAssistThreats();
+      this.processActiveAllyAssistThreats();
       separateNearbyUnits(this.units.values());
       this.checkBattleOutcome();
     }
@@ -199,6 +217,7 @@ export class BattleScene extends Phaser.Scene {
     this.enemyColor = 0x64748b;
     this.goldReward = 0;
     this.units.clear();
+    this.allyAssistThreats.clear();
     this.unitVisuals.clear();
     this.slotVisuals.clear();
     this.selectedUnitIds.clear();
@@ -752,9 +771,12 @@ export class BattleScene extends Phaser.Scene {
         continue;
       }
 
-      if (unit.commandMode === "MOVE") {
+      this.normalizeCompletedMoveCommand(unit);
+      if (this.isActiveMoveCommand(unit)) {
         this.updateUnitOnMoveCommand(unit, deltaMs);
-        continue;
+        if (this.isActiveMoveCommand(unit)) {
+          continue;
+        }
       }
 
       const hadTarget = Boolean(unit.currentTargetId);
@@ -805,18 +827,42 @@ export class BattleScene extends Phaser.Scene {
     }
   }
 
-  private updateUnitOnMoveCommand(unit: RTSBattleUnit, deltaMs: number): void {
-    unit.currentTargetId = null;
-    unit.attackElapsedMs = 0;
-    unit.state = "MOVING";
+  private isActiveMoveCommand(unit: RTSBattleUnit): boolean {
+    if (unit.commandMode !== "MOVE" || !unit.commandDestination) {
+      return false;
+    }
 
-    if (!unit.commandDestination) {
+    const { x, y } = unit.commandDestination;
+    if (!Number.isFinite(x) || !Number.isFinite(y) ||
+      !Number.isFinite(unit.position.x) || !Number.isFinite(unit.position.y)) {
+      return false;
+    }
+
+    return distanceBetween(unit.position, unit.commandDestination) > RTS_MOVE_ARRIVAL_EPSILON;
+  }
+
+  private normalizeCompletedMoveCommand(unit: RTSBattleUnit): void {
+    if (unit.commandMode === "MOVE" && !this.isActiveMoveCommand(unit)) {
+      this.finishMoveCommand(unit);
+    }
+  }
+
+  private updateUnitOnMoveCommand(unit: RTSBattleUnit, deltaMs: number): void {
+    if (!this.isActiveMoveCommand(unit)) {
       this.finishMoveCommand(unit);
       return;
     }
 
-    unit.moveDestination = unit.commandDestination;
-    if (moveToward(unit, unit.commandDestination, deltaMs)) {
+    const destination = unit.commandDestination;
+    if (!destination) {
+      this.finishMoveCommand(unit);
+      return;
+    }
+    unit.currentTargetId = null;
+    unit.attackElapsedMs = 0;
+    unit.state = "MOVING";
+    unit.moveDestination = destination;
+    if (moveToward(unit, destination, deltaMs)) {
       this.finishMoveCommand(unit);
     }
   }
@@ -1001,77 +1047,124 @@ export class BattleScene extends Phaser.Scene {
     target.currentHp = Math.max(0, target.currentHp - attacker.attackDamage);
     target.lastAttackerId = attacker.battleUnitId;
     target.lastAttackedAt = this.combatTimeMs;
-    const activeTarget = this.getAliveEnemy(target.currentTargetId);
-    if (target.team === "ALLY" && target.commandMode !== "MOVE" && !activeTarget) {
-      target.currentTargetId = attacker.battleUnitId;
-      if (target.commandMode === "ATTACK_MOVE") {
-        target.moveDestination = null;
-      } else {
-        target.commandMode = "LOCAL_ENGAGE";
-        target.commandDestination = null;
-        target.moveDestination = null;
-      }
-      target.attackElapsedMs = 0;
-    }
     if (target.team === "ALLY") {
-      this.alertNearbyAlliesForAssist(target, attacker);
+      this.normalizeCompletedMoveCommand(target);
+      const isMoving = this.isActiveMoveCommand(target);
+      const activeTarget = this.getAliveEnemy(target.currentTargetId);
+      if (!isMoving && !activeTarget) {
+        target.currentTargetId = attacker.battleUnitId;
+        if (target.commandMode === "ATTACK_MOVE") {
+          target.moveDestination = null;
+        } else {
+          target.commandMode = "LOCAL_ENGAGE";
+          target.commandDestination = null;
+          target.moveDestination = null;
+        }
+        target.attackElapsedMs = 0;
+      }
+      this.refreshAllyAssistThreat(target, attacker);
     }
     this.addAttackLog(`${attacker.displayName} dealt ${attacker.attackDamage} to ${target.displayName}.`);
     if (target.currentHp === 0) {
       this.markUnitDead(target);
     }
+    if (target.team === "ALLY") {
+      this.processActiveAllyAssistThreats();
+    }
   }
 
-  private alertNearbyAlliesForAssist(attackedAlly: RTSBattleUnit, attacker: RTSBattleUnit): void {
+  private refreshAllyAssistThreat(
+    threatenedAlly: RTSBattleUnit,
+    attacker: RTSBattleUnit,
+  ): void {
     if (
       this.combatState !== "RUNNING" ||
-      attackedAlly.team !== "ALLY" ||
+      !threatenedAlly.isAlive ||
+      threatenedAlly.team !== "ALLY" ||
+      !attacker.isAlive ||
       attacker.team !== "ENEMY" ||
-      !Number.isFinite(attackedAlly.position.x) ||
-      !Number.isFinite(attackedAlly.position.y)
+      this.units.get(threatenedAlly.battleUnitId) !== threatenedAlly ||
+      this.units.get(attacker.battleUnitId) !== attacker ||
+      !Number.isFinite(threatenedAlly.position.x) ||
+      !Number.isFinite(threatenedAlly.position.y) ||
+      !Number.isFinite(attacker.position.x) ||
+      !Number.isFinite(attacker.position.y)
     ) {
       return;
     }
 
-    const supportAllies = this.getAliveUnits("ALLY")
-      .filter((ally) => {
-        if (
-          ally.battleUnitId === attackedAlly.battleUnitId ||
-          !Number.isFinite(ally.position.x) ||
-          !Number.isFinite(ally.position.y)
-        ) {
-          return false;
-        }
+    this.allyAssistThreats.set(threatenedAlly.battleUnitId, {
+      threatenedAllyId: threatenedAlly.battleUnitId,
+      primaryAttackerId: attacker.battleUnitId,
+      expiresAtMs: this.combatTimeMs + RTS_ALLY_ASSIST_THREAT_MEMORY_MS,
+    });
+  }
 
-        const distance = distanceBetween(attackedAlly.position, ally.position);
-        if (!Number.isFinite(distance) || distance > RTS_ALLY_ASSIST_RANGE) {
-          return false;
-        }
-
-        if (ally.commandMode === "NONE") {
-          return true;
-        }
-
-        return ally.commandMode === "LOCAL_ENGAGE" && !this.getAliveEnemy(ally.currentTargetId);
-      })
-      .sort((first, second) => (
-        distanceBetween(attackedAlly.position, first.position) -
-        distanceBetween(attackedAlly.position, second.position) ||
-        first.battleUnitId.localeCompare(second.battleUnitId)
-      ));
-
-    if (supportAllies.length === 0) {
+  private refreshAssistThreatsFromEnemyTargets(): void {
+    if (this.combatState !== "RUNNING") {
       return;
     }
 
-    const localEnemies = this.getAliveUnits("ENEMY")
-      .filter((enemy) => (
-        Number.isFinite(enemy.position.x) &&
-        Number.isFinite(enemy.position.y) &&
-        Number.isFinite(distanceBetween(attackedAlly.position, enemy.position)) &&
-        distanceBetween(attackedAlly.position, enemy.position) <= RTS_LOCAL_ENGAGEMENT_RANGE
+    for (const enemy of this.getAliveUnits("ENEMY")) {
+      if (!enemy.currentTargetId || (enemy.state !== "CHASING" && enemy.state !== "ATTACKING")) {
+        continue;
+      }
+
+      const threatenedAlly = this.units.get(enemy.currentTargetId);
+      if (!threatenedAlly?.isAlive || threatenedAlly.team !== "ALLY") {
+        continue;
+      }
+
+      const distance = distanceBetween(enemy.position, threatenedAlly.position);
+      if (Number.isFinite(distance) && distance <= RTS_LOCAL_ENGAGEMENT_RANGE) {
+        this.refreshAllyAssistThreat(threatenedAlly, enemy);
+      }
+    }
+  }
+
+  private pruneExpiredAllyAssistThreats(): void {
+    if (this.combatState !== "RUNNING") {
+      this.allyAssistThreats.clear();
+      return;
+    }
+
+    for (const [threatenedAllyId, threat] of this.allyAssistThreats) {
+      const threatenedAlly = this.units.get(threatenedAllyId);
+      const attacker = this.units.get(threat.primaryAttackerId);
+      if (
+        threat.expiresAtMs <= this.combatTimeMs ||
+        threat.threatenedAllyId !== threatenedAllyId ||
+        !threatenedAlly?.isAlive ||
+        threatenedAlly.team !== "ALLY" ||
+        !attacker?.isAlive ||
+        attacker.team !== "ENEMY" ||
+        this.units.get(threatenedAlly.battleUnitId) !== threatenedAlly ||
+        this.units.get(attacker.battleUnitId) !== attacker
+      ) {
+        this.allyAssistThreats.delete(threatenedAllyId);
+      }
+    }
+  }
+
+  private processActiveAllyAssistThreats(): void {
+    this.pruneExpiredAllyAssistThreats();
+    if (this.combatState !== "RUNNING") {
+      return;
+    }
+
+    for (const ally of this.getAliveUnits("ALLY")) {
+      this.normalizeCompletedMoveCommand(ally);
+    }
+
+    const threats = [...this.allyAssistThreats.values()]
+      .map((threat) => ({
+        threat,
+        threatenedAlly: this.units.get(threat.threatenedAllyId),
+      }))
+      .filter((entry): entry is { threat: AllyAssistThreat; threatenedAlly: RTSBattleUnit } => (
+        Boolean(entry.threatenedAlly?.isAlive && entry.threatenedAlly.team === "ALLY")
       ));
-    if (localEnemies.length === 0) {
+    if (threats.length === 0) {
       return;
     }
 
@@ -1082,22 +1175,61 @@ export class BattleScene extends Phaser.Scene {
       }
     }
 
+    const supportAllies = this.getAliveUnits("ALLY")
+      .sort((first, second) => first.battleUnitId.localeCompare(second.battleUnitId));
     for (const ally of supportAllies) {
-      const target = localEnemies
-        .map((candidate) => ({
-          candidate,
-          assignedCount: targetCounts.get(candidate.battleUnitId) ?? 0,
-          distance: distanceBetween(ally.position, candidate.position),
-        }))
-        .filter(({ distance }) => Number.isFinite(distance))
-        .sort((first, second) => (
-          first.assignedCount - second.assignedCount ||
-          (first.candidate.battleUnitId === attacker.battleUnitId ? -1 : 0) -
-          (second.candidate.battleUnitId === attacker.battleUnitId ? -1 : 0) ||
-          first.distance - second.distance ||
-          first.candidate.battleUnitId.localeCompare(second.candidate.battleUnitId)
-        ))[0]?.candidate;
+      if (
+        ally.commandMode !== "NONE" &&
+        !(ally.commandMode === "LOCAL_ENGAGE" && !this.getAliveEnemy(ally.currentTargetId))
+      ) {
+        continue;
+      }
 
+      const selectedThreat = threats
+        .map(({ threat, threatenedAlly }) => ({
+          threat,
+          threatenedAlly,
+          distance: distanceBetween(ally.position, threatenedAlly.position),
+        }))
+        .filter(({ threatenedAlly, distance }) => (
+          threatenedAlly.battleUnitId !== ally.battleUnitId &&
+          Number.isFinite(distance) &&
+          distance <= RTS_ALLY_ASSIST_RANGE
+        ))
+        .sort((first, second) => (
+          first.distance - second.distance ||
+          first.threat.threatenedAllyId.localeCompare(second.threat.threatenedAllyId)
+        ))[0];
+      if (!selectedThreat) {
+        continue;
+      }
+
+      const { threat, threatenedAlly } = selectedThreat;
+      const localEnemies = this.getAliveUnits("ENEMY")
+        .map((enemy) => ({
+          enemy,
+          distanceFromThreat: distanceBetween(threatenedAlly.position, enemy.position),
+          distanceFromHelper: distanceBetween(ally.position, enemy.position),
+        }))
+        .filter(({ enemy, distanceFromThreat, distanceFromHelper }) => (
+          this.units.get(enemy.battleUnitId) === enemy &&
+          Number.isFinite(enemy.position.x) &&
+          Number.isFinite(enemy.position.y) &&
+          Number.isFinite(distanceFromThreat) &&
+          distanceFromThreat <= RTS_LOCAL_ENGAGEMENT_RANGE &&
+          Number.isFinite(distanceFromHelper)
+        ))
+        .sort((first, second) => (
+          (targetCounts.get(first.enemy.battleUnitId) ?? 0) -
+            (targetCounts.get(second.enemy.battleUnitId) ?? 0) ||
+          (first.enemy.battleUnitId === threat.primaryAttackerId ? -1 : 0) -
+            (second.enemy.battleUnitId === threat.primaryAttackerId ? -1 : 0) ||
+          (first.enemy.currentTargetId === threatenedAlly.battleUnitId ? -1 : 0) -
+            (second.enemy.currentTargetId === threatenedAlly.battleUnitId ? -1 : 0) ||
+          first.distanceFromHelper - second.distanceFromHelper ||
+          first.enemy.battleUnitId.localeCompare(second.enemy.battleUnitId)
+        ));
+      const target = localEnemies[0]?.enemy;
       if (!target) {
         continue;
       }

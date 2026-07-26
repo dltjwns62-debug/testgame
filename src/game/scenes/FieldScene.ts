@@ -4,15 +4,15 @@ import {
   GAME_HEIGHT,
   GAME_WIDTH,
   MONSTERS,
-  MONSTER_MAX_HP,
   MONSTER_RADIUS,
+  MONSTER_RESPAWN_DELAY_MS,
   PLAYER_MAX_HP,
   PLAYER_POSITION,
   PLAYER_MOVE_SPEED,
   PLAYER_RADIUS,
   type MonsterDefinition,
 } from "../constants";
-import type { BattleSceneData } from "../battleTypes";
+import type { BattleResult, BattleSceneData } from "../battleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
@@ -20,6 +20,8 @@ type MonsterView = {
   definition: MonsterDefinition;
   container: Phaser.GameObjects.Container;
   selectionMarker: Phaser.GameObjects.Arc;
+  isAvailable: boolean;
+  respawnEvent: Phaser.Time.TimerEvent | null;
 };
 
 export class FieldScene extends Phaser.Scene {
@@ -29,6 +31,8 @@ export class FieldScene extends Phaser.Scene {
   private state: FieldState = "IDLE";
   private stateText!: Phaser.GameObjects.Text;
   private battleTransitionStarted = false;
+  private battleResultApplied = false;
+  private playerGold = 0;
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
@@ -47,6 +51,8 @@ export class FieldScene extends Phaser.Scene {
     MONSTERS.forEach((monster) => this.addMonster(monster));
 
     this.setupCanvasContextMenu();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.clearRespawnTimers, this);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.clearRespawnTimers, this);
   }
 
   public update(_time: number, delta: number): void {
@@ -73,14 +79,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 4: Battle Transition", {
+    this.add.text(48, 36, "Stage 6: Results, Rewards and Respawn", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Right-click a monster and approach it to enter battle.", {
+    this.add.text(50, 66, "Defeat monsters, earn Gold, and wait for them to respawn.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -147,21 +153,23 @@ export class FieldScene extends Phaser.Scene {
       align: "center",
     }).setOrigin(0.5));
 
-    monsterObject.setInteractive(
-      new Phaser.Geom.Rectangle(-42, -42, 84, 84),
-      Phaser.Geom.Rectangle.Contains,
-    );
+    const monsterView: MonsterView = {
+      definition: monster,
+      container: monsterObject,
+      selectionMarker,
+      isAvailable: true,
+      respawnEvent: null,
+    };
+
+    this.enableMonsterInteraction(monsterView);
     monsterObject.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      if (pointer.button === 2) {
+      const currentMonster = this.monsterViews.get(monster.id);
+      if (pointer.button === 2 && currentMonster?.isAvailable) {
         this.selectMonster(monster.id);
       }
     });
 
-    this.monsterViews.set(monster.id, {
-      definition: monster,
-      container: monsterObject,
-      selectionMarker,
-    });
+    this.monsterViews.set(monster.id, monsterView);
   }
 
   private setupCanvasContextMenu(): void {
@@ -182,7 +190,7 @@ export class FieldScene extends Phaser.Scene {
     }
 
     const nextTarget = this.monsterViews.get(monsterId);
-    if (!nextTarget) {
+    if (!nextTarget || !nextTarget.isAvailable) {
       return;
     }
 
@@ -192,6 +200,7 @@ export class FieldScene extends Phaser.Scene {
 
     this.targetMonster = nextTarget;
     this.targetMonster.selectionMarker.setVisible(true);
+    this.battleResultApplied = false;
 
     const distance = Phaser.Math.Distance.Between(
       this.player.x,
@@ -246,6 +255,7 @@ export class FieldScene extends Phaser.Scene {
     }
 
     this.battleTransitionStarted = true;
+    this.battleResultApplied = false;
     this.state = "BATTLE";
     this.updateStatusText();
 
@@ -256,8 +266,11 @@ export class FieldScene extends Phaser.Scene {
       playerMaxHp: PLAYER_MAX_HP,
       monsterId: target.id,
       monsterName: target.name,
-      monsterCurrentHp: MONSTER_MAX_HP,
-      monsterMaxHp: MONSTER_MAX_HP,
+      monsterCurrentHp: target.maxHp,
+      monsterMaxHp: target.maxHp,
+      monsterAttackDamage: target.attackDamage,
+      monsterAttackIntervalMs: target.attackIntervalMs,
+      goldReward: target.goldReward,
     };
 
     this.scene.pause();
@@ -276,6 +289,94 @@ export class FieldScene extends Phaser.Scene {
     this.updateStatusText();
   }
 
+  public applyBattleResult(result: BattleResult): void {
+    if (
+      !result ||
+      !this.battleTransitionStarted ||
+      this.battleResultApplied ||
+      !this.targetMonster ||
+      this.targetMonster.definition.id !== result.monsterId
+    ) {
+      return;
+    }
+
+    const targetMonster = this.monsterViews.get(result.monsterId);
+    if (!targetMonster || !targetMonster.isAvailable) {
+      return;
+    }
+
+    if (result.outcome !== "VICTORY" && result.outcome !== "DEFEAT") {
+      return;
+    }
+
+    if (result.outcome === "VICTORY") {
+      const expectedReward = targetMonster.definition.goldReward;
+      if (
+        !Number.isSafeInteger(expectedReward) ||
+        expectedReward < 0 ||
+        result.goldReward !== expectedReward
+      ) {
+        return;
+      }
+
+      this.battleResultApplied = true;
+      this.playerGold += expectedReward;
+      this.hideMonster(targetMonster);
+      this.targetMonster = null;
+      this.scheduleRespawn(targetMonster);
+      return;
+    }
+
+    if (result.goldReward !== 0) {
+      return;
+    }
+
+    this.battleResultApplied = true;
+  }
+
+  private enableMonsterInteraction(monster: MonsterView): void {
+    monster.container.setInteractive(
+      new Phaser.Geom.Rectangle(-42, -42, 84, 84),
+      Phaser.Geom.Rectangle.Contains,
+    );
+  }
+
+  private hideMonster(monster: MonsterView): void {
+    monster.isAvailable = false;
+    monster.selectionMarker.setVisible(false);
+    monster.container.setVisible(false);
+    monster.container.disableInteractive();
+  }
+
+  private scheduleRespawn(monster: MonsterView): void {
+    if (monster.respawnEvent) {
+      this.time.removeEvent(monster.respawnEvent);
+    }
+
+    monster.respawnEvent = this.time.delayedCall(
+      MONSTER_RESPAWN_DELAY_MS,
+      () => this.respawnMonster(monster),
+    );
+  }
+
+  private respawnMonster(monster: MonsterView): void {
+    monster.respawnEvent = null;
+    monster.isAvailable = true;
+    monster.container.setVisible(true);
+    monster.container.setActive(true);
+    monster.selectionMarker.setVisible(false);
+    this.enableMonsterInteraction(monster);
+  }
+
+  private clearRespawnTimers(): void {
+    this.monsterViews.forEach((monster) => {
+      if (monster.respawnEvent) {
+        this.time.removeEvent(monster.respawnEvent);
+        monster.respawnEvent = null;
+      }
+    });
+  }
+
   private updateStatusText(): void {
     if (!this.stateText) {
       return;
@@ -284,6 +385,7 @@ export class FieldScene extends Phaser.Scene {
     this.stateText.setText([
       `State: ${this.state}`,
       `Target: ${this.targetMonster?.definition.name ?? "None"}`,
+      `Gold: ${this.playerGold}`,
     ]);
   }
 }

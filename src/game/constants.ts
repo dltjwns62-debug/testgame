@@ -15,6 +15,7 @@ export const COMBAT_LOG_LIMIT = 4;
 export const COMBAT_HP_BAR_WIDTH = 240;
 export const COMBAT_HP_BAR_HEIGHT = 18;
 export const COMBAT_BUTTON_Y = 480;
+export const MONSTER_RESPAWN_DELAY_MS = 3000;
 
 export type MonsterDefinition = {
   id: string;
@@ -22,6 +23,10 @@ export type MonsterDefinition = {
   x: number;
   y: number;
   color: number;
+  maxHp: number;
+  attackDamage: number;
+  attackIntervalMs: number;
+  goldReward: number;
 };
 
 export const PLAYER_POSITION = {
@@ -30,8 +35,48 @@ export const PLAYER_POSITION = {
 };
 
 export const MONSTERS: readonly MonsterDefinition[] = [
-  { id: "slime-1", name: "Slime 1", x: 510, y: 165, color: 0xe67e91 },
-  { id: "slime-2", name: "Slime 2", x: 725, y: 190, color: 0xb98ae6 },
-  { id: "slime-3", name: "Slime 3", x: 560, y: 380, color: 0xf0ad62 },
-  { id: "slime-4", name: "Slime 4", x: 790, y: 365, color: 0x6fb7e8 },
+  {
+    id: "slime-1",
+    name: "Slime 1",
+    x: 510,
+    y: 165,
+    color: 0xe67e91,
+    maxHp: MONSTER_MAX_HP,
+    attackDamage: MONSTER_ATTACK_DAMAGE,
+    attackIntervalMs: MONSTER_ATTACK_INTERVAL_MS,
+    goldReward: 10,
+  },
+  {
+    id: "slime-2",
+    name: "Slime 2",
+    x: 725,
+    y: 190,
+    color: 0xb98ae6,
+    maxHp: MONSTER_MAX_HP,
+    attackDamage: MONSTER_ATTACK_DAMAGE,
+    attackIntervalMs: MONSTER_ATTACK_INTERVAL_MS,
+    goldReward: 10,
+  },
+  {
+    id: "slime-3",
+    name: "Slime 3",
+    x: 560,
+    y: 380,
+    color: 0xf0ad62,
+    maxHp: MONSTER_MAX_HP,
+    attackDamage: MONSTER_ATTACK_DAMAGE,
+    attackIntervalMs: MONSTER_ATTACK_INTERVAL_MS,
+    goldReward: 10,
+  },
+  {
+    id: "slime-4",
+    name: "Slime 4",
+    x: 790,
+    y: 365,
+    color: 0x6fb7e8,
+    maxHp: 120,
+    attackDamage: 12,
+    attackIntervalMs: 1000,
+    goldReward: 25,
+  },
 ];

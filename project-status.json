@@ -2,22 +2,46 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 10,
-  "currentStage": 5,
-  "currentStageName": "기본 자동전투",
-  "stageStatus": "completed",
-  "activeTask": "5단계 완료 — 6단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 6,
+  "currentStageName": "승리·패배, 보상, 몬스터 재생성",
+  "stageStatus": "review_pending",
+  "activeTask": "6단계 검수 수정 완료 — 사용자 실행 테스트 및 코드 검수 대기",
+  "workingBranch": "stage-06-results-rewards-respawn",
   "completedStages": [1, 2, 3, 4, 5],
   "approvedStages": [1, 2, 3, 4, 5],
-  "nextStage": 6,
-  "nextStageName": "승리·패배, 보상, 몬스터 재생성",
+  "nextStage": 7,
+  "nextStageName": "경험치, 레벨, 능력치 성장",
   "reviewSubmission": {
-    "branch": "stage-05-basic-auto-combat",
-    "tag": "review-stage-05-v1",
-    "version": 1,
+    "branch": "stage-06-results-rewards-respawn",
+    "tag": "review-stage-06-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 6,
+      "branch": "stage-06-results-rewards-respawn",
+      "tag": "review-stage-06-v2",
+      "version": 2,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "commit": null,
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 6,
+      "branch": "stage-06-results-rewards-respawn",
+      "tag": "review-stage-06-v1",
+      "version": 1,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "commit": "cfd0490e3ee2a2fc22e0e3457bc0e90ae35a1c66",
+      "reason": "필드가 전달된 Gold 값을 신뢰해 몬스터 정의와 다른 보상을 지급할 수 있음",
+      "mainBranchMerged": false
+    },
     {
       "stage": 5,
       "branch": "stage-05-basic-auto-combat",
@@ -100,23 +124,20 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-26T03:45:18+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
     "typecheck": "passed",
     "build": "passed",
-    "responsiveViewport": "passed",
     "devServer": "passed",
     "browserAutomation": "passed",
-    "userRunTest": "passed",
-    "chatGptCodeReview": "approved"
+    "userRunTest": "not_tested",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
-  "knownIssues": [
-    "필드 상단 단계 안내가 Stage 4로 남아 있으며 6단계 작업 브랜치에서 수정 예정"
-  ],
-  "lastUpdated": "2026-07-26T03:45:18+09:00"
+  "mainBranchMerged": false,
+  "knownIssues": [],
+  "lastUpdated": "2026-07-26T14:58:42+09:00"
 }

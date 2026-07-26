@@ -14,21 +14,25 @@ import {
   PLAYER_ATTACK_INTERVAL_MS,
   PLAYER_MAX_HP,
 } from "../constants";
-import type { BattleSceneData } from "../battleTypes";
+import type { BattleOutcome, BattleResult, BattleSceneData } from "../battleTypes";
 import type { FieldScene } from "./FieldScene";
 
-type CombatState = "RUNNING" | "STOPPED_PENDING_RESULT";
+type CombatState = "RUNNING" | "VICTORY" | "DEFEAT";
 
 export class BattleScene extends Phaser.Scene {
   private returnStarted = false;
   private combatState: CombatState = "RUNNING";
-  private combatStopHandled = false;
+  private resultCommitted = false;
   private playerName = "Player";
+  private monsterId = "unknown-monster";
   private monsterName = "Unknown Monster";
   private playerCurrentHp = PLAYER_MAX_HP;
   private playerMaxHp = PLAYER_MAX_HP;
   private monsterCurrentHp = MONSTER_MAX_HP;
   private monsterMaxHp = MONSTER_MAX_HP;
+  private monsterAttackDamage = MONSTER_ATTACK_DAMAGE;
+  private monsterAttackIntervalMs = MONSTER_ATTACK_INTERVAL_MS;
+  private goldReward = 0;
   private playerAttackElapsed = 0;
   private monsterAttackElapsed = 0;
   private readonly attackLogs: string[] = [];
@@ -57,14 +61,14 @@ export class BattleScene extends Phaser.Scene {
     this.resetCombat(data);
     const returnButton = this.addBattleBackground();
 
-    this.add.text(GAME_WIDTH / 2, 64, "Stage 5: Basic Auto Combat", {
+    this.add.text(GAME_WIDTH / 2, 64, "Stage 6: Results, Rewards and Respawn", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "32px",
       fontStyle: "bold",
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 104, "Player and monster attack automatically.", {
+    this.add.text(GAME_WIDTH / 2, 104, "Automatic combat resolves with victory or defeat.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "17px",
@@ -134,7 +138,7 @@ export class BattleScene extends Phaser.Scene {
     this.updateAttackLogDisplay();
 
     if (this.playerCurrentHp === 0 || this.monsterCurrentHp === 0) {
-      this.stopCombat();
+      this.commitResult(this.monsterCurrentHp === 0 ? "VICTORY" : "DEFEAT");
     }
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -163,7 +167,7 @@ export class BattleScene extends Phaser.Scene {
       return;
     }
 
-    if (this.monsterAttackElapsed >= MONSTER_ATTACK_INTERVAL_MS) {
+    if (this.monsterAttackElapsed >= this.monsterAttackIntervalMs) {
       this.monsterAttackElapsed = 0;
       this.performMonsterAttack();
     }
@@ -174,16 +178,26 @@ export class BattleScene extends Phaser.Scene {
 
     this.returnStarted = false;
     this.combatState = "RUNNING";
-    this.combatStopHandled = false;
+    this.resultCommitted = false;
     this.playerAttackElapsed = 0;
     this.monsterAttackElapsed = 0;
     this.attackLogs.length = 0;
     this.playerName = battleData.playerName;
+    this.monsterId = battleData.monsterId;
     this.monsterName = battleData.monsterName;
     this.playerMaxHp = this.sanitizeMaxHp(battleData.playerMaxHp, PLAYER_MAX_HP);
     this.monsterMaxHp = this.sanitizeMaxHp(battleData.monsterMaxHp, MONSTER_MAX_HP);
     this.playerCurrentHp = this.clampHp(battleData.playerCurrentHp, this.playerMaxHp);
     this.monsterCurrentHp = this.clampHp(battleData.monsterCurrentHp, this.monsterMaxHp);
+    this.monsterAttackDamage = this.sanitizeNonNegative(
+      battleData.monsterAttackDamage,
+      MONSTER_ATTACK_DAMAGE,
+    );
+    this.monsterAttackIntervalMs = this.sanitizeMinimum(
+      battleData.monsterAttackIntervalMs,
+      MONSTER_ATTACK_INTERVAL_MS,
+    );
+    this.goldReward = this.sanitizeGold(battleData.goldReward);
   }
 
   private addBattleBackground(): Phaser.GameObjects.Rectangle {
@@ -223,7 +237,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private performPlayerAttack(): void {
-    if (this.playerCurrentHp === 0 || this.monsterCurrentHp === 0) {
+    if (this.combatState !== "RUNNING" || this.playerCurrentHp === 0 || this.monsterCurrentHp === 0) {
       return;
     }
 
@@ -232,34 +246,46 @@ export class BattleScene extends Phaser.Scene {
     this.updateHealthDisplay();
 
     if (this.monsterCurrentHp === 0) {
-      this.stopCombat();
+      this.commitResult("VICTORY");
     }
   }
 
   private performMonsterAttack(): void {
-    if (this.playerCurrentHp === 0 || this.monsterCurrentHp === 0) {
+    if (this.combatState !== "RUNNING" || this.playerCurrentHp === 0 || this.monsterCurrentHp === 0) {
       return;
     }
 
-    this.playerCurrentHp = Math.max(0, this.playerCurrentHp - MONSTER_ATTACK_DAMAGE);
-    this.addAttackLog(`${this.monsterName} dealt ${MONSTER_ATTACK_DAMAGE} damage to ${this.playerName}.`);
+    this.playerCurrentHp = Math.max(0, this.playerCurrentHp - this.monsterAttackDamage);
+    this.addAttackLog(`${this.monsterName} dealt ${this.monsterAttackDamage} damage to ${this.playerName}.`);
     this.updateHealthDisplay();
 
     if (this.playerCurrentHp === 0) {
-      this.stopCombat();
+      this.commitResult("DEFEAT");
     }
   }
 
-  private stopCombat(): void {
-    if (this.combatStopHandled) {
+  private commitResult(outcome: BattleOutcome): void {
+    if (this.resultCommitted) {
       return;
     }
 
-    this.combatStopHandled = true;
-    this.combatState = "STOPPED_PENDING_RESULT";
+    this.resultCommitted = true;
+    this.combatState = outcome;
     this.playerAttackElapsed = 0;
     this.monsterAttackElapsed = 0;
+    if (outcome === "DEFEAT") {
+      this.goldReward = 0;
+    }
     this.updateCombatStatus();
+
+    const result: BattleResult = {
+      outcome,
+      monsterId: this.monsterId,
+      monsterName: this.monsterName,
+      goldReward: this.goldReward,
+    };
+    const fieldScene = this.scene.get("FieldScene") as FieldScene;
+    fieldScene.applyBattleResult(result);
   }
 
   private updateHealthDisplay(): void {
@@ -296,10 +322,21 @@ export class BattleScene extends Phaser.Scene {
       return;
     }
 
+    if (this.combatState === "VICTORY") {
+      this.combatStateText.setText([
+        "VICTORY",
+        `${this.monsterName} was defeated.`,
+        `Reward: +${this.goldReward} Gold`,
+        "The monster will respawn after returning to the field.",
+      ]);
+      return;
+    }
+
     this.combatStateText.setText([
-      "Combat state: STOPPED_PENDING_RESULT",
-      "Combat stopped at 0 HP.",
-      "Result handling will be implemented in Stage 6.",
+      "DEFEAT",
+      "Player reached 0 HP.",
+      "Reward: 0 Gold",
+      "The monster remains on the field.",
     ]);
   }
 
@@ -330,6 +367,18 @@ export class BattleScene extends Phaser.Scene {
     return Number.isFinite(value) && value > 0 ? value : fallback;
   }
 
+  private sanitizeNonNegative(value: number, fallback: number): number {
+    return Number.isFinite(value) && value >= 0 ? value : fallback;
+  }
+
+  private sanitizeMinimum(value: number, fallback: number): number {
+    return Number.isFinite(value) && value >= 1 ? value : fallback;
+  }
+
+  private sanitizeGold(value: number): number {
+    return Number.isSafeInteger(value) && value >= 0 ? value : 0;
+  }
+
   private clampHp(value: number, maxHp: number): number {
     return Math.min(maxHp, Math.max(0, value));
   }
@@ -345,6 +394,9 @@ export class BattleScene extends Phaser.Scene {
       candidate.playerMaxHp,
       candidate.monsterCurrentHp,
       candidate.monsterMaxHp,
+      candidate.monsterAttackDamage,
+      candidate.monsterAttackIntervalMs,
+      candidate.goldReward,
     ];
 
     return (
@@ -364,6 +416,9 @@ export class BattleScene extends Phaser.Scene {
       monsterName: "Unknown Monster",
       monsterCurrentHp: MONSTER_MAX_HP,
       monsterMaxHp: MONSTER_MAX_HP,
+      monsterAttackDamage: MONSTER_ATTACK_DAMAGE,
+      monsterAttackIntervalMs: MONSTER_ATTACK_INTERVAL_MS,
+      goldReward: 0,
     };
   }
 }

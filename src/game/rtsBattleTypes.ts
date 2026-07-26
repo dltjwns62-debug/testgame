@@ -37,6 +37,7 @@ export type RTSBattleUnit = {
   attackRange: number;
   collisionRadius: number;
   position: BattlePosition;
+  guardPosition: BattlePosition;
   state: BattleUnitState;
   currentTargetId: string | null;
   moveDestination: BattlePosition | null;

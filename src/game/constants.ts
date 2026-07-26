@@ -27,10 +27,9 @@ export const RTS_ARENA_BOUNDS = {
 export const RTS_SELECTION_DRAG_THRESHOLD_PX = 6;
 export const RTS_MAX_COMBAT_DELTA_MS = 100;
 export const RTS_FORMATION_SPACING = 34;
-export const RTS_LOCAL_ENGAGEMENT_RANGE = 180;
-export const RTS_ALLY_ASSIST_RANGE = 140;
 export const RTS_MOVE_ARRIVAL_EPSILON = 2;
-export const RTS_ALLY_ASSIST_THREAT_MEMORY_MS = 2500;
+export const RTS_GUARD_AGGRO_RANGE = 140;
+export const RTS_GUARD_LEASH_RANGE = 180;
 export const RTS_RETALIATION_MEMORY_MS = 2500;
 export const AUTO_HUNT_REGISTRY_KEY = "testgame.autoHuntEnabled";
 

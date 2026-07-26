@@ -5,7 +5,7 @@
   "currentStage": 8,
   "currentStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
   "stageStatus": "review_pending",
-  "activeTask": "8단계 구현 완료 — review-stage-08-v1 검수 대기 중",
+  "activeTask": "8단계 피드백 수정 완료 — review-stage-08-v2 검수 대기 중",
   "workingBranch": "stage-08-auto-hunt-controls",
   "completedStages": [1, 2, 3, 4, 5, 6, 7],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7],
@@ -13,11 +13,25 @@
   "nextStageName": "유닛 스킬과 단일 선택 전용 스킬 UI",
   "reviewSubmission": {
     "branch": "stage-08-auto-hunt-controls",
-    "tag": "review-stage-08-v1",
-    "version": 1,
+    "tag": "review-stage-08-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 8,
+      "branch": "stage-08-auto-hunt-controls",
+      "tag": "review-stage-08-v2",
+      "version": 2,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
     {
       "stage": 8,
       "branch": "stage-08-auto-hunt-controls",
@@ -25,11 +39,13 @@
       "version": 1,
       "submitted": true,
       "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
       "reviewedAt": null,
-      "commit": "d4154bc6d985a7778294ba88c747abdf25c4172b",
-      "userRunTest": "not_tested",
+      "commit": "af4a009349efb8c12ac87a0767f7950e697cdc3b",
+      "codeCommit": "d4154bc6d985a7778294ba88c747abdf25c4172b",
+      "reason": "Auto Hunt OFF 상태에서 한 아군이 공격받아도 주변 대기 아군이 지역 전투에 참여하지 않으며, 현재 근접 유닛의 추가 공격 사거리가 26~34px로 넓어 시각적으로 원거리 공격처럼 느껴질 수 있음",
+      "userRunTest": "failed",
       "mainBranchMerged": false
     },
     {
@@ -236,7 +252,7 @@
     "typecheck": "passed",
     "build": "passed",
     "devServer": "passed",
-    "browserAutomation": "passed",
+    "browserAutomation": "partial",
     "userRunTest": "not_tested",
     "chatGptCodeReview": "not_reviewed"
   },
@@ -244,5 +260,5 @@
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T20:41:12+09:00"
+  "lastUpdated": "2026-07-26T21:19:27+09:00"
 }

@@ -315,6 +315,22 @@
 - 결정: 사용자 수동 테스트와 ChatGPT 코드 검수 전까지 8단계는 `review_pending`으로 유지한다.
 - 상태: 확정
 
+## 8단계 v2 동료 지원 및 근접 범위 결정
+
+- 결정: Auto Hunt OFF에서도 공격받은 아군을 중심으로 `RTS_ALLY_ASSIST_RANGE` 안의 대기 아군이 지역 전투에 참여한다.
+- 결정: 동료 지원 범위는 `RTS_ALLY_ASSIST_RANGE = 140`으로 조절 가능하게 관리한다.
+- 결정: 지원 대상은 `RTS_LOCAL_ENGAGEMENT_RANGE` 안의 적만 사용하며 전장 전체 탐색으로 확장하지 않는다.
+- 결정: `NONE`과 유효한 적 대상이 없는 `LOCAL_ENGAGE`만 동료 지원 대상으로 허용한다.
+- 결정: MOVE·FOCUS_ATTACK·ATTACK_MOVE는 동료 지원보다 우선하고, AUTO_HUNT는 기존 자동 전투를 유지한다.
+- 결정: 이미 유효한 적과 싸우는 LOCAL_ENGAGE 유닛의 대상은 불필요하게 변경하지 않는다.
+- 결정: 지원 대상은 현재 타깃 수, 공격자 우선, 지원 유닛과의 거리, battleUnitId 순으로 결정적으로 분산한다.
+- 결정: 현재 모든 전투 유닛은 근접 유닛이며, 원거리 유닛과 투사체는 후속 단계로 연기한다.
+- 결정: attackRange는 몸 반지름을 제외한 추가 무기 도달 거리이며 현재 주인공 10px, 일반 유닛 8px, Slime 4 10px로 설정한다.
+- 결정: 실제 중심점 공격 판정은 공격자 attackRange와 양쪽 collisionRadius를 합산하고 피해 직전에 다시 확인한다.
+- 결정: 정확히 한 명의 생존 아군을 선택했을 때만 `collisionRadius + attackRange` 공격 범위 원과 `Melee reach` 정보를 표시한다.
+- 결정: `review-stage-08-v1`은 수정 요청으로 보존하고 `review-stage-08-v2`로 재제출한다.
+- 상태: 확정
+
 ## 공통 단계 정보
 
 - 전체 단계: 17단계
@@ -334,7 +350,7 @@
 - 6단계 현재 검수 태그: `review-stage-06-v2`
 - 6단계 완료 태그: `stage-06-completed`
 - 7단계 현재 검수 태그: `review-stage-07-v7`
-- 8단계 현재 검수 태그: `review-stage-08-v1`
+- 8단계 현재 검수 태그: `review-stage-08-v2`
 - 다음 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계
 - 검수 승인: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계 승인

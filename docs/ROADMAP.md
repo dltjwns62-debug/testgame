@@ -20,7 +20,7 @@
 - 6단계 현재 검수 태그: `review-stage-06-v2`
 - 6단계 완료 태그: `stage-06-completed`
 - 7단계 현재 검수 태그: `review-stage-07-v7`
-- 8단계 현재 검수 태그: `review-stage-08-v1`
+- 8단계 현재 검수 태그: `review-stage-08-v2`
 - 다음 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계
@@ -348,7 +348,7 @@
 
 ### 단계 상태
 
-`review_pending` — 구현 완료, `review-stage-08-v1` 검수 대기. 작업 브랜치: `stage-08-auto-hunt-controls`
+`review_pending` — v1 피드백 수정 완료, `review-stage-08-v2` 검수 대기. 작업 브랜치: `stage-08-auto-hunt-controls`
 
 ### 목표
 
@@ -362,13 +362,23 @@
 - [x] 수동 FOCUS_ATTACK 명령이 Auto Hunt보다 우선 처리
 - [x] 수동 명령 종료 후 Auto Hunt ON 상태에서 자동 전투 재개
 - [x] Auto Hunt OFF 시 자동 유닛만 해제하고 수동 명령은 보존
+- [x] Auto Hunt OFF에서 140px 내 대기 아군의 지역 동료 지원
+- [x] MOVE·FOCUS_ATTACK·ATTACK_MOVE·AUTO_HUNT와 기존 유효 LOCAL_ENGAGE 보호
+- [x] 지원 대상의 결정적 분산과 지역 교전 종료 후 상태 복귀
+- [x] 모든 근접 유닛의 추가 attackRange를 8~10px로 조정
+- [x] 단일 아군 선택 시 공격 범위 원과 `Melee reach` 정보 표시
 
 ### 완료 조건
 
 - [x] 명령 우선순위와 자동사냥 상태가 일관되게 동작한다.
 - [x] `npm ci`, TypeScript 검사, 빌드가 통과한다.
 - [x] 자동 브라우저 확인에서 초기 OFF, ON 전역 전투, 수동 MOVE 우선, ON/OFF 로그, 치명적 콘솔 오류 없음이 확인된다.
+- [x] 실제 피해 직후 지역 동료 지원 코드와 공격 거리 재검사 코드가 확인된다.
+- [x] 단일 선택 Hero의 `Melee reach: 10px`와 공격 범위 원을 브라우저에서 확인한다.
 - [ ] 필드 왕복 후 전투 재진입 시 Auto Hunt 세션 유지 사용자 테스트
+- [ ] 지역 동료 지원의 수동 전투 시나리오와 지원 대상 분산
+- [ ] 모든 축소 근접 사거리와 사거리 밖 피해 방지 수동 테스트
+- [ ] 10대10 전투의 교착 없는 종료 수동 테스트
 - [ ] ChatGPT 코드 검수
 - [ ] 승인 후 `main` 반영
 

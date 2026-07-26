@@ -2,6 +2,21 @@
 
 변경 이력은 누적해서 기록한다. 기존 기록은 삭제하지 않으며, 새 기록은 최신 항목이 위에 오도록 추가한다. 검수 대기 중인 작업은 완료 이력과 구분해서 표시한다.
 
+## 2026-07-26 — 8단계 검수 피드백 수정 및 v2 재제출 — 검수 대기
+
+- Auto Hunt OFF에서 공격받은 아군 주변의 대기 아군이 지역 전투를 지원하도록 추가
+- 동료 지원 범위를 `RTS_ALLY_ASSIST_RANGE = 140`으로 분리해 조절 가능하게 구성
+- MOVE·FOCUS_ATTACK·ATTACK_MOVE·AUTO_HUNT와 유효한 기존 LOCAL_ENGAGE 명령은 지원으로 덮어쓰지 않음
+- 지역 적 후보의 공격자 우선·현재 타깃 수·거리·ID 정렬로 지원 대상을 결정적으로 분산
+- 동료 지원 전투는 `RTS_LOCAL_ENGAGEMENT_RANGE`를 벗어나 전장 전체 추적으로 확장하지 않음
+- 주인공 10px, 시험용 용병 8px, Slime 1~3 8px, Slime 4 10px로 근접 추가 사거리를 축소
+- 실제 공격 판정은 기존처럼 공격자 사거리와 양쪽 collisionRadius를 합산하고 피해 직전에 재검사
+- 단일 아군 선택 시 실제 근접 도달 경계를 얇은 공격 범위 원으로 표시하고 `Melee reach`를 표시
+- `review-stage-08-v1`은 changes_requested 기록으로 보존
+- 새 검수 태그는 `review-stage-08-v2`
+- 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 실시하지 않음
+- 8단계는 아직 완료되지 않았으며 현재 상태는 `review_pending`
+
 ## 2026-07-26 — 8단계 Auto Hunt 제어 및 수동 명령 우선순위 구현 — 검수 대기
 
 - 전투 화면에 Auto Hunt ON/OFF 버튼을 추가하고 기본값을 OFF로 유지

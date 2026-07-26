@@ -1,23 +1,35 @@
 {
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
-  "totalStages": 10,
-  "currentStage": 6,
-  "currentStageName": "승리·패배, 보상, 몬스터 재생성",
-  "stageStatus": "completed",
-  "activeTask": "6단계 완료 — 7단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "totalStages": 17,
+  "currentStage": 7,
+  "currentStageName": "10대10 RTS 핵심 전투",
+  "stageStatus": "review_pending",
+  "activeTask": "7단계 구현 완료 — 사용자 실행 테스트 및 코드 검수 대기",
+  "workingBranch": "stage-07-rts-battle-core",
   "completedStages": [1, 2, 3, 4, 5, 6],
   "approvedStages": [1, 2, 3, 4, 5, 6],
-  "nextStage": 7,
-  "nextStageName": "경험치, 레벨, 능력치 성장",
+  "nextStage": 8,
+  "nextStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
   "reviewSubmission": {
-    "branch": "stage-06-results-rewards-respawn",
-    "tag": "review-stage-06-v2",
-    "version": 2,
+    "branch": "stage-07-rts-battle-core",
+    "tag": "review-stage-07-v1",
+    "version": 1,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 7,
+      "branch": "stage-07-rts-battle-core",
+      "tag": "review-stage-07-v1",
+      "version": 1,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "commit": null,
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
     {
       "stage": 6,
       "branch": "stage-06-results-rewards-respawn",
@@ -125,9 +137,9 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-26T15:29:00+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
@@ -135,13 +147,12 @@
     "build": "passed",
     "devServer": "passed",
     "browserAutomation": "passed",
-    "browserAutomation": "기존 실제 결과 유지",
-    "userRunTest": "passed",
-    "chatGptCodeReview": "approved"
+    "userRunTest": "not_tested",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T15:29:00+09:00"
+  "lastUpdated": "2026-07-26T16:15:35+09:00"
 }

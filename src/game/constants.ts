@@ -29,6 +29,7 @@ export const RTS_MAX_COMBAT_DELTA_MS = 100;
 export const RTS_FORMATION_SPACING = 34;
 export const RTS_LOCAL_ENGAGEMENT_RANGE = 180;
 export const RTS_RETALIATION_MEMORY_MS = 2500;
+export const AUTO_HUNT_REGISTRY_KEY = "testgame.autoHuntEnabled";
 export const RTS_TRIAL_MAIN_CHARACTER = {
   maxHp: 120,
   attackDamage: 15,

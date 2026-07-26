@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import {
+  AUTO_HUNT_REGISTRY_KEY,
   COMBAT_LOG_LIMIT,
   GAME_HEIGHT,
   GAME_WIDTH,
@@ -46,6 +47,11 @@ type SlotVisual = {
   hpFill: Phaser.GameObjects.Rectangle;
 };
 
+type AutoHuntButtonVisual = {
+  background: Phaser.GameObjects.Rectangle;
+  label: Phaser.GameObjects.Text;
+};
+
 type PointerPosition = {
   x: number;
   y: number;
@@ -59,6 +65,7 @@ export class BattleScene extends Phaser.Scene {
   private dataError: string | null = null;
   private resultCommitted = false;
   private combatTimeMs = 0;
+  private autoHuntEnabled = false;
   private sourceWorldMonsterId = "unknown-monster";
   private enemyDefinitionId = "slime-1";
   private enemyDisplayName = "Slime 1";
@@ -75,6 +82,7 @@ export class BattleScene extends Phaser.Scene {
   private selectedInfoText!: Phaser.GameObjects.Text;
   private outcomeText!: Phaser.GameObjects.Text;
   private attackLogText!: Phaser.GameObjects.Text;
+  private autoHuntButton!: AutoHuntButtonVisual;
   private dragStart: PointerPosition | null = null;
   private dragEnd: PointerPosition | null = null;
   private isDragging = false;
@@ -147,6 +155,11 @@ export class BattleScene extends Phaser.Scene {
     this.resultCommitted = false;
     this.dataError = null;
     this.combatTimeMs = 0;
+    const storedAutoHunt = this.game.registry.get(AUTO_HUNT_REGISTRY_KEY);
+    this.autoHuntEnabled = storedAutoHunt === true;
+    if (storedAutoHunt === undefined) {
+      this.game.registry.set(AUTO_HUNT_REGISTRY_KEY, false);
+    }
     this.sourceWorldMonsterId = "unknown-monster";
     this.enemyDefinitionId = "unknown-enemy";
     this.enemyDisplayName = "Unknown enemy";
@@ -189,6 +202,10 @@ export class BattleScene extends Phaser.Scene {
     createEnemyIds(this.enemyDefinitionId, RTS_ENEMY_COUNT).forEach((battleUnitId, index) => {
       this.units.set(battleUnitId, this.createEnemyUnit(battleUnitId, enemyPositions[index], enemyDefinition));
     });
+
+    if (this.autoHuntEnabled) {
+      this.activateAutoHuntForIdleAllies();
+    }
   }
 
   private createAllyUnit(entry: RosterEntry, position: BattlePosition): RTSBattleUnit {
@@ -266,17 +283,38 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 14, "Stage 7: 10v10 RTS Battle Core", {
+    this.add.text(32, 12, "Stage 8: Auto Hunt Controls", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
-    this.add.text(34, 45, `Enemy: ${this.enemyDisplayName} x10 · Command allies manually.`, {
+    this.add.text(34, 43, `Enemy: ${this.enemyDisplayName} x10`, {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
-      fontSize: "14px",
+      fontSize: "12px",
     });
+    this.add.text(34, 57, "Auto Hunt: all allies · manual commands first.", {
+      color: "#c4e4d0",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "11px",
+    });
+    const autoHuntBackground = this.add.rectangle(500, 28, 150, 28, 0x26394b, 1)
+      .setStrokeStyle(1, 0x54748a, 1);
+    autoHuntBackground.setInteractive({ useHandCursor: true });
+    autoHuntBackground.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      this.setAutoHuntEnabled(!this.autoHuntEnabled);
+    });
+    this.autoHuntButton = {
+      background: autoHuntBackground,
+      label: this.add.text(500, 28, "", {
+        color: "#d9e8f2",
+        fontFamily: "Segoe UI, sans-serif",
+        fontSize: "12px",
+        fontStyle: "bold",
+      }).setOrigin(0.5),
+    };
     this.statusText = this.add.text(730, 14, "", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
@@ -284,6 +322,50 @@ export class BattleScene extends Phaser.Scene {
       fontStyle: "bold",
       align: "right",
     }).setOrigin(1, 0);
+  }
+
+  private setAutoHuntEnabled(enabled: boolean): void {
+    if (this.dataError || this.combatState !== "RUNNING") {
+      return;
+    }
+
+    this.autoHuntEnabled = enabled;
+    this.game.registry.set(AUTO_HUNT_REGISTRY_KEY, enabled);
+    this.addAttackLog(enabled ? "Auto Hunt enabled." : "Auto Hunt disabled.");
+
+    if (enabled) {
+      this.activateAutoHuntForIdleAllies();
+    } else {
+      for (const unit of this.units.values()) {
+        if (unit.team !== "ALLY" || !unit.isAlive || unit.commandMode !== "AUTO_HUNT") {
+          continue;
+        }
+
+        unit.currentTargetId = null;
+        unit.moveDestination = null;
+        unit.commandDestination = null;
+        unit.attackElapsedMs = 0;
+        unit.commandMode = "NONE";
+        unit.state = "IDLE";
+      }
+    }
+
+    this.updateUi();
+  }
+
+  private activateAutoHuntForIdleAllies(): void {
+    for (const unit of this.units.values()) {
+      if (unit.team === "ALLY" && unit.isAlive && unit.commandMode === "NONE") {
+        unit.commandMode = "AUTO_HUNT";
+      }
+    }
+  }
+
+  private updateAutoHuntUi(): void {
+    const color = this.autoHuntEnabled ? 0x3b9b6f : 0x26394b;
+    const stroke = this.autoHuntEnabled ? 0x9ce4b0 : 0x54748a;
+    this.autoHuntButton?.background.setFillStyle(color, 1).setStrokeStyle(1, stroke, 1);
+    this.autoHuntButton?.label.setText(`Auto Hunt: ${this.autoHuntEnabled ? "ON" : "OFF"}`);
   }
 
   private addArenaInteraction(): void {
@@ -423,14 +505,14 @@ export class BattleScene extends Phaser.Scene {
       const currentTarget = this.getAliveEnemy(unit.currentTargetId);
       let targetLost = false;
       if (!currentTarget && unit.commandMode === "FOCUS_ATTACK") {
-        unit.commandMode = "LOCAL_ENGAGE";
+        unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "LOCAL_ENGAGE";
       }
       if (unit.currentTargetId && !currentTarget) {
         targetLost = true;
         unit.currentTargetId = null;
         unit.attackElapsedMs = 0;
         if (unit.commandMode === "FOCUS_ATTACK") {
-          unit.commandMode = "LOCAL_ENGAGE";
+          unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "LOCAL_ENGAGE";
         }
         if (unit.commandMode === "ATTACK_MOVE" && unit.commandDestination) {
           unit.moveDestination = unit.commandDestination;
@@ -454,13 +536,13 @@ export class BattleScene extends Phaser.Scene {
         if (moveToward(unit, unit.commandDestination, deltaMs)) {
           unit.moveDestination = null;
           unit.commandDestination = null;
-          unit.commandMode = "NONE";
+          unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "NONE";
           unit.state = "IDLE";
         }
       } else {
         unit.moveDestination = null;
         if (unit.commandMode === "LOCAL_ENGAGE") {
-          unit.commandMode = "NONE";
+          unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "NONE";
         }
         unit.state = "IDLE";
       }
@@ -488,7 +570,7 @@ export class BattleScene extends Phaser.Scene {
     unit.commandDestination = null;
     unit.currentTargetId = null;
     unit.attackElapsedMs = 0;
-    unit.commandMode = "NONE";
+    unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "NONE";
     unit.lastAttackerId = null;
     unit.lastAttackedAt = 0;
     unit.state = "IDLE";
@@ -506,6 +588,10 @@ export class BattleScene extends Phaser.Scene {
   private chooseAllyTarget(unit: RTSBattleUnit, targetLost: boolean): RTSBattleUnit | null {
     if (unit.commandMode === "FOCUS_ATTACK") {
       return null;
+    }
+
+    if (unit.commandMode === "AUTO_HUNT") {
+      return this.findPreferredEnemyTarget(unit);
     }
 
     const retaliationTarget = this.getRetaliationTarget(unit);
@@ -886,8 +972,9 @@ export class BattleScene extends Phaser.Scene {
       ? "Battle cannot start with invalid data. Return to Field."
       : selected.length === 0
       ? "No allies selected. Left-click or drag to select; right-click to command."
-      : `${selected.length} ally selected${selected.length === 1 ? "" : "s"}. Skills are not available in Stage 7.`);
+      : `${selected.length} ally selected${selected.length === 1 ? "" : "s"}. Manual commands have priority over Auto Hunt.`);
     this.attackLogText?.setText(["Recent orders", ...(this.attackLogs.length > 0 ? this.attackLogs.slice(-3) : ["No orders yet."])]);
+    this.updateAutoHuntUi();
     this.refreshSlotUi();
   }
 
@@ -900,7 +987,8 @@ export class BattleScene extends Phaser.Scene {
       }
 
       visual.nameText.setText(unit.unitRole === "MAIN_CHARACTER" ? "Hero" : `Merc ${index}`);
-      visual.stateText.setText(unit.isAlive ? unit.state : "DEAD");
+      const stateLabel = unit.commandMode === "AUTO_HUNT" ? `AUTO / ${unit.state}` : unit.state;
+      visual.stateText.setText(unit.isAlive ? stateLabel : "DEAD");
       visual.stateText.setColor(unit.isAlive ? "#b9cad7" : "#ef9a9a");
       visual.hpFill.setDisplaySize(54 * this.getHealthRatio(unit.currentHp, unit.maxHp), 4);
     }

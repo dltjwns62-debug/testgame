@@ -1,10 +1,20 @@
 # 현재 개발 상태
 
-## Stage 9 v2 resubmission status
+## Stage 9 v3 resubmission status
+
+- Submission: `review-stage-09-v3` on `stage-09-unit-skills-ui`
+- Stage status: `review_pending`
+- Active task: per-unit local guard defense completed; waiting for v3 review
+- v1 and v2 tags remain preserved; `main` is not changed
+- User run test: `not_tested`
+- ChatGPT code review: `not_reviewed`
+- The v3 fix replaces persistent AllyAssistThreat processing with guardPosition-based aggro, leash, return, and visualization.
+
+## Stage 9 v2 resubmission history (superseded by v3)
 
 - Submission: `review-stage-09-v2` on `stage-09-unit-skills-ui`
-- Stage status: `review_pending`
-- Active task: persistent local ally assistance fix completed; waiting for v2 review
+- Stage status: `changes_requested` (historical)
+- Historical result: v2 local ally assistance fix was superseded after user testing
 - v1 `review-stage-09-v1` remains preserved; `main` is not changed
 - User run test: `not_tested`
 - ChatGPT code review: `not_reviewed`
@@ -18,10 +28,10 @@
 - 현재 단계 상태: 검수 대기 (`review_pending`)
 - 상태 코드: `review_pending`
 - 현재 작업 브랜치: `stage-09-unit-skills-ui`
-- 검수 태그: `review-stage-09-v2`
+- 검수 태그: `review-stage-09-v3`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
-- 현재 작업: 9단계 지속형 지역 동료 지원 수정 완료 — `review-stage-09-v2` 검수 대기 중
+- 현재 작업: 9단계 주둔 지역 자동 방어 수정 완료 — `review-stage-09-v3` 검수 대기 중
 - 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
@@ -63,7 +73,7 @@
 - 8단계 v3 no-ff 병합: 완료
 - 8단계 완료 태그: `stage-08-completed`
 - 9단계 Skill Mercenary 정의·Q/W 스킬·단일 선택 UI: 구현 완료, 검수 대기
-- 9단계 검수 제출 태그: `review-stage-09-v2` (v1 수정 요청 보존)
+- 9단계 검수 제출 태그: `review-stage-09-v3` (v1·v2 수정 요청 보존)
 - 9단계 자동 브라우저 확인: Stage 9 제목, Skill Mercenary 슬롯·색상, 단일 선택 Q/W 패널과 콘솔 오류 없음 확인
 - 9단계 사용자 수동 테스트: 미실시
 - 9단계 ChatGPT 코드 검수: 미실시

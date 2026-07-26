@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 9 v2 scope note: the submitted fix is limited to persistent local ally assistance and completed/stale MOVE normalization. It does not implement stage 10 formation changes or any deferred skill, inventory, save, or online features.
+Stage 9 v3 scope note: the submitted fix is limited to per-unit guard defense, completed/stale MOVE normalization, and the guard-range indicator. It does not implement stage 10 formation changes or any deferred skill, inventory, save, or online features.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -53,7 +53,7 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 7단계 완료 태그: `stage-07-completed`
 - 8단계 검수 태그: `review-stage-08-v3` (완료)
 - 8단계 완료 태그: `stage-08-completed`
-- 9단계 검수 태그: `review-stage-09-v2`
+- 9단계 검수 태그: `review-stage-09-v3`
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
@@ -62,4 +62,4 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
 완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 8단계까지 완료됐고, 9단계는 이 작업 브랜치에서 구현 후 검수 대기 중이다. 검수 전에는 작업 브랜치에만 push하며, 승인 없이 `main`을 변경하지 않는다.
 
-8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의에 스킬을 연결하고 단일 선택 Skill Mercenary에게만 Q Whirlwind와 W First Aid를 제공한다. 스킬은 수동 사용과 전투별 쿨다운만 다루며 Auto Hunt가 자동 사용하지 않는다. 편성 재배치, 부대 지정, 경험치·레벨·아이템·저장·온라인 기능 및 10단계 기능은 구현하지 않는다.
+8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의에 스킬을 연결하고 단일 선택 Skill Mercenary에게만 Q Whirlwind와 W First Aid를 제공한다. v3에서는 각 아군의 guardPosition을 중심으로 주둔 지역 자동 방어를 수행하고, 기존 AllyAssistThreat 방식은 제거한다. 스킬은 수동 사용과 전투별 쿨다운만 다루며 Auto Hunt가 자동 사용하지 않는다. 편성 재배치, 부대 지정, 경험치·레벨·아이템·저장·온라인 기능 및 10단계 기능은 구현하지 않는다.

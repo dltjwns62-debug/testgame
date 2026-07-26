@@ -1,6 +1,25 @@
 # 2단계 실행 및 수동 테스트
 
-## Stage 9 v2 local ally assistance regression checklist
+## Stage 9 v3 local guard defense regression checklist
+
+- [ ] Each ally starts with an independent guard position copied from its spawn position.
+- [ ] A successful MOVE updates only that unit's guard position to the constrained arrival point.
+- [ ] Invalid or stale MOVE cleanup preserves the previous guard position.
+- [ ] Auto Hunt OFF detects nearby enemies within 140px of the unit's own guard position.
+- [ ] Guard aggro does not require real damage or the enemy to target another ally.
+- [ ] A local target is released after moving beyond 180px from the guard position.
+- [ ] With no local enemies, the ally returns to its guard position.
+- [ ] Multiple local enemies are distributed deterministically.
+- [ ] Active MOVE remains higher priority than guard defense.
+- [ ] FOCUS_ATTACK ignores guard leash and retains its manually selected target.
+- [ ] Auto Hunt ON keeps global enemy search; switching OFF adopts current positions as guard positions.
+- [ ] A single selected ally shows a 140px guard range centered on guardPosition only when Auto Hunt is OFF.
+- [ ] Skill Merc Q/W, melee range, victory, defeat, Gold, and Return to Field remain functional.
+- [ ] No fatal browser console error occurs.
+
+The v3 user-run checklist remains `not_tested` until the manual scenarios A-G are performed.
+
+## Stage 9 v2 local ally assistance regression checklist (historical; superseded by v3)
 
 - [ ] Nearby enemy pursuit creates a local threat before real damage is dealt.
 - [ ] An ally that enters the support range later can join while the threat is remembered.
@@ -15,7 +34,7 @@
 - [ ] Skill Merc Q/W, multi-selection skill blocking, melee attacks, victory, defeat, and Gold remain functional.
 - [ ] No fatal browser console error occurs during the scenarios.
 
-The v2 user-run checklist remains `not_tested` until the user performs the manual scenarios in a browser.
+The v2 user-run checklist remains `not_tested` and is retained only as review history; v3 guard-defense scenarios are listed above.
 
 ## 설치
 

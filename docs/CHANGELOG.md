@@ -1,5 +1,17 @@
 # 변경 이력
 
+## 2026-07-27 — Stage 9 v3 per-unit guard defense resubmission
+
+- Adds independent `guardPosition` data for every battle unit.
+- Stores successful MOVE arrival positions as new guard positions.
+- Detects nearby enemies around each guard position without damage or enemy target ownership.
+- Adds 140px guard aggro and 180px guard leash behavior.
+- Returns units to guard positions after local enemies disappear or leave leash range.
+- Replaces persistent AllyAssistThreat processing with per-unit guard defense.
+- Adds the single-selection guard range visualization while Auto Hunt is OFF.
+- Preserves Skill Merc Q/W and existing command priorities.
+- Records `review-stage-09-v2` as `changes_requested` and submits `review-stage-09-v3`.
+
 ## 2026-07-27 — Stage 9 v2 persistent local ally assistance resubmission
 
 - Detects nearby enemy pursuit as a local assistance threat before real damage.

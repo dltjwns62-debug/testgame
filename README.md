@@ -1,6 +1,10 @@
 # Test Game
 
-## Stage 9 v2 resubmission
+## Stage 9 v3 resubmission
+
+v3 replaces threat-request-based ally assistance with per-unit local guard defense. Every ally owns an independent `guardPosition`; Auto Hunt OFF detects enemies within `RTS_GUARD_AGGRO_RANGE` and stops pursuit beyond `RTS_GUARD_LEASH_RANGE`. Completed MOVE commands update the guard position, while malformed MOVE states preserve the previous guard position.
+
+## Stage 9 v2 resubmission history
 
 The v1 user test found that ally assistance was checked only from `applyDamage()` and that completed MOVE commands could remain active. v2 records both real damage and nearby enemy pursuit as `AllyAssistThreat` entries, remembers them for 2500ms, and continuously evaluates eligible allies within `RTS_ALLY_ASSIST_RANGE`.
 
@@ -15,7 +19,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 현재 단계 이름: 유닛 스킬과 단일 선택 전용 스킬 UI
 - 현재 상태: 검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-09-unit-skills-ui`
-- 검수 태그: `review-stage-09-v2`
+- 검수 태그: `review-stage-09-v3`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 
@@ -71,4 +75,4 @@ npm run typecheck
 npm run build
 ```
 
-7단계와 8단계는 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다. 9단계는 v1 사용자 테스트에서 발견된 지역 동료 지원 문제를 수정해 `review-stage-09-v2`로 재제출했으며 현재 상태는 `review_pending`이다. 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 미실시다.
+7단계와 8단계는 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다. 9단계는 v2 사용자 테스트에서 발견된 지역 전투 문제를 주둔 지점 기반 자동 방어로 수정해 `review-stage-09-v3`로 재제출했으며 현재 상태는 `review_pending`이다. 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 미실시다.

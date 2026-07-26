@@ -1,6 +1,18 @@
 # 프로젝트 결정 사항
 
-## Stage 9 v2 persistent local ally assistance decisions
+## Stage 9 v3 per-unit guard defense decisions
+
+- Auto Hunt OFF allies each own an independent `guardPosition`, initially copied from their spawn position.
+- A successful floor MOVE stores the constrained arrival position as the new guard position; invalid MOVE cleanup does not change it.
+- An ally detects any living enemy within `RTS_GUARD_AGGRO_RANGE = 140` of its own guard position, regardless of damage or enemy `currentTargetId`.
+- Local defense uses `RTS_GUARD_LEASH_RANGE = 180`; targets beyond it are released and the ally returns home.
+- Guard aggro targets are distributed by assigned count, current distance, and `battleUnitId`.
+- Only active MOVE blocks guard defense. FOCUS_ATTACK ignores guard leash, and Auto Hunt ON keeps global search.
+- Auto Hunt OFF transition copies each AUTO_HUNT ally's current position into a new guard position before clearing its target.
+- The v2 AllyAssistThreat request system is replaced rather than run alongside guard defense.
+- A single selected ally in Auto Hunt OFF shows the guard range centered on `guardPosition`; per-unit ranges remain deferred.
+
+## Stage 9 v2 persistent local ally assistance decisions (historical; superseded by v3)
 
 - Local assistance reacts to real damage and to nearby enemies that are pursuing an ally through `currentTargetId`.
 - A distant target assignment alone does not create a threat; the enemy and target must be within `RTS_LOCAL_ENGAGEMENT_RANGE`.
@@ -9,7 +21,7 @@
 - Only active MOVE has priority over support. Completed or stale MOVE is normalized immediately.
 - `FOCUS_ATTACK`, `AUTO_HUNT`, and an existing valid `LOCAL_ENGAGE` target are not overwritten.
 - Multiple threats and targets use deterministic distance, attacker, pursuit, target-count, and `battleUnitId` ordering.
-- `review-stage-09-v1` is preserved; the v2 submission is `review-stage-09-v2` and remains `review_pending`.
+- `review-stage-09-v1` is preserved; the v2 submission is `review-stage-09-v2` and is recorded as `changes_requested`.
 
 현재 단계 기준: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
 
@@ -385,7 +397,7 @@
 - 7단계 현재 검수 태그: `review-stage-07-v7`
 - 8단계 현재 검수 태그: `review-stage-08-v3`
 - 8단계 완료 태그: `stage-08-completed`
-- 9단계 현재 검수 태그: `review-stage-09-v2`
+- 9단계 현재 검수 태그: `review-stage-09-v3`
 - 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 승인: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계 승인

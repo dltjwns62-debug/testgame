@@ -2,17 +2,24 @@ import { RTS_ARENA_BOUNDS, RTS_FORMATION_SPACING } from "./constants";
 import type { BattlePosition, RTSBattleUnit } from "./rtsBattleTypes";
 
 export function clampNumber(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
+  const safeMin = Number.isFinite(min) ? min : 0;
+  const safeMax = Number.isFinite(max) ? Math.max(safeMin, max) : safeMin;
+  if (!Number.isFinite(value)) {
+    return safeMin + (safeMax - safeMin) / 2;
+  }
+  return Math.min(safeMax, Math.max(safeMin, value));
 }
 
 export function distanceBetween(first: BattlePosition, second: BattlePosition): number {
-  return Math.hypot(second.x - first.x, second.y - first.y);
+  const distance = Math.hypot(second.x - first.x, second.y - first.y);
+  return Number.isFinite(distance) ? distance : Number.POSITIVE_INFINITY;
 }
 
 export function constrainToArena(position: BattlePosition, radius: number): BattlePosition {
+  const safeRadius = Number.isFinite(radius) ? Math.max(0, radius) : 0;
   return {
-    x: clampNumber(position.x, RTS_ARENA_BOUNDS.left + radius, RTS_ARENA_BOUNDS.right - radius),
-    y: clampNumber(position.y, RTS_ARENA_BOUNDS.top + radius, RTS_ARENA_BOUNDS.bottom - radius),
+    x: clampNumber(position.x, RTS_ARENA_BOUNDS.left + safeRadius, RTS_ARENA_BOUNDS.right - safeRadius),
+    y: clampNumber(position.y, RTS_ARENA_BOUNDS.top + safeRadius, RTS_ARENA_BOUNDS.bottom - safeRadius),
   };
 }
 
@@ -31,18 +38,42 @@ export function isPointInRectangle(
 export function createFormationDestinations(
   center: BattlePosition,
   count: number,
+  unitRadius = 13,
 ): BattlePosition[] {
-  const columns = Math.max(1, Math.ceil(Math.sqrt(count)));
-  const rows = Math.max(1, Math.ceil(count / columns));
+  const safeCount = Number.isSafeInteger(count) ? Math.max(0, count) : 0;
+  if (safeCount === 0) {
+    return [];
+  }
+
+  const safeRadius = Number.isFinite(unitRadius) ? Math.max(0, unitRadius) : 0;
+  const columns = Math.max(1, Math.ceil(Math.sqrt(safeCount)));
+  const rows = Math.max(1, Math.ceil(safeCount / columns));
+  const offsets = Array.from({ length: safeCount }, (_, index) => ({
+    x: (index % columns - (columns - 1) / 2) * RTS_FORMATION_SPACING,
+    y: (Math.floor(index / columns) - (rows - 1) / 2) * RTS_FORMATION_SPACING,
+  }));
+  const minOffsetX = Math.min(...offsets.map((offset) => offset.x));
+  const maxOffsetX = Math.max(...offsets.map((offset) => offset.x));
+  const minOffsetY = Math.min(...offsets.map((offset) => offset.y));
+  const maxOffsetY = Math.max(...offsets.map((offset) => offset.y));
+  const safeCenter = constrainToArena(center, safeRadius);
+  const centerX = clampNumber(
+    safeCenter.x,
+    RTS_ARENA_BOUNDS.left + safeRadius - minOffsetX,
+    RTS_ARENA_BOUNDS.right - safeRadius - maxOffsetX,
+  );
+  const centerY = clampNumber(
+    safeCenter.y,
+    RTS_ARENA_BOUNDS.top + safeRadius - minOffsetY,
+    RTS_ARENA_BOUNDS.bottom - safeRadius - maxOffsetY,
+  );
   const destinations: BattlePosition[] = [];
 
-  for (let index = 0; index < count; index += 1) {
-    const column = index % columns;
-    const row = Math.floor(index / columns);
-    destinations.push(constrainToArena({
-      x: center.x + (column - (columns - 1) / 2) * RTS_FORMATION_SPACING,
-      y: center.y + (row - (rows - 1) / 2) * RTS_FORMATION_SPACING,
-    }, 12));
+  for (const offset of offsets) {
+    destinations.push({
+      x: centerX + offset.x,
+      y: centerY + offset.y,
+    });
   }
 
   return destinations;
@@ -75,13 +106,18 @@ export function moveToward(
   destination: BattlePosition,
   deltaMs: number,
 ): boolean {
-  const deltaX = destination.x - unit.position.x;
-  const deltaY = destination.y - unit.position.y;
+  const safePosition = constrainToArena(unit.position, unit.collisionRadius);
+  const safeDestination = constrainToArena(destination, unit.collisionRadius);
+  unit.position = safePosition;
+  const deltaX = safeDestination.x - safePosition.x;
+  const deltaY = safeDestination.y - safePosition.y;
   const distance = Math.hypot(deltaX, deltaY);
-  const travelDistance = unit.moveSpeed * (deltaMs / 1000);
+  const safeDeltaMs = Number.isFinite(deltaMs) ? Math.max(0, deltaMs) : 0;
+  const safeSpeed = Number.isFinite(unit.moveSpeed) ? Math.max(0, unit.moveSpeed) : 0;
+  const travelDistance = safeSpeed * (safeDeltaMs / 1000);
 
   if (!Number.isFinite(distance) || distance <= 2 || travelDistance >= distance) {
-    unit.position = constrainToArena(destination, unit.collisionRadius);
+    unit.position = safeDestination;
     return true;
   }
 
@@ -98,26 +134,30 @@ export function separateNearbyUnits(units: Iterable<RTSBattleUnit>): void {
     for (let secondIndex = firstIndex + 1; secondIndex < aliveUnits.length; secondIndex += 1) {
       const first = aliveUnits[firstIndex];
       const second = aliveUnits[secondIndex];
+      first.position = constrainToArena(first.position, first.collisionRadius);
+      second.position = constrainToArena(second.position, second.collisionRadius);
       const deltaX = second.position.x - first.position.x;
       const deltaY = second.position.y - first.position.y;
       const distance = Math.hypot(deltaX, deltaY);
-      const minimumDistance = first.collisionRadius + second.collisionRadius;
+      const firstRadius = Number.isFinite(first.collisionRadius) ? Math.max(0, first.collisionRadius) : 0;
+      const secondRadius = Number.isFinite(second.collisionRadius) ? Math.max(0, second.collisionRadius) : 0;
+      const minimumDistance = firstRadius + secondRadius;
 
-      if (distance >= minimumDistance || distance === 0) {
+      if (!Number.isFinite(distance) || distance >= minimumDistance) {
         continue;
       }
 
       const push = (minimumDistance - distance) / 2;
-      const normalX = deltaX / distance;
-      const normalY = deltaY / distance;
+      const normalX = distance === 0 ? (firstIndex % 2 === 0 ? 1 : 0) : deltaX / distance;
+      const normalY = distance === 0 ? (firstIndex % 2 === 0 ? 0 : 1) : deltaY / distance;
       first.position = constrainToArena({
         x: first.position.x - normalX * push,
         y: first.position.y - normalY * push,
-      }, first.collisionRadius);
+      }, firstRadius);
       second.position = constrainToArena({
         x: second.position.x + normalX * push,
         y: second.position.y + normalY * push,
-      }, second.collisionRadius);
+      }, secondRadius);
     }
   }
 }

@@ -44,11 +44,7 @@ export type RTSBattleUnit = {
 
 export type RTSBattleSceneData = {
   sourceWorldMonsterId: string;
-  enemyDefinitionId: string;
-  enemyDisplayName: string;
-  enemyColor: number;
   enemyCount: number;
-  goldReward: number;
   allyRoster: RosterEntry[];
 };
 

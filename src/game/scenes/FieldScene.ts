@@ -11,9 +11,8 @@ import {
   PLAYER_RADIUS,
   type MonsterDefinition,
 } from "../constants";
-import type { BattleResult } from "../battleTypes";
 import { createTrialRoster } from "../rtsBattleDefinitions";
-import type { RTSBattleSceneData } from "../rtsBattleTypes";
+import type { RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
@@ -263,11 +262,7 @@ export class FieldScene extends Phaser.Scene {
     const target = this.targetMonster.definition;
     const battleData: RTSBattleSceneData = {
       sourceWorldMonsterId: target.id,
-      enemyDefinitionId: target.id,
-      enemyDisplayName: target.name,
-      enemyColor: target.color,
       enemyCount: 10,
-      goldReward: target.goldReward,
       allyRoster: createTrialRoster(),
     };
 
@@ -287,19 +282,22 @@ export class FieldScene extends Phaser.Scene {
     this.updateStatusText();
   }
 
-  public applyBattleResult(result: BattleResult): void {
+  public applyBattleResult(result: RTSBattleResult): void {
     if (
       !result ||
       !this.battleTransitionStarted ||
       this.battleResultApplied ||
-      !this.targetMonster ||
-      this.targetMonster.definition.id !== result.monsterId
+      !this.targetMonster
     ) {
       return;
     }
 
-    const targetMonster = this.monsterViews.get(result.monsterId);
-    if (!targetMonster || !targetMonster.isAvailable) {
+    const targetMonster = this.targetMonster;
+    if (
+      !targetMonster.isAvailable ||
+      result.sourceWorldMonsterId !== targetMonster.definition.id ||
+      result.enemyDefinitionId !== targetMonster.definition.id
+    ) {
       return;
     }
 

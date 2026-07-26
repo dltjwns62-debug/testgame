@@ -9,11 +9,12 @@ import {
   RTS_MAX_COMBAT_DELTA_MS,
   RTS_SELECTION_DRAG_THRESHOLD_PX,
 } from "../constants";
-import type { BattleResult } from "../battleTypes";
-import { createEnemyIds, createTrialRoster, getEnemyDefinition, getTrialUnitStats } from "../rtsBattleDefinitions";
+import { createEnemyIds, getEnemyDefinition, getTrialUnitStats } from "../rtsBattleDefinitions";
 import type {
   BattleOutcome,
   BattlePosition,
+  EnemyDefinition,
+  RTSBattleResult,
   RTSBattleSceneData,
   RTSBattleUnit,
   RosterEntry,
@@ -52,6 +53,7 @@ type CombatState = "RUNNING" | "VICTORY" | "DEFEAT";
 export class BattleScene extends Phaser.Scene {
   private returnStarted = false;
   private combatState: CombatState = "RUNNING";
+  private dataError: string | null = null;
   private resultCommitted = false;
   private sourceWorldMonsterId = "unknown-monster";
   private enemyDefinitionId = "slime-1";
@@ -99,7 +101,9 @@ export class BattleScene extends Phaser.Scene {
     this.refreshAllVisuals();
     this.updateUi();
 
-    if (this.getAliveUnits("ENEMY").length === 0) {
+    if (this.dataError) {
+      this.outcomeText.setText(["BATTLE DATA ERROR", this.dataError, "Return to Field to continue."]);
+    } else if (this.getAliveUnits("ENEMY").length === 0) {
       this.commitResult("VICTORY");
     }
 
@@ -107,12 +111,19 @@ export class BattleScene extends Phaser.Scene {
   }
 
   public update(_time: number, delta: number): void {
+    if (this.dataError) {
+      this.updateUi();
+      return;
+    }
+
     if (this.combatState !== "RUNNING") {
       this.refreshAllVisuals();
       return;
     }
 
-    const safeDelta = Math.min(Math.max(delta, 0), RTS_MAX_COMBAT_DELTA_MS);
+    const safeDelta = Number.isFinite(delta)
+      ? Math.min(Math.max(delta, 0), RTS_MAX_COMBAT_DELTA_MS)
+      : 0;
     this.updateAllies(safeDelta);
     if (this.combatState === "RUNNING") {
       this.updateEnemies(safeDelta);
@@ -126,17 +137,10 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private resetBattle(data: unknown): void {
-    const battleData = this.isRTSBattleSceneData(data) ? data : this.getFallbackData();
-    const enemyDefinition = getEnemyDefinition(battleData.enemyDefinitionId);
-
     this.returnStarted = false;
     this.combatState = "RUNNING";
     this.resultCommitted = false;
-    this.sourceWorldMonsterId = battleData.sourceWorldMonsterId;
-    this.enemyDefinitionId = enemyDefinition?.id ?? battleData.enemyDefinitionId;
-    this.enemyDisplayName = enemyDefinition?.name ?? battleData.enemyDisplayName;
-    this.enemyColor = enemyDefinition?.color ?? battleData.enemyColor;
-    this.goldReward = this.sanitizeGold(enemyDefinition?.goldReward ?? battleData.goldReward);
+    this.dataError = null;
     this.units.clear();
     this.unitVisuals.clear();
     this.slotVisuals.clear();
@@ -147,9 +151,24 @@ export class BattleScene extends Phaser.Scene {
     this.isDragging = false;
     this.suppressArenaPointer = false;
 
-    const roster = battleData.allyRoster.length === RTS_ALLY_COUNT
-      ? [...battleData.allyRoster].sort((first, second) => first.slotIndex - second.slotIndex)
-      : createTrialRoster();
+    if (!this.isRTSBattleSceneData(data)) {
+      this.dataError = "The battle payload is invalid.";
+      return;
+    }
+
+    const enemyDefinition = getEnemyDefinition(data.sourceWorldMonsterId);
+    if (!enemyDefinition) {
+      this.dataError = `Unknown world monster: ${data.sourceWorldMonsterId}`;
+      return;
+    }
+
+    this.sourceWorldMonsterId = data.sourceWorldMonsterId;
+    this.enemyDefinitionId = enemyDefinition.id;
+    this.enemyDisplayName = enemyDefinition.name;
+    this.enemyColor = enemyDefinition.color;
+    this.goldReward = this.sanitizeGold(enemyDefinition.goldReward);
+
+    const roster = [...data.allyRoster].sort((first, second) => first.slotIndex - second.slotIndex);
     const allyPositions = createFormationDestinations({ x: GAME_WIDTH / 2, y: 338 }, RTS_ALLY_COUNT);
     roster.slice(0, RTS_ALLY_COUNT).forEach((entry, index) => {
       this.units.set(entry.rosterUnitId, this.createAllyUnit(entry, allyPositions[index]));
@@ -192,16 +211,8 @@ export class BattleScene extends Phaser.Scene {
   private createEnemyUnit(
     battleUnitId: string,
     position: BattlePosition,
-    enemyDefinition: ReturnType<typeof getEnemyDefinition>,
+    enemyDefinition: EnemyDefinition,
   ): RTSBattleUnit {
-    const stats = enemyDefinition ?? {
-      maxHp: 35,
-      attackDamage: 5,
-      attackIntervalMs: 1300,
-      moveSpeed: 70,
-      attackRange: 26,
-      collisionRadius: 12,
-    };
     return {
       battleUnitId,
       rosterUnitId: null,
@@ -210,14 +221,14 @@ export class BattleScene extends Phaser.Scene {
       definitionId: this.enemyDefinitionId,
       displayName: this.enemyDisplayName,
       sourceWorldMonsterId: this.sourceWorldMonsterId,
-      currentHp: stats.maxHp,
-      maxHp: stats.maxHp,
-      attackDamage: stats.attackDamage,
-      attackIntervalMs: stats.attackIntervalMs,
+      currentHp: enemyDefinition.maxHp,
+      maxHp: enemyDefinition.maxHp,
+      attackDamage: enemyDefinition.attackDamage,
+      attackIntervalMs: enemyDefinition.attackIntervalMs,
       attackElapsedMs: 0,
-      moveSpeed: stats.moveSpeed,
-      attackRange: stats.attackRange,
-      collisionRadius: stats.collisionRadius,
+      moveSpeed: enemyDefinition.moveSpeed,
+      attackRange: enemyDefinition.attackRange,
+      collisionRadius: enemyDefinition.collisionRadius,
       position,
       state: "IDLE",
       currentTargetId: null,
@@ -318,11 +329,15 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addBottomUi(): void {
-    this.attackLogText = this.add.text(32, 446, "", {
+    this.add.rectangle(150, 113, 236, 70, 0x172033, 0.88)
+      .setStrokeStyle(1, 0x54748a, 1)
+      .setDepth(4);
+    this.attackLogText = this.add.text(42, 84, "", {
       color: "#b9cad7",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "10px",
       lineSpacing: 2,
+      wordWrap: { width: 216 },
     }).setDepth(5);
 
     const slotWidth = 82;
@@ -491,10 +506,11 @@ export class BattleScene extends Phaser.Scene {
       }
     }
 
-    const result: BattleResult = {
+    const result: RTSBattleResult = {
       outcome,
-      monsterId: this.sourceWorldMonsterId,
-      monsterName: this.enemyDisplayName,
+      sourceWorldMonsterId: this.sourceWorldMonsterId,
+      enemyDefinitionId: this.enemyDefinitionId,
+      enemyDisplayName: this.enemyDisplayName,
       goldReward: outcome === "VICTORY" ? this.goldReward : 0,
     };
     const fieldScene = this.scene.get("FieldScene") as FieldScene;
@@ -668,9 +684,11 @@ export class BattleScene extends Phaser.Scene {
     this.statusText?.setText([
       `Allies: ${aliveAllies}/${RTS_ALLY_COUNT}`,
       `Enemies: ${aliveEnemies}/${RTS_ENEMY_COUNT}`,
-      `State: ${this.combatState}`,
+      `State: ${this.dataError ? "INVALID_DATA" : this.combatState}`,
     ]);
-    this.selectedInfoText?.setText(selected.length === 0
+    this.selectedInfoText?.setText(this.dataError
+      ? "Battle cannot start with invalid data. Return to Field."
+      : selected.length === 0
       ? "No allies selected. Left-click or drag to select; right-click to command."
       : `${selected.length} ally selected${selected.length === 1 ? "" : "s"}. Skills are not available in Stage 7.`);
     this.attackLogText?.setText(["Recent orders", ...(this.attackLogs.length > 0 ? this.attackLogs.slice(-3) : ["No orders yet."])]);
@@ -710,7 +728,9 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private getHealthRatio(currentHp: number, maxHp: number): number {
-    return maxHp > 0 ? Math.min(1, Math.max(0, currentHp / maxHp)) : 0;
+    return Number.isFinite(currentHp) && Number.isFinite(maxHp) && maxHp > 0
+      ? Math.min(1, Math.max(0, currentHp / maxHp))
+      : 0;
   }
 
   private constrainPointer(pointer: Phaser.Input.Pointer): PointerPosition {
@@ -733,29 +753,39 @@ export class BattleScene extends Phaser.Scene {
     }
 
     const candidate = data as Record<string, unknown>;
+    if (candidate.enemyDefinitionId !== undefined &&
+      candidate.enemyDefinitionId !== candidate.sourceWorldMonsterId) {
+      return false;
+    }
+    if (!(typeof candidate.sourceWorldMonsterId === "string" &&
+      Number.isSafeInteger(candidate.enemyCount) &&
+      candidate.enemyCount === RTS_ENEMY_COUNT &&
+      Array.isArray(candidate.allyRoster) &&
+      candidate.allyRoster.length === RTS_ALLY_COUNT)) {
+      return false;
+    }
+
+    const roster = candidate.allyRoster as unknown[];
+    const validSlots = new Set<number>();
     return (
       typeof candidate.sourceWorldMonsterId === "string" &&
-      typeof candidate.enemyDefinitionId === "string" &&
-      typeof candidate.enemyDisplayName === "string" &&
-      typeof candidate.enemyColor === "number" &&
-      typeof candidate.enemyCount === "number" &&
-      typeof candidate.goldReward === "number" &&
-      Number.isFinite(candidate.enemyColor) &&
-      Number.isFinite(candidate.enemyCount) &&
-      Number.isFinite(candidate.goldReward) &&
-      Array.isArray(candidate.allyRoster)
+      roster.every((entry) => {
+        if (!entry || typeof entry !== "object") {
+          return false;
+        }
+        const rosterEntry = entry as Record<string, unknown>;
+        const valid = typeof rosterEntry.rosterUnitId === "string" &&
+          typeof rosterEntry.unitDefinitionId === "string" &&
+          (rosterEntry.unitRole === "MAIN_CHARACTER" || rosterEntry.unitRole === "MERCENARY") &&
+          Number.isSafeInteger(rosterEntry.slotIndex) &&
+          (rosterEntry.slotIndex as number) >= 0 &&
+          (rosterEntry.slotIndex as number) < RTS_ALLY_COUNT &&
+          !validSlots.has(rosterEntry.slotIndex as number);
+        if (valid) {
+          validSlots.add(rosterEntry.slotIndex as number);
+        }
+        return valid;
+      }) && validSlots.size === RTS_ALLY_COUNT
     );
-  }
-
-  private getFallbackData(): RTSBattleSceneData {
-    return {
-      sourceWorldMonsterId: "slime-1",
-      enemyDefinitionId: "slime-1",
-      enemyDisplayName: "Slime 1",
-      enemyColor: 0xe67e91,
-      enemyCount: RTS_ENEMY_COUNT,
-      goldReward: 10,
-      allyRoster: createTrialRoster(),
-    };
   }
 }

@@ -282,8 +282,8 @@ http://localhost:5173
 ```
 
 7단계 자동 브라우저 검사: 통과
-7단계 사용자 실행 테스트: 미실시 (`not_tested`)
-7단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`), 재검수 태그: `review-stage-07-v7`
+7단계 사용자 실행 테스트: 통과 (`passed`)
+7단계 ChatGPT 코드 검수: 승인 (`approved`), 승인 태그: `review-stage-07-v7`
 
 ## Stage 7 manual combat response checks — v5
 
@@ -339,22 +339,22 @@ v6 사용자 수동 실행 테스트: 미실시 (`not_tested`)
 ## Stage 7 direct movement controls — v7
 
 ```text
-[ ] A selected ally stops its current attack immediately after a floor right-click.
-[ ] The previous attack target is cleared immediately.
-[ ] The selected squad moves to the formation-adjusted destination.
-[ ] An ally keeps moving toward the destination after taking damage.
-[ ] A MOVE ally does not automatically pursue its attacker.
-[ ] A MOVE ally does not acquire nearby enemies before reaching the destination.
-[ ] A MOVE ally becomes IDLE after reaching the destination.
-[ ] After arrival, a newly received attack can use the existing NONE retaliation rule.
-[ ] A floor right-click cancels FOCUS_ATTACK and starts MOVE.
-[ ] An enemy right-click cancels MOVE and starts FOCUS_ATTACK.
-[ ] Direct enemy focus attack remains available.
-[ ] Focus-target loss still uses local engagement rules only.
-[ ] A floor right-click never creates ATTACK_MOVE.
-[ ] No A-key or attack-move UI input is implemented in Stage 7.
-[ ] Auto Hunt remains absent.
-[ ] Allies and enemies are not pushed apart by cross-team separation.
+[x] A selected ally stops its current attack immediately after a floor right-click.
+[x] The previous attack target is cleared immediately.
+[x] The selected squad moves to the formation-adjusted destination.
+[x] An ally keeps moving toward the destination after taking damage.
+[x] A MOVE ally does not automatically pursue its attacker.
+[x] A MOVE ally does not acquire nearby enemies before reaching the destination.
+[x] A MOVE ally becomes IDLE after reaching the destination.
+[x] After arrival, a newly received attack can use the existing NONE retaliation rule.
+[x] A floor right-click cancels FOCUS_ATTACK and starts MOVE.
+[x] An enemy right-click cancels MOVE and starts FOCUS_ATTACK.
+[x] Direct enemy focus attack remains available.
+[x] Focus-target loss still uses local engagement rules only.
+[x] A floor right-click never creates ATTACK_MOVE.
+[x] No A-key or attack-move UI input is implemented in Stage 7.
+[x] Auto Hunt remains absent.
+[x] Allies and enemies are not pushed apart by cross-team separation.
 ```
 
 v7 자동 브라우저 확인:
@@ -364,7 +364,7 @@ v7 자동 브라우저 확인:
 - 목적지 도착 후 `IDLE` 상태와 도착 후 새 피격 반응 확인
 - 브라우저 콘솔 오류·경고 없음
 
-v7 사용자 수동 실행 테스트: 미실시 (`not_tested`)
+v7 사용자 수동 실행 테스트: 통과 (`passed`)
 
 자동 브라우저 확인 내용:
 
@@ -372,3 +372,28 @@ v7 사용자 수동 실행 테스트: 미실시 (`not_tested`)
 - 드래그 10마리 선택과 대형 이동: 통과
 - 우클릭 공격 명령, 적군 AI, 아군 전멸 `DEFEAT`: 통과
 - 브라우저 콘솔 치명적 오류·경고: 없음
+
+## Stage 7 final user execution — passed
+
+```text
+[x] Game starts normally.
+[x] Ten allies and ten enemies appear.
+[x] The selected world-map Slime type matches the enemy type.
+[x] Single selection works.
+[x] Drag multi-selection works.
+[x] Direct enemy right-click focus attack works.
+[x] Focus-target death allows local enemy retaliation.
+[x] No unlimited pursuit of enemies across the field occurs.
+[x] Floor right-click is a pure MOVE command.
+[x] MOVE cancels the previous attack and pursuit.
+[x] MOVE keeps priority after taking damage.
+[x] MOVE does not auto-retaliate before arrival.
+[x] Direct enemy right-click during MOVE switches to FOCUS_ATTACK.
+[x] Allies and enemies are not pushed apart.
+[x] Attack damage has no knockback.
+[x] Victory and defeat handling works.
+[x] Gold is paid once per battle.
+[x] World-map monster removal and respawn remain connected.
+[x] Auto Hunt is not present.
+[x] Skills and squad assignment are not present.
+```

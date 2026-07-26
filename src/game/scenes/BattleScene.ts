@@ -5,6 +5,7 @@ import {
   GAME_HEIGHT,
   GAME_WIDTH,
   RTS_ALLY_COUNT,
+  RTS_ALLY_ASSIST_RANGE,
   RTS_ARENA_BOUNDS,
   RTS_ENEMY_COUNT,
   RTS_LOCAL_ENGAGEMENT_RANGE,
@@ -39,6 +40,7 @@ type UnitVisual = {
   interactionZone: Phaser.GameObjects.Zone;
   healthFill: Phaser.GameObjects.Rectangle;
   selectionRing: Phaser.GameObjects.Arc;
+  attackReachRing: Phaser.GameObjects.Arc;
 };
 
 type SlotVisual = {
@@ -389,6 +391,8 @@ export class BattleScene extends Phaser.Scene {
         ? unit.unitRole === "MAIN_CHARACTER" ? 0xf4d35e : 0x63b3ed
         : this.enemyColor;
       const container = this.add.container(unit.position.x, unit.position.y);
+      const attackReachRing = this.add.arc(0, 0, radius + unit.attackRange, 0, 360, false, 0x67e8f9, 0);
+      attackReachRing.setStrokeStyle(1, 0x67e8f9, 0.42).setVisible(false);
       const selectionRing = this.add.arc(0, 0, radius + 7, 0, 360, false, 0xf7d154, 0);
       selectionRing.setStrokeStyle(2, 0xf7d154, 1).setVisible(false);
       const body = this.add.circle(0, 0, radius, color);
@@ -403,11 +407,17 @@ export class BattleScene extends Phaser.Scene {
       const healthBack = this.add.rectangle(0, -radius - 7, 32, 4, 0x0b1220).setOrigin(0.5);
       const healthFill = this.add.rectangle(0, -radius - 7, 32, 4, unit.team === "ALLY" ? 0x66d18f : 0xef7185).setOrigin(0, 0.5);
       healthFill.x = -16;
-      container.add([selectionRing, body, banner, ...eyes, label, healthBack, healthFill]);
+      container.add([attackReachRing, selectionRing, body, banner, ...eyes, label, healthBack, healthFill]);
       const interactionZone = this.add.zone(unit.position.x, unit.position.y, radius * 2 + 12, radius * 2 + 12);
       interactionZone.setInteractive({ useHandCursor: true });
       interactionZone.on("pointerdown", (pointer: Phaser.Input.Pointer) => this.handleUnitPointerDown(unit.battleUnitId, pointer));
-      this.unitVisuals.set(unit.battleUnitId, { container, interactionZone, healthFill, selectionRing });
+      this.unitVisuals.set(unit.battleUnitId, {
+        container,
+        interactionZone,
+        healthFill,
+        selectionRing,
+        attackReachRing,
+      });
     }
   }
 
@@ -745,6 +755,9 @@ export class BattleScene extends Phaser.Scene {
       }
       target.attackElapsedMs = 0;
     }
+    if (target.team === "ALLY") {
+      this.alertNearbyAlliesForAssist(target, attacker);
+    }
     this.addAttackLog(`${attacker.displayName} dealt ${attacker.attackDamage} to ${target.displayName}.`);
     if (target.currentHp === 0) {
       target.isAlive = false;
@@ -755,6 +768,98 @@ export class BattleScene extends Phaser.Scene {
       this.selectedUnitIds.delete(target.battleUnitId);
       const visual = this.unitVisuals.get(target.battleUnitId);
       visual?.container.disableInteractive();
+    }
+  }
+
+  private alertNearbyAlliesForAssist(attackedAlly: RTSBattleUnit, attacker: RTSBattleUnit): void {
+    if (
+      this.combatState !== "RUNNING" ||
+      attackedAlly.team !== "ALLY" ||
+      attacker.team !== "ENEMY" ||
+      !Number.isFinite(attackedAlly.position.x) ||
+      !Number.isFinite(attackedAlly.position.y)
+    ) {
+      return;
+    }
+
+    const supportAllies = this.getAliveUnits("ALLY")
+      .filter((ally) => {
+        if (
+          ally.battleUnitId === attackedAlly.battleUnitId ||
+          !Number.isFinite(ally.position.x) ||
+          !Number.isFinite(ally.position.y)
+        ) {
+          return false;
+        }
+
+        const distance = distanceBetween(attackedAlly.position, ally.position);
+        if (!Number.isFinite(distance) || distance > RTS_ALLY_ASSIST_RANGE) {
+          return false;
+        }
+
+        if (ally.commandMode === "NONE") {
+          return true;
+        }
+
+        return ally.commandMode === "LOCAL_ENGAGE" && !this.getAliveEnemy(ally.currentTargetId);
+      })
+      .sort((first, second) => (
+        distanceBetween(attackedAlly.position, first.position) -
+        distanceBetween(attackedAlly.position, second.position) ||
+        first.battleUnitId.localeCompare(second.battleUnitId)
+      ));
+
+    if (supportAllies.length === 0) {
+      return;
+    }
+
+    const localEnemies = this.getAliveUnits("ENEMY")
+      .filter((enemy) => (
+        Number.isFinite(enemy.position.x) &&
+        Number.isFinite(enemy.position.y) &&
+        Number.isFinite(distanceBetween(attackedAlly.position, enemy.position)) &&
+        distanceBetween(attackedAlly.position, enemy.position) <= RTS_LOCAL_ENGAGEMENT_RANGE
+      ));
+    if (localEnemies.length === 0) {
+      return;
+    }
+
+    const targetCounts = new Map<string, number>();
+    for (const ally of this.getAliveUnits("ALLY")) {
+      if (ally.currentTargetId && this.getAliveEnemy(ally.currentTargetId)) {
+        targetCounts.set(ally.currentTargetId, (targetCounts.get(ally.currentTargetId) ?? 0) + 1);
+      }
+    }
+
+    for (const ally of supportAllies) {
+      const target = localEnemies
+        .map((candidate) => ({
+          candidate,
+          assignedCount: targetCounts.get(candidate.battleUnitId) ?? 0,
+          distance: distanceBetween(ally.position, candidate.position),
+        }))
+        .filter(({ distance }) => Number.isFinite(distance))
+        .sort((first, second) => (
+          first.assignedCount - second.assignedCount ||
+          (first.candidate.battleUnitId === attacker.battleUnitId ? -1 : 0) -
+          (second.candidate.battleUnitId === attacker.battleUnitId ? -1 : 0) ||
+          first.distance - second.distance ||
+          first.candidate.battleUnitId.localeCompare(second.candidate.battleUnitId)
+        ))[0]?.candidate;
+
+      if (!target) {
+        continue;
+      }
+
+      ally.commandMode = "LOCAL_ENGAGE";
+      ally.currentTargetId = target.battleUnitId;
+      ally.commandDestination = null;
+      ally.moveDestination = null;
+      ally.attackElapsedMs = 0;
+      ally.lastAttackerId = attacker.battleUnitId;
+      ally.lastAttackedAt = this.combatTimeMs;
+      ally.state = "CHASING";
+      targetCounts.set(target.battleUnitId, (targetCounts.get(target.battleUnitId) ?? 0) + 1);
     }
   }
 
@@ -941,6 +1046,8 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private refreshAllVisuals(): void {
+    const selectedAllies = this.getSelectedAliveAllies();
+    const selectedAllyId = selectedAllies.length === 1 ? selectedAllies[0].battleUnitId : null;
     for (const unit of this.units.values()) {
       const visual = this.unitVisuals.get(unit.battleUnitId);
       if (!visual) {
@@ -955,6 +1062,7 @@ export class BattleScene extends Phaser.Scene {
         visual.interactionZone.disableInteractive();
       }
       visual.selectionRing.setVisible(unit.isAlive && this.selectedUnitIds.has(unit.battleUnitId));
+      visual.attackReachRing.setVisible(unit.isAlive && unit.battleUnitId === selectedAllyId);
       visual.healthFill.setDisplaySize(32 * this.getHealthRatio(unit.currentHp, unit.maxHp), 4);
     }
   }
@@ -972,6 +1080,8 @@ export class BattleScene extends Phaser.Scene {
       ? "Battle cannot start with invalid data. Return to Field."
       : selected.length === 0
       ? "No allies selected. Left-click or drag to select; right-click to command."
+      : selected.length === 1
+      ? `${this.getSelectionInfoLabel(selected[0])} · Melee reach: ${selected[0].attackRange}px`
       : `${selected.length} ally selected${selected.length === 1 ? "" : "s"}. Manual commands have priority over Auto Hunt.`);
     this.attackLogText?.setText(["Recent orders", ...(this.attackLogs.length > 0 ? this.attackLogs.slice(-3) : ["No orders yet."])]);
     this.updateAutoHuntUi();
@@ -1009,6 +1119,10 @@ export class BattleScene extends Phaser.Scene {
       return this.enemyDefinitionId.replace("slime-", "S");
     }
     return unit.unitRole === "MAIN_CHARACTER" ? "Hero" : `M${(unit.slotIndex ?? 0)}`;
+  }
+
+  private getSelectionInfoLabel(unit: RTSBattleUnit): string {
+    return unit.unitRole === "MAIN_CHARACTER" ? "Hero" : `Merc ${unit.slotIndex ?? 0}`;
   }
 
   private getHealthRatio(currentHp: number, maxHp: number): number {

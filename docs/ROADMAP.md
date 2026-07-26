@@ -20,7 +20,7 @@
 - 6단계 현재 검수 태그: `review-stage-06-v2`
 - 6단계 완료 태그: `stage-06-completed`
 - 7단계 현재 검수 태그: `review-stage-07-v7`
-- 8단계 현재 검수 태그: `review-stage-08-v2`
+- 8단계 현재 검수 태그: `review-stage-08-v3`
 - 다음 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계
@@ -348,7 +348,7 @@
 
 ### 단계 상태
 
-`review_pending` — v1 피드백 수정 완료, `review-stage-08-v2` 검수 대기. 작업 브랜치: `stage-08-auto-hunt-controls`
+`review_pending` — v2 피드백 수정 완료, `review-stage-08-v3` 검수 대기. 작업 브랜치: `stage-08-auto-hunt-controls`
 
 ### 목표
 
@@ -365,6 +365,7 @@
 - [x] Auto Hunt OFF에서 140px 내 대기 아군의 지역 동료 지원
 - [x] MOVE·FOCUS_ATTACK·ATTACK_MOVE·AUTO_HUNT와 기존 유효 LOCAL_ENGAGE 보호
 - [x] 지원 대상의 결정적 분산과 지역 교전 종료 후 상태 복귀
+- [x] 지원 아군 배정 시 이전 `lastAttackerId`·`lastAttackedAt` 기억 초기화
 - [x] 모든 근접 유닛의 추가 attackRange를 8~10px로 조정
 - [x] 단일 아군 선택 시 공격 범위 원과 `Melee reach` 정보 표시
 
@@ -377,6 +378,7 @@
 - [x] 단일 선택 Hero의 `Melee reach: 10px`와 공격 범위 원을 브라우저에서 확인한다.
 - [ ] 필드 왕복 후 전투 재진입 시 Auto Hunt 세션 유지 사용자 테스트
 - [ ] 지역 동료 지원의 수동 전투 시나리오와 지원 대상 분산
+- [ ] 지원 대상 사망 후 최초 공격자 강제 재집결 없음 확인
 - [ ] 모든 축소 근접 사거리와 사거리 밖 피해 방지 수동 테스트
 - [ ] 10대10 전투의 교착 없는 종료 수동 테스트
 - [ ] ChatGPT 코드 검수

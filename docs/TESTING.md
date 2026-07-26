@@ -487,3 +487,41 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 8단계 v2 `main` 반영: 미반영
 
 브라우저에서 직접 확인하지 못한 항목은 통과로 추정하지 않고 사용자 수동 테스트 대기로 유지한다.
+
+## 8단계 동료 지원 타깃 기억 수정 — v3
+
+- 현재 작업 브랜치: `stage-08-auto-hunt-controls`
+- 현재 검수 태그: `review-stage-08-v3`
+- 8단계 상태: 검수 대기 (`review_pending`)
+
+자동 검사:
+
+- [x] `npm ci` 통과
+- [x] `npm run typecheck` 통과
+- [x] `npm run build` 통과
+- [x] 개발 서버 HTTP 200 응답 확인 후 종료
+
+코드 확인:
+
+- [x] 실제 공격받은 `attackedAlly`의 `lastAttackerId`·`lastAttackedAt` 기록은 유지한다.
+- [x] 지원 아군 배정 시 `lastAttackerId = null`, `lastAttackedAt = 0`으로 초기화한다.
+- [x] 지원 아군의 최초 타깃 분산 규칙과 지역 탐색 범위를 유지한다.
+- [x] MOVE·FOCUS_ATTACK·AUTO_HUNT 보호 규칙을 유지한다.
+
+사용자 수동 테스트 대기:
+
+```text
+[ ] Auto Hunt OFF에서 한 아군이 공격받는다.
+[ ] 주변 지원 아군들이 여러 지역 적에게 분산된다.
+[ ] 각 지원 아군의 최초 대상이 사망한다.
+[ ] 지원 아군들이 최초 공격자 하나로 강제 집결하지 않는다.
+[ ] 지원 아군들이 지역 범위 안에서 결정적으로 다음 적을 탐색한다.
+[ ] MOVE 중인 아군은 지원 요청으로 명령을 취소하지 않는다.
+[ ] FOCUS_ATTACK 중인 아군은 지원 요청으로 대상을 바꾸지 않는다.
+[ ] 사거리 밖에서 HP가 감소하지 않는다.
+[ ] 치명적인 콘솔 오류가 없다.
+```
+
+8단계 v3 사용자 실행 테스트: 미실시 (`not_tested`)
+8단계 v3 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+8단계 v3 `main` 반영: 미반영

@@ -1,5 +1,15 @@
 # 변경 이력
 
+## 2026-07-27 — Stage 9 v2 persistent local ally assistance resubmission
+
+- Detects nearby enemy pursuit as a local assistance threat before real damage.
+- Adds 2500ms threat memory and refreshes it while pursuit continues.
+- Rechecks support candidates continuously, including allies entering range later.
+- Normalizes completed and malformed MOVE commands; active MOVE retains priority.
+- Uses deterministic threat and target selection without overwriting protected commands.
+- Preserves Skill Merc Q/W behavior and all deferred stage boundaries.
+- Records v1 as `changes_requested` and submits `review-stage-09-v2`.
+
 변경 이력은 누적해서 기록한다. 기존 기록은 삭제하지 않으며, 새 기록은 최신 항목이 위에 오도록 추가한다. 검수 대기 중인 작업은 완료 이력과 구분해서 표시한다.
 
 ## 2026-07-26 — 8단계 Auto Hunt 및 지역 동료 지원 최종 승인·main 반영 — 완료

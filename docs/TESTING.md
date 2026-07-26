@@ -1,5 +1,22 @@
 # 2단계 실행 및 수동 테스트
 
+## Stage 9 v2 local ally assistance regression checklist
+
+- [ ] Nearby enemy pursuit creates a local threat before real damage is dealt.
+- [ ] An ally that enters the support range later can join while the threat is remembered.
+- [ ] Threat memory refreshes while pursuit continues and expires after 2.5 seconds when it stops.
+- [ ] Distant enemy target assignment alone does not trigger support.
+- [ ] Support is limited to `RTS_ALLY_ASSIST_RANGE` and local enemies.
+- [ ] An actually moving ally keeps its MOVE command and is not reassigned.
+- [ ] A completed or stale MOVE is normalized and can support afterward.
+- [ ] Completed MOVE retaliates normally after Auto Hunt OFF normalization.
+- [ ] Multiple threats and support targets are selected deterministically and distributed.
+- [ ] Existing `LOCAL_ENGAGE`, `FOCUS_ATTACK`, and `AUTO_HUNT` behavior is preserved.
+- [ ] Skill Merc Q/W, multi-selection skill blocking, melee attacks, victory, defeat, and Gold remain functional.
+- [ ] No fatal browser console error occurs during the scenarios.
+
+The v2 user-run checklist remains `not_tested` until the user performs the manual scenarios in a browser.
+
 ## 설치
 
 ```bash

@@ -1,5 +1,7 @@
 # 개발 AI 작업 규칙
 
+Stage 9 v2 scope note: the submitted fix is limited to persistent local ally assistance and completed/stale MOVE normalization. It does not implement stage 10 formation changes or any deferred skill, inventory, save, or online features.
+
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
 1. 작업을 시작하기 전에 반드시 `README.md`, `docs/ROADMAP.md`, `docs/STATUS.md`, `docs/DECISIONS.md`, `project-status.json`을 읽는다.
@@ -51,7 +53,7 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 7단계 완료 태그: `stage-07-completed`
 - 8단계 검수 태그: `review-stage-08-v3` (완료)
 - 8단계 완료 태그: `stage-08-completed`
-- 9단계 검수 태그: `review-stage-09-v1`
+- 9단계 검수 태그: `review-stage-09-v2`
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계

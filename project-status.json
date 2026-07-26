@@ -5,7 +5,7 @@
   "currentStage": 9,
   "currentStageName": "유닛 스킬과 단일 선택 전용 스킬 UI",
   "stageStatus": "review_pending",
-  "activeTask": "9단계 구현 완료 — review-stage-09-v1 검수 대기 중",
+  "activeTask": "9단계 지속형 지역 동료 지원 수정 완료 — review-stage-09-v2 검수 대기 중",
   "workingBranch": "stage-09-unit-skills-ui",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8],
@@ -13,16 +13,16 @@
   "nextStageName": "편성·슬롯 재배치와 주인공 필수 편성",
   "reviewSubmission": {
     "branch": "stage-09-unit-skills-ui",
-    "tag": "review-stage-09-v1",
-    "version": 1,
+    "tag": "review-stage-09-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
     {
       "stage": 9,
       "branch": "stage-09-unit-skills-ui",
-      "tag": "review-stage-09-v1",
-      "version": 1,
+      "tag": "review-stage-09-v2",
+      "version": 2,
       "submitted": true,
       "approved": false,
       "result": "review_pending",
@@ -30,6 +30,22 @@
       "reviewedAt": null,
       "commit": null,
       "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 9,
+      "branch": "stage-09-unit-skills-ui",
+      "tag": "review-stage-09-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": "e61441e1f651350a1d204dd35738e171d6e0bd36",
+      "codeCommit": "aa96165058a595583e67929ed5f789cea834d332",
+      "reason": "지역 동료 지원이 실제 피해 순간에만 실행되고 완료되거나 잘못 남은 MOVE 상태를 실제 활성 이동과 구분하지 못함",
+      "userRunTest": "failed",
       "mainBranchMerged": false
     },
     {
@@ -291,5 +307,5 @@
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T23:17:28+09:00"
+  "lastUpdated": "2026-07-27T00:00:00+09:00"
 }

@@ -1,5 +1,15 @@
 # 현재 개발 상태
 
+## Stage 9 v2 resubmission status
+
+- Submission: `review-stage-09-v2` on `stage-09-unit-skills-ui`
+- Stage status: `review_pending`
+- Active task: persistent local ally assistance fix completed; waiting for v2 review
+- v1 `review-stage-09-v1` remains preserved; `main` is not changed
+- User run test: `not_tested`
+- ChatGPT code review: `not_reviewed`
+- The fix adds pursuit-based threat refresh, 2500ms threat memory, continuous deterministic support assignment, and completed/stale MOVE normalization.
+
 ## 단계 정보
 
 - 전체 단계: 17단계
@@ -8,10 +18,10 @@
 - 현재 단계 상태: 검수 대기 (`review_pending`)
 - 상태 코드: `review_pending`
 - 현재 작업 브랜치: `stage-09-unit-skills-ui`
-- 검수 태그: `review-stage-09-v1`
+- 검수 태그: `review-stage-09-v2`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
-- 현재 작업: 9단계 구현 완료 — `review-stage-09-v1` 검수 대기 중
+- 현재 작업: 9단계 지속형 지역 동료 지원 수정 완료 — `review-stage-09-v2` 검수 대기 중
 - 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
@@ -53,7 +63,7 @@
 - 8단계 v3 no-ff 병합: 완료
 - 8단계 완료 태그: `stage-08-completed`
 - 9단계 Skill Mercenary 정의·Q/W 스킬·단일 선택 UI: 구현 완료, 검수 대기
-- 9단계 검수 제출 태그: `review-stage-09-v1`
+- 9단계 검수 제출 태그: `review-stage-09-v2` (v1 수정 요청 보존)
 - 9단계 자동 브라우저 확인: Stage 9 제목, Skill Mercenary 슬롯·색상, 단일 선택 Q/W 패널과 콘솔 오류 없음 확인
 - 9단계 사용자 수동 테스트: 미실시
 - 9단계 ChatGPT 코드 검수: 미실시

@@ -1,5 +1,14 @@
 # Test Game 개발 로드맵
 
+## Stage 9 v2 resubmission scope
+
+- Nearby enemy pursuit is a local threat even before the first successful hit.
+- Threats are stored for 2500ms and refreshed while the enemy keeps the ally as its local target.
+- Support candidates are re-evaluated during the threat window, including allies that enter range later.
+- Completed and malformed MOVE commands are normalized; only active MOVE retains movement priority.
+- Support remains local and does not expand Auto Hunt OFF into whole-field searching.
+- v1 is preserved; the current review tag is `review-stage-09-v2`.
+
 ## 로드맵 기준
 
 - 전체 단계: 17단계
@@ -23,7 +32,7 @@
 - 7단계 완료 태그: `stage-07-completed`
 - 8단계 현재 검수 태그: `review-stage-08-v3` (완료)
 - 8단계 완료 태그: `stage-08-completed`
-- 9단계 현재 검수 태그: `review-stage-09-v1`
+- 9단계 현재 검수 태그: `review-stage-09-v2`
 - 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
@@ -398,7 +407,7 @@
 
 ### 단계 상태
 
-`review_pending` — `stage-09-unit-skills-ui`에서 구현 완료, `review-stage-09-v1` 검수 대기
+`review_pending` — `stage-09-unit-skills-ui`에서 지속형 지역 동료 지원 수정까지 구현 완료, `review-stage-09-v2` 검수 대기
 
 ### 목표
 

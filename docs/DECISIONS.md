@@ -1,5 +1,16 @@
 # 프로젝트 결정 사항
 
+## Stage 9 v2 persistent local ally assistance decisions
+
+- Local assistance reacts to real damage and to nearby enemies that are pursuing an ally through `currentTargetId`.
+- A distant target assignment alone does not create a threat; the enemy and target must be within `RTS_LOCAL_ENGAGEMENT_RANGE`.
+- `AllyAssistThreat` entries remain valid for `RTS_ALLY_ASSIST_THREAT_MEMORY_MS = 2500`ms and are refreshed while pursuit continues.
+- Support candidates are checked continuously within the shared `RTS_ALLY_ASSIST_RANGE = 140`; per-unit `assistRange` remains deferred.
+- Only active MOVE has priority over support. Completed or stale MOVE is normalized immediately.
+- `FOCUS_ATTACK`, `AUTO_HUNT`, and an existing valid `LOCAL_ENGAGE` target are not overwritten.
+- Multiple threats and targets use deterministic distance, attacker, pursuit, target-count, and `battleUnitId` ordering.
+- `review-stage-09-v1` is preserved; the v2 submission is `review-stage-09-v2` and remains `review_pending`.
+
 현재 단계 기준: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
 
 ## 결정 목록
@@ -374,7 +385,7 @@
 - 7단계 현재 검수 태그: `review-stage-07-v7`
 - 8단계 현재 검수 태그: `review-stage-08-v3`
 - 8단계 완료 태그: `stage-08-completed`
-- 9단계 현재 검수 태그: `review-stage-09-v1`
+- 9단계 현재 검수 태그: `review-stage-09-v2`
 - 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 승인: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계 승인

@@ -16,6 +16,39 @@ export const COMBAT_HP_BAR_WIDTH = 240;
 export const COMBAT_HP_BAR_HEIGHT = 18;
 export const COMBAT_BUTTON_Y = 480;
 export const MONSTER_RESPAWN_DELAY_MS = 3000;
+export const RTS_ALLY_COUNT = 10;
+export const RTS_ENEMY_COUNT = 10;
+export const RTS_ARENA_BOUNDS = {
+  left: 28,
+  top: 72,
+  right: 932,
+  bottom: 398,
+};
+export const RTS_SELECTION_DRAG_THRESHOLD_PX = 6;
+export const RTS_MAX_COMBAT_DELTA_MS = 100;
+export const RTS_FORMATION_SPACING = 34;
+export const RTS_TRIAL_MAIN_CHARACTER = {
+  maxHp: 120,
+  attackDamage: 15,
+  attackIntervalMs: 900,
+  moveSpeed: 120,
+  attackRange: 34,
+  collisionRadius: 13,
+};
+export const RTS_TRIAL_MERCENARY = {
+  maxHp: 70,
+  attackDamage: 8,
+  attackIntervalMs: 1100,
+  moveSpeed: 100,
+  attackRange: 30,
+  collisionRadius: 12,
+};
+export const RTS_SLIME_STATS = {
+  slime1: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 26, collisionRadius: 12 },
+  slime2: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 26, collisionRadius: 12 },
+  slime3: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 26, collisionRadius: 12 },
+  slime4: { maxHp: 70, attackDamage: 10, attackIntervalMs: 1000, moveSpeed: 85, attackRange: 28, collisionRadius: 14 },
+} as const;
 
 export type MonsterDefinition = {
   id: string;

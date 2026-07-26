@@ -6,13 +6,14 @@ import {
   MONSTERS,
   MONSTER_RADIUS,
   MONSTER_RESPAWN_DELAY_MS,
-  PLAYER_MAX_HP,
   PLAYER_POSITION,
   PLAYER_MOVE_SPEED,
   PLAYER_RADIUS,
   type MonsterDefinition,
 } from "../constants";
-import type { BattleResult, BattleSceneData } from "../battleTypes";
+import type { BattleResult } from "../battleTypes";
+import { createTrialRoster } from "../rtsBattleDefinitions";
+import type { RTSBattleSceneData } from "../rtsBattleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
@@ -79,14 +80,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 6: Results, Rewards and Respawn", {
+    this.add.text(48, 36, "Stage 7: 10v10 RTS Battle Core", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Defeat monsters, earn Gold, and wait for them to respawn.", {
+    this.add.text(50, 66, "Command a trial squad against the selected monster group.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -260,17 +261,14 @@ export class FieldScene extends Phaser.Scene {
     this.updateStatusText();
 
     const target = this.targetMonster.definition;
-    const battleData: BattleSceneData = {
-      playerName: "Player",
-      playerCurrentHp: PLAYER_MAX_HP,
-      playerMaxHp: PLAYER_MAX_HP,
-      monsterId: target.id,
-      monsterName: target.name,
-      monsterCurrentHp: target.maxHp,
-      monsterMaxHp: target.maxHp,
-      monsterAttackDamage: target.attackDamage,
-      monsterAttackIntervalMs: target.attackIntervalMs,
+    const battleData: RTSBattleSceneData = {
+      sourceWorldMonsterId: target.id,
+      enemyDefinitionId: target.id,
+      enemyDisplayName: target.name,
+      enemyColor: target.color,
+      enemyCount: 10,
       goldReward: target.goldReward,
+      allyRoster: createTrialRoster(),
     };
 
     this.scene.pause();

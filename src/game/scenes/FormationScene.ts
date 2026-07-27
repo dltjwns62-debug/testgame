@@ -1,10 +1,10 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH, RTS_ALLY_COUNT } from "../constants";
 import {
-  createDefaultFormationState,
   getFormationSlotLabel,
   getOrCreateFormationState,
   isValidFormationState,
+  resetFormationSlotsToDefault,
   setFormationState,
 } from "../formationState";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
@@ -57,13 +57,13 @@ export class FormationScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 18, "Stage 10: Formation", {
+    this.add.text(32, 18, "Stage 11: Formation & Roster", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
-    this.add.text(34, 52, "Arrange up to 10 units. Hero must remain deployed.", {
+    this.add.text(34, 52, "Arrange up to 13 owned units. Hero must remain deployed.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "13px",
@@ -125,8 +125,8 @@ export class FormationScene extends Phaser.Scene {
       const column = index % 5;
       const row = Math.floor(index / 5);
       const x = 126 + column * 150;
-      const y = 270 + row * 58;
-      const background = this.add.rectangle(x, y, 136, 54, 0x26394b, 1)
+      const y = 260 + row * 44;
+      const background = this.add.rectangle(x, y, 136, 42, 0x26394b, 1)
         .setStrokeStyle(1, 0x54748a, 1)
         .setInteractive({ useHandCursor: true });
       background.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
@@ -135,17 +135,17 @@ export class FormationScene extends Phaser.Scene {
           this.selectUnit(unit.rosterUnitId);
         }
       });
-      const nameText = this.add.text(x - 61, y - 21, unit.displayName, {
+      const nameText = this.add.text(x - 61, y - 16, unit.displayName, {
         color: "#d9f2ff",
         fontFamily: "Segoe UI, sans-serif",
         fontSize: "10px",
         fontStyle: "bold",
       });
-      const stateText = this.add.text(x - 61, y - 4, "", {
+      const stateText = this.add.text(x - 61, y + 1, "", {
         color: "#b9cad7",
         fontFamily: "Segoe UI, sans-serif",
-        fontSize: "8px",
-        lineSpacing: 1,
+        fontSize: "7px",
+        lineSpacing: 0,
         wordWrap: { width: 124 },
       });
       this.ownedVisuals.set(unit.rosterUnitId, { background, nameText, stateText });
@@ -302,7 +302,7 @@ export class FormationScene extends Phaser.Scene {
   }
 
   private resetDefault(): void {
-    this.draft = createDefaultFormationState();
+    this.draft = resetFormationSlotsToDefault(this.draft);
     this.selectedRosterUnitId = null;
     this.setStatus("Default formation restored. Apply to save.", "#c4e4d0");
     this.refreshUi();

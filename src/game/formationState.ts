@@ -1,6 +1,12 @@
 import type Phaser from "phaser";
-import { FORMATION_REGISTRY_KEY, RTS_ALLY_COUNT } from "./constants";
+import {
+  FORMATION_REGISTRY_KEY,
+  INITIAL_OWNED_UNIT_COUNT,
+  MAX_OWNED_UNIT_COUNT,
+  RTS_ALLY_COUNT,
+} from "./constants";
 import { createTrialOwnedUnits, getAllyUnitDefinition } from "./rtsBattleDefinitions";
+import { SHOP_OFFERS } from "./shopCatalog";
 import type { FormationSlot, FormationState, OwnedRosterUnit, RosterEntry } from "./rtsBattleTypes";
 
 function createDefaultSlots(ownedUnits: OwnedRosterUnit[]): FormationSlot[] {
@@ -35,11 +41,14 @@ export function isValidFormationState(value: unknown): value is FormationState {
   }
 
   const candidate = value as Partial<FormationState>;
-  if (!Array.isArray(candidate.ownedUnits) || candidate.ownedUnits.length !== RTS_ALLY_COUNT ||
+  if (!Array.isArray(candidate.ownedUnits) || candidate.ownedUnits.length < INITIAL_OWNED_UNIT_COUNT ||
+    candidate.ownedUnits.length > MAX_OWNED_UNIT_COUNT ||
     !Array.isArray(candidate.slots) || candidate.slots.length !== RTS_ALLY_COUNT) {
     return false;
   }
 
+  const initialUnitsById = new Map(createTrialOwnedUnits().map((unit) => [unit.rosterUnitId, unit]));
+  const shopOffersByRosterId = new Map(SHOP_OFFERS.map((offer) => [offer.rosterUnitId, offer]));
   const ownedIds = new Set<string>();
   let mainCharacterCount = 0;
   for (const unit of candidate.ownedUnits) {
@@ -51,6 +60,17 @@ export function isValidFormationState(value: unknown): value is FormationState {
     }
     const definition = getAllyUnitDefinition(unit.unitDefinitionId);
     if (!definition || definition.unitRole !== unit.unitRole) {
+      return false;
+    }
+    const initialUnit = initialUnitsById.get(unit.rosterUnitId);
+    const shopOffer = shopOffersByRosterId.get(unit.rosterUnitId);
+    if (initialUnit) {
+      if (unit.unitDefinitionId !== initialUnit.unitDefinitionId ||
+        unit.unitRole !== initialUnit.unitRole || unit.displayName !== initialUnit.displayName) {
+        return false;
+      }
+    } else if (!shopOffer || unit.unitDefinitionId !== shopOffer.unitDefinitionId ||
+      unit.unitRole !== "MERCENARY" || unit.displayName !== shopOffer.displayName) {
       return false;
     }
     if (unit.unitRole === "MAIN_CHARACTER") {
@@ -80,7 +100,11 @@ export function isValidFormationState(value: unknown): value is FormationState {
   }
 
   const mainId = candidate.ownedUnits.find((unit) => unit.unitRole === "MAIN_CHARACTER")?.rosterUnitId;
-  return Boolean(mainId && deployedIds.has(mainId));
+  if (!mainId || !deployedIds.has(mainId)) {
+    return false;
+  }
+
+  return createTrialOwnedUnits().every((unit) => ownedIds.has(unit.rosterUnitId));
 }
 
 export function getOrCreateFormationState(registry: Phaser.Data.DataManager): FormationState {
@@ -99,6 +123,13 @@ export function setFormationState(registry: Phaser.Data.DataManager, state: Form
     throw new Error("Invalid formation state");
   }
   registry.set(FORMATION_REGISTRY_KEY, cloneFormationState(state));
+}
+
+export function resetFormationSlotsToDefault(state: FormationState): FormationState {
+  const defaultState = createDefaultFormationState();
+  const nextState = cloneFormationState(state);
+  nextState.slots = defaultState.slots.map((slot) => ({ ...slot }));
+  return nextState;
 }
 
 export function buildBattleRosterFromFormation(state: FormationState): RosterEntry[] {

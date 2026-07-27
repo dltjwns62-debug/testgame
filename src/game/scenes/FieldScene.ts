@@ -12,6 +12,7 @@ import {
   type MonsterDefinition,
 } from "../constants";
 import { buildBattleRosterFromFormation, getOrCreateFormationState, isValidFormationState } from "../formationState";
+import { addPlayerGold, getOrCreatePlayerGold } from "../playerEconomy";
 import type { RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
@@ -32,9 +33,10 @@ export class FieldScene extends Phaser.Scene {
   private stateText!: Phaser.GameObjects.Text;
   private battleTransitionStarted = false;
   private battleResultApplied = false;
-  private playerGold = 0;
   private formationButton!: Phaser.GameObjects.Rectangle;
   private formationButtonLabel!: Phaser.GameObjects.Text;
+  private shopButton!: Phaser.GameObjects.Rectangle;
+  private shopButtonLabel!: Phaser.GameObjects.Text;
   private formationMessage: string | null = null;
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
@@ -47,10 +49,12 @@ export class FieldScene extends Phaser.Scene {
 
   public create(): void {
     getOrCreateFormationState(this.game.registry);
+    getOrCreatePlayerGold(this.game.registry);
     this.drawField();
     this.addStageNotice();
     this.addStatusText();
     this.addFormationButton();
+    this.addShopButton();
     this.player = this.addPlayer();
 
     MONSTERS.forEach((monster) => this.addMonster(monster));
@@ -84,14 +88,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 10: Formation", {
+    this.add.text(48, 36, "Stage 11: Shop & Recruitment", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Arrange your roster before entering battle.", {
+    this.add.text(50, 66, "Earn Gold and recruit mercenaries for your roster.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -99,13 +103,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStatusText(): void {
-    this.stateText = this.add.text(650, 36, "", {
+    this.stateText = this.add.text(928, 36, "", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "18px",
       fontStyle: "bold",
       lineSpacing: 8,
-    });
+      align: "right",
+    }).setOrigin(1, 0);
     this.updateStatusText();
   }
 
@@ -123,6 +128,24 @@ export class FieldScene extends Phaser.Scene {
       pointer.event?.stopPropagation();
       if (pointer.button === 0) {
         this.openFormation();
+      }
+    });
+  }
+
+  private addShopButton(): void {
+    this.shopButton = this.add.rectangle(640, 66, 104, 28, 0x4b8b6d, 1)
+      .setStrokeStyle(1, 0x9ce4b0, 1)
+      .setInteractive({ useHandCursor: true });
+    this.shopButtonLabel = this.add.text(640, 66, "Shop", {
+      color: "#f3f8e9",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "11px",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+    this.shopButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      if (pointer.button === 0) {
+        this.openShop();
       }
     });
   }
@@ -337,6 +360,29 @@ export class FieldScene extends Phaser.Scene {
     this.updateStatusText();
   }
 
+  public openShop(): void {
+    if (this.battleTransitionStarted || this.state === "BATTLE") {
+      return;
+    }
+    if (this.state === "MOVING") {
+      this.formationMessage = "Shop is unavailable while the player is moving.";
+      this.updateStatusText();
+      return;
+    }
+
+    this.formationMessage = null;
+    this.scene.pause();
+    this.scene.launch("ShopScene");
+  }
+
+  public returnFromShop(savedMessage?: string): void {
+    this.scene.stop("ShopScene");
+    this.scene.resume();
+    this.state = "IDLE";
+    this.formationMessage = savedMessage ?? null;
+    this.updateStatusText();
+  }
+
   public applyBattleResult(result: RTSBattleResult): void {
     if (
       !result ||
@@ -370,8 +416,11 @@ export class FieldScene extends Phaser.Scene {
         return;
       }
 
+      if (addPlayerGold(this.game.registry, expectedReward) === null) {
+        return;
+      }
+
       this.battleResultApplied = true;
-      this.playerGold += expectedReward;
       this.hideMonster(targetMonster);
       this.targetMonster = null;
       this.scheduleRespawn(targetMonster);
@@ -437,13 +486,16 @@ export class FieldScene extends Phaser.Scene {
     const deployedCount = formation.slots.filter((slot) => slot.rosterUnitId !== null).length;
     const hero = formation.ownedUnits.find((unit) => unit.unitRole === "MAIN_CHARACTER");
     const heroSlot = formation.slots.find((slot) => slot.rosterUnitId === hero?.rosterUnitId)?.slotIndex;
+    const playerGold = getOrCreatePlayerGold(this.game.registry);
     this.formationButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
     this.formationButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
+    this.shopButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
+    this.shopButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.stateText.setText([
       `State: ${this.state}`,
       `Target: ${this.targetMonster?.definition.name ?? "None"}`,
-      `Gold: ${this.playerGold}`,
-      `Formation: ${deployedCount}/10 · Hero Slot: ${heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1}`,
+      `Gold: ${playerGold}`,
+      `Formation: ${deployedCount}/10 · Owned: ${formation.ownedUnits.length}/13 · Hero Slot: ${heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1}`,
       ...(this.formationMessage ? [this.formationMessage] : []),
     ]);
   }

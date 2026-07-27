@@ -1,5 +1,44 @@
 # 변경 이력
 
+## 2026-07-27 — 10단계 v2 선택 상태 UX 수정 및 v3 재제출 — 검수 대기
+
+- v2 사용자 테스트에서 선택 유닛이 슬롯 교환·이동 후에도 남는 문제를 발견해 수정 요청됨
+- FormationScene 진입 시 `selectedRosterUnitId`를 초기화
+- 같은 유닛 카드 재클릭과 같은 슬롯 재클릭 시 `Selection cleared.`로 선택 취소
+- 슬롯 배치·교환 성공 후 선택 상태 자동 해제
+- 일반 용병 편성 제외 성공 후 선택 상태 자동 해제
+- v2 검수 결과 `changes_requested`, 사용자 테스트 결과 `failed`를 보존
+- v1·v2 태그는 보존하고 새 검수 태그는 `review-stage-10-v3`
+- 사용자 수동 테스트는 v3에서도 미실시 (`not_tested`), 10단계는 아직 `main`에 병합하지 않음
+- 11단계 상점·용병 구매 기능은 구현하지 않음
+
+## 2026-07-27 — 10단계 v1 수정 요청 반영 및 v2 재제출 — 검수 대기
+
+- v1 정적 코드 검수에서 `ownedUnits` 1~10명 허용, roster 정렬, 편성 정체성 표시와 Reset 저장 안내가 수정 요청됨
+- `ownedUnits`를 정확히 10명으로 강제하고, 일반 용병 Bench는 보유 유닛 삭제가 아님을 명확히 함
+- 잘못된 Hero 단독 registry를 기본 10명 편성으로 복구
+- 배치 전투 roster를 `slotIndex` 오름차순으로 정렬하고 빈 슬롯은 제외
+- Formation 화면에 역할·Required·Q/W 스킬·Slot/Bench 정보를 표시
+- Reset 안내를 `Default formation restored. Apply to save.`로 변경하고 Apply 성공 시 `Formation saved.` 표시
+- v1 태그 `review-stage-10-v1`과 수정 요청 이력을 보존하고 새 검수 태그는 `review-stage-10-v2`
+- 사용자 수동 테스트는 아직 미실시 (`not_tested`), 10단계는 아직 `main`에 병합하지 않음
+- 11단계 상점·용병 구매 기능은 구현하지 않음
+
+## 2026-07-27 — 10단계 편성·슬롯 재배치와 주인공 필수 편성 — 검수 대기
+
+- `FormationState`로 보유 유닛과 전투 슬롯을 분리
+- Hero의 `unitRole`·`rosterUnitId`를 슬롯 번호와 독립적으로 유지
+- Hero 필수 1개 편성과 1~10번 슬롯 이동, 슬롯 교체와 빈 슬롯 배치 구현
+- 일반 용병 Remove from Formation, Reset Default, Cancel과 Apply & Return 구현
+- registry 기반 편성 저장과 FieldScene·BattleScene roster 전달 구현
+- 빈 슬롯 전투 UI와 잘못된 roster 전투 시작 차단 구현
+- `npm ci`, typecheck, build, 개발 서버 HTTP 200 및 Formation 브라우저 확인 완료
+- 사용자 수동 테스트는 아직 미실시 (`not_tested`)
+- ChatGPT 코드 검수는 아직 미실시 (`not_reviewed`)
+- 현재 상태는 `review_pending`
+- 검수 태그는 `review-stage-10-v1`
+- 11단계 상점·용병 구매 기능은 구현하지 않음
+
 ## 2026-07-27 — 9단계 v3 검수 승인 및 main 반영 — 완료
 
 - 검수 태그 `review-stage-09-v3`와 승인 커밋 `40abfb77036d08decfc4369324ca9201ffae38ea` 확인

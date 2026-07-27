@@ -628,6 +628,126 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 9단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 9단계 `main` 반영: 미반영
 
+## 10단계 편성·슬롯 재배치와 주인공 필수 편성 — v1
+
+- 현재 작업 브랜치: `stage-10-formation-roster`
+- 현재 검수 태그: `review-stage-10-v1`
+- 10단계 v1 상태: 수정 요청 (`changes_requested`)
+
+자동 검사:
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`)
+- `npm run dev`: 개발 서버 HTTP 200 확인 후 종료 (`passed`)
+
+브라우저 자동 확인:
+
+- [x] Field 화면의 Stage 10 제목, Formation 버튼, 10/10 및 Hero Slot 1 표시
+- [x] FormationScene의 10개 슬롯과 보유 유닛 목록 표시
+- [x] Skill Merc를 5번 슬롯으로 교체하고 기존 Merc4가 2번 슬롯으로 이동
+- [x] 일반 용병 제거 시 EMPTY/UNDEPLOYED 표시
+- [x] Hero 제거 시도 차단 및 안내 문구 표시
+- [x] Reset Default로 기본 편성 복원
+- [x] Cancel로 draft 변경 폐기
+- [x] 적용된 편성이 BattleScene에 전달되고 Skill Merc 5번, Merc4 2번으로 표시
+- [x] Return to Field 후 편성 요약 유지
+- [x] 브라우저 콘솔 error/warn 로그 없음
+
+사용자 수동 테스트 대기:
+
+- [ ] 전체 사용자 수동 테스트는 아직 실행하지 않음
+- [ ] 장시간 전투와 추가 편성 시나리오는 사용자 확인 대기
+
+10단계 사용자 실행 테스트: 미실시 (`not_tested`)
+10단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+10단계 `main` 반영: 미반영
+
+10단계 v1 정적 코드 검수 결과: 수정 요청 (`changes_requested`)
+
+- 보유 유닛 1~10명 허용, roster 정렬, 편성 정체성 표시, Reset 저장 안내가 미흡해 수정 요청됨
+
+## 10단계 편성·슬롯 재배치와 주인공 필수 편성 — v2
+
+- 현재 작업 브랜치: `stage-10-formation-roster`
+- 현재 검수 태그: `review-stage-10-v2`
+- 10단계 상태: 검수 대기 (`review_pending`)
+
+순수 함수 검사:
+
+- [x] 기본 FormationState는 valid
+- [x] ownedUnits 10명, Hero만 배치된 상태는 valid
+- [x] Hero 한 명만 보유, ownedUnits 9명·11명은 invalid
+- [x] Hero 미배치, Hero 중복 슬롯, 슬롯 rosterUnitId 중복은 invalid
+- [x] 슬롯 배열 순서가 섞여도 valid
+- [x] buildBattleRosterFromFormation() 결과는 slotIndex 오름차순
+- [x] 빈 슬롯은 전투 roster에서 제외
+- [x] draft 수정은 registry 원본에 영향을 주지 않음
+- [x] 잘못된 registry는 기본 10명 상태로 복구
+
+자동 검사:
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 개발 서버 정상 시작 및 HTTP 200 확인 후 종료 (`passed`)
+
+브라우저 자동 확인:
+
+- [x] Hero 카드에 Main Character · Required 표시
+- [x] Skill Merc 카드에 Mercenary · Skills Q/W 표시
+- [x] 일반 용병 카드에 Mercenary 표시
+- [x] 선택 정보에 이름·역할·Required/스킬·Slot/Bench 표시
+- [x] 일반 용병 Remove 후 EMPTY와 Bench 표시
+- [x] Reset Default 후 `Default formation restored. Apply to save.` 표시
+- [x] Apply 후 FieldScene에 `Formation saved.` 표시
+- [x] Hero만 배치하고 나머지를 Bench로 둔 편성 적용
+- [x] Hero 한 명 전투 진입과 빈 슬롯 EMPTY UI 확인
+- [x] 브라우저 error/warn 로그 없음
+
+10단계 v2 사용자 실행 테스트: 실패 (`failed`)
+10단계 v2 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+10단계 v2 `main` 반영: 미반영
+
+10단계 v2 사용자 테스트 결과: 실패 (`failed`)
+
+- 선택된 유닛이 슬롯 이동·교환 후에도 남고, 동일 유닛·동일 슬롯·Scene 재진입 선택 취소가 보장되지 않아 v3 수정 요청됨
+
+## 10단계 편성·슬롯 재배치와 주인공 필수 편성 — v3
+
+- 현재 작업 브랜치: `stage-10-formation-roster`
+- 현재 검수 태그: `review-stage-10-v3`
+- 10단계 상태: 검수 대기 (`review_pending`)
+
+선택 상태 브라우저 재현:
+
+- [x] 최초 FormationScene 진입 시 `Selected: None`, 선택 강조 없음, Remove 비활성
+- [x] 같은 Owned Unit 카드 재클릭 시 `Selection cleared.`와 `Selected: None`
+- [x] 같은 유닛의 현재 슬롯 재클릭 시 선택 취소 및 슬롯 유지
+- [x] Hero와 일반 용병 슬롯 교환 후 `Selected: None` 및 강조 해제
+- [x] 교환 직후 다른 슬롯 클릭 시 해당 용병만 선택되고 추가 교환 없음
+- [x] 일반 용병 두 명 연속 Remove 후 각각 Bench 이동, 선택 자동 해제
+- [x] 선택 후 Cancel로 복귀하고 FormationScene 재진입 시 `Selected: None`
+
+기존 기능 회귀 확인:
+
+- [x] Apply 후 `Formation saved.` 표시
+- [x] Hero Required·Skill Merc Q/W·빈 슬롯 표시 유지
+- [x] 기본 10/10 BattleScene roster 및 Return to Field 확인
+- [ ] Auto Hunt·MOVE·FOCUS_ATTACK·Skill 사용 전체 수동 흐름은 v3에서 재실행하지 않음 (`not_tested`)
+- [x] 브라우저 error/warn 로그 없음
+
+자동 검사:
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 개발 서버 정상 시작 및 HTTP 200 확인 후 종료 (`passed`)
+
+10단계 v3 사용자 실행 테스트: 미실시 (`not_tested`)
+10단계 v3 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+10단계 v3 `main` 반영: 미반영
+
 ## 9단계 v3 최종 승인 및 main 반영
 
 - 승인 검수 태그: `review-stage-09-v3`

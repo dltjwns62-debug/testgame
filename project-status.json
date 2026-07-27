@@ -2,22 +2,66 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 9,
-  "currentStageName": "유닛 스킬과 단일 선택 전용 스킬 UI",
-  "stageStatus": "completed",
-  "activeTask": "9단계 완료 — 10단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 10,
+  "currentStageName": "편성·슬롯 재배치와 주인공 필수 편성",
+  "stageStatus": "review_pending",
+  "activeTask": "10단계 선택 토글과 작업 후 선택 해제 수정 완료 — review-stage-10-v3 검수 대기 중",
+  "workingBranch": "stage-10-formation-roster",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-  "nextStage": 10,
-  "nextStageName": "편성·슬롯 재배치와 주인공 필수 편성",
+  "nextStage": 11,
+  "nextStageName": "상점·용병 구매 기능",
   "reviewSubmission": {
-    "branch": "stage-09-unit-skills-ui",
-    "tag": "review-stage-09-v3",
+    "branch": "stage-10-formation-roster",
+    "tag": "review-stage-10-v3",
     "version": 3,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 10,
+      "branch": "stage-10-formation-roster",
+      "tag": "review-stage-10-v3",
+      "version": 3,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 10,
+      "branch": "stage-10-formation-roster",
+      "tag": "review-stage-10-v2",
+      "version": 2,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": null,
+      "commit": "74deeb968f25e435676d3803cb739facfe2a3244",
+      "reason": "FormationScene에서 선택한 유닛이 슬롯 이동·교환 후에도 selectedRosterUnitId로 남고, 동일 유닛·동일 슬롯 재클릭 및 Scene 재진입 시 선택 취소·초기화가 보장되지 않음",
+      "userRunTest": "failed",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 10,
+      "branch": "stage-10-formation-roster",
+      "tag": "review-stage-10-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": null,
+      "commit": "c6949ed1bf7710bc17fea400b5bf37e328043d70",
+      "reason": "FormationState 검증이 보유 유닛 1~10명을 허용하여 Hero 한 명만 남은 registry를 정상으로 인정할 수 있고, 전투 roster 정렬과 편성 화면의 역할·스킬·Required 표시 및 Reset 저장 안내가 요구사항에 미달함",
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
     {
       "stage": 9,
       "branch": "stage-09-unit-skills-ui",
@@ -308,9 +352,9 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-27T15:22:22+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
@@ -318,13 +362,12 @@
     "build": "passed",
     "devServer": "passed",
     "browserAutomation": "passed",
-    "userRunTest": "skipped_by_user",
-    "userRunTestReason": "사용자 요청에 따라 단계별 전체 수동 테스트를 생략하고, 주요 마일스톤 또는 이상 발견 시 종합 테스트를 진행하기로 함",
-    "chatGptCodeReview": "approved"
+    "userRunTest": "not_tested",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-27T15:22:22+09:00"
+  "lastUpdated": "2026-07-27T16:59:00+09:00"
 }

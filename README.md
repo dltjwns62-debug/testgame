@@ -1,5 +1,17 @@
 # Test Game
 
+## Stage 10 v3 resubmission
+
+10단계 v2 사용자 테스트에서 발견된 FormationScene 선택 상태 잔존 문제를 수정했다. Scene 진입 시 선택을 초기화하고, 같은 유닛·같은 슬롯 재클릭은 선택을 취소하며, 슬롯 이동·교환·일반 용병 편성 제외가 끝나면 선택을 자동 해제한다.
+
+v2 사용자 테스트 결과는 `failed`로 보존하고, 현재 제출은 `review-stage-10-v3` 및 `review_pending` 상태다. v1·v2 태그와 수정 요청 이력은 보존하며, 10단계는 아직 `main`에 병합하지 않았다. 11단계 상점·용병 구매 기능은 구현하지 않았다.
+
+## Stage 10 v2 resubmission history
+
+10단계 v1 정적 코드 검수에서 수정 요청된 보유 유닛 검증, roster 정렬, 편성 정보 표시와 저장 안내를 보완했다. `ownedUnits`는 정확히 10명을 보유하고, 실제 슬롯 배치는 1~10명을 허용한다. Bench는 보유 유닛 삭제가 아니며, 전투 roster는 `slotIndex` 오름차순으로 전달된다.
+
+v3 제출 전의 v2 기록은 `review-stage-10-v2` 및 `changes_requested`로 보존한다. v1 태그와 수정 요청 이력도 보존하며, 10단계는 아직 `main`에 병합하지 않았고, 11단계 상점·용병 구매 기능은 구현하지 않았다.
+
 ## Stage 9 v3 resubmission
 
 v3 replaces threat-request-based ally assistance with per-unit local guard defense. Every ally owns an independent `guardPosition`; Auto Hunt OFF detects enemies within `RTS_GUARD_AGGRO_RANGE` and stops pursuit beyond `RTS_GUARD_LEASH_RANGE`. Completed MOVE commands update the guard position, while malformed MOVE states preserve the previous guard position.
@@ -15,18 +27,17 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 프로젝트 이름: Test Game
 - 장르: 자동사냥 방치형 웹게임
 - 전체 개발 단계: 17단계
-- 현재 단계: 9단계
-- 현재 단계 이름: 유닛 스킬과 단일 선택 전용 스킬 UI
-- 현재 상태: 완료 (`completed`)
-- 현재 작업 브랜치: `main`
-- 검수 태그: `review-stage-09-v3`
-- 완료 태그: `stage-09-completed`
+- 현재 단계: 10단계
+- 현재 단계 이름: 편성·슬롯 재배치와 주인공 필수 편성
+- 현재 상태: 검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-10-formation-roster`
+- 검수 태그: `review-stage-10-v3`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
-- 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
+- 다음 단계: 11단계 — 상점·용병 구매 기능
 
 7단계 10대10 RTS 핵심 전투와 8단계 Auto Hunt·지역 동료 지원 기능은 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다.
 
-8단계는 `main`에 반영되어 완료됐다. 9단계는 Skill Mercenary의 Whirlwind·First Aid, 단일 선택 전용 Q/W 스킬 UI, 유닛별 주둔 지역 자동 방어를 포함해 `main`에 반영됐다. 승인 태그는 `review-stage-09-v3`이며 사용자 전체 수동 테스트는 요청에 따라 `skipped_by_user`로 기록했다.
+9단계는 `main`에 반영되어 완료됐다. 10단계에서는 보유 유닛 10명과 전투 슬롯을 분리한 FormationState, FormationScene, Hero 필수 편성, 슬롯 교체·제거·초기화, 역할·Required·Q/W 스킬 표시, 전투 roster 정렬 및 선택 상태 제어를 구현하고 v3 검수 대기 중이다. 11단계 상점·용병 구매 기능은 아직 시작하지 않았다.
 
 프로젝트는 필드에서 몬스터를 선택하고 접근한 뒤 전투를 진행하는 자동사냥 방치형 웹게임을 단계적으로 개발한다. 7단계부터는 거상온라인식 소규모 부대 RTS 방향으로 확장하며, 로드맵은 총 17단계로 관리한다.
 
@@ -76,4 +87,4 @@ npm run typecheck
 npm run build
 ```
 
-7단계부터 9단계까지는 코드 검수와 자동 검사를 거쳐 `main`에 반영됐다. 9단계 사용자 전체 수동 테스트는 사용자의 명시적 요청으로 생략했으며, 이는 테스트 통과를 의미하지 않는다. 다음 예정 단계는 10단계이고 아직 시작하지 않았다.
+7단계부터 9단계까지는 `main`에 반영됐다. 10단계 v3 자동 검사와 브라우저 재현 확인은 완료했지만 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 미실시다. 다음 예정 단계는 11단계이며, 10단계 승인 전에는 시작하지 않는다.

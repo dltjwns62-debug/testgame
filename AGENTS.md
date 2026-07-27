@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 10 scope note: the submitted work is limited to formation state, roster ownership, slot rearrangement, Hero-required validation, FormationScene, battle roster integration, v2 validation/display fixes, and the v3 selection clear/toggle behavior fix. It does not implement stage 11 shop or mercenary purchase features, or any deferred inventory, save, or online features.
+Stage 11 scope note: the submitted work is limited to registry-based Gold, the three fixed mercenary shop offers, atomic one-time recruitment, ShopScene, FieldScene shop access, owned-unit validation up to 13, Bench-preserving Reset Default, and deployed-roster integration. It does not implement stage 12 formation shortcuts, repeat purchases, sales, inventory, save, or online features.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -34,9 +34,9 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 ## 현재 단계 기준
 
 - 전체 단계: 17단계
-- 현재 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
-- 현재 단계 상태: 완료 (`completed`)
-- 현재 작업 브랜치: `main`
+- 현재 단계: 11단계 — 상점·용병 구매 기능
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-11-shop-recruitment`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -59,12 +59,13 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 10단계 2차 검수 태그: `review-stage-10-v2` — 사용자 테스트 수정 요청
 - 10단계 현재 검수 태그: `review-stage-10-v3` (승인)
 - 10단계 완료 태그: `stage-10-completed`
-- 사용자 실행 테스트: 통과 (`passed`)
-- ChatGPT 코드 검수: 승인 (`approved`)
+- 11단계 현재 검수 태그: `review-stage-11-v1`
+- 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계
-- 다음 단계: 11단계 — 상점·용병 구매 기능
+- 다음 단계: 12단계 — 부대 지정과 단축키 설정
 
-완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 10단계까지 완료됐고, 10단계 v3가 승인되어 `main`에 반영됐다. 다음 단계 작업은 승인된 최신 `main`에서 별도 브랜치를 만들어 수행하며, 11단계 시작 명령 전에는 상점·용병 구매 코드를 작성하지 않는다.
+완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 10단계까지 완료됐고, 11단계는 `stage-11-shop-recruitment`에서 구현 후 `review_pending`으로 제출했다. 검수 전에는 작업 브랜치에만 push하며, 승인 없이 `main`을 변경하지 않는다. 12단계 부대 지정·단축키 기능은 별도 승인 명령 전까지 구현하지 않는다.
 
-8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의 기반 Skill Mercenary 스킬과 주둔 지역 자동 방어를 구현했다. 10단계에서는 `FormationState`, 정확히 10명의 보유 유닛과 1~10명의 배치 roster 분리, FormationScene, Hero 필수 편성, 슬롯 교체·제거·초기화, 역할·Required·Q/W 표시, slotIndex 정렬, 저장 피드백과 선택 상태 제어만 다룬다. 상점·용병 구매, 인벤토리, 저장 데이터 시스템, 온라인 기능 및 11단계 기능은 구현하지 않는다.
+8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의 기반 Skill Mercenary 스킬과 주둔 지역 자동 방어를 구현했다. 10단계에서는 `FormationState`, 보유 유닛과 1~10명의 배치 roster 분리, FormationScene, Hero 필수 편성, 슬롯 교체·제거·초기화와 선택 상태 제어를 구현했다. 11단계에서는 registry Gold, 고정 상점 3종, 한 번만 구매 가능한 용병, 최대 13명 보유 검증, Bench 보존과 ShopScene만 다룬다. 12단계 부대 단축키, 반복 구매·판매·환불, 인벤토리, 저장 데이터, 온라인 기능은 구현하지 않는다.

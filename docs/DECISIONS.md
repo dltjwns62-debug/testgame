@@ -1,5 +1,21 @@
 # 프로젝트 결정 사항
 
+## 11단계 상점·용병 구매 기능 결정
+
+- Gold는 `PLAYER_GOLD_REGISTRY_KEY`로 세션 동안 유지하고, 전투 보상과 상점 소비는 같은 registry 잔액을 사용한다.
+- 초기 Gold는 0이며, 음수·소수·NaN·Infinity·문자열·객체·안전하지 않은 정수는 유효하지 않은 값으로 처리한다.
+- 상점 상품은 Swordsman, Guardian, Scout 세 종류이며 각 상품은 현재 한 번만 구매할 수 있다.
+- 구매 성공 시 Gold는 정확히 한 번 차감되고, Gold와 FormationState가 부분 성공으로 어긋나지 않도록 동기식 원자 처리와 복구를 사용한다.
+- 구매한 유닛은 `ownedUnits`에 추가하고 슬롯에는 자동 배치하지 않으며, 구매 직후 상태는 Bench다.
+- `ownedUnits`는 기본 10명과 구매 가능한 용병 최대 3명을 합쳐 10~13명으로 검증하고, 편성 슬롯은 계속 10개로 유지한다.
+- Reset Default는 구매 용병을 삭제하지 않고 초기 기본 10명을 슬롯에 복원하며 구매 용병은 Bench로 보존한다.
+- 구매 용병의 이름·정의·능력치는 슬롯과 무관한 정체성으로 유지하고 실제 편성 roster에 포함될 때 자신의 정의를 사용한다.
+- Gold와 구매 결과는 Phaser registry 세션 범위에서만 유지하며 새로고침·브라우저 종료·서버 저장은 다루지 않는다.
+- 반복 구매·판매·환불·재고 갱신·랜덤 상품·원거리 공격·새 스킬은 구현하지 않는다.
+- 부대 지정과 단축키는 12단계에서 별도 구현한다.
+- 11단계는 `review-stage-11-v1`로 `review_pending` 제출하며, 사용자 요청으로 수동 테스트를 생략하고 `main`에는 병합하지 않는다.
+- 상태: 확정
+
 ## Stage 9 v3 per-unit guard defense decisions
 
 - Auto Hunt OFF allies each own an independent `guardPosition`, initially copied from their spawn position.
@@ -23,7 +39,7 @@
 - Multiple threats and targets use deterministic distance, attacker, pursuit, target-count, and `battleUnitId` ordering.
 - `review-stage-09-v1` is preserved; the v2 submission is `review-stage-09-v2` and is recorded as `changes_requested`.
 
-현재 단계 기준: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
+현재 단계 기준: 11단계 — 상점·용병 구매 기능 (`review_pending`)
 
 ## 결정 목록
 
@@ -449,9 +465,9 @@
 ## 공통 단계 정보
 
 - 전체 단계: 17단계
-- 현재 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
-- 현재 단계 상태: 완료 (`completed`)
-- 작업 브랜치: `main`
+- 현재 단계: 11단계 — 상점·용병 구매 기능
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 작업 브랜치: `stage-11-shop-recruitment`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -472,10 +488,11 @@
 - 10단계 2차 검수 태그: `review-stage-10-v2` — 사용자 테스트 수정 요청
 - 10단계 현재 검수 태그: `review-stage-10-v3` (승인)
 - 10단계 완료 태그: `stage-10-completed`
-- 다음 단계: 11단계 — 상점·용병 구매 기능
+- 11단계 현재 검수 태그: `review-stage-11-v1`
+- 다음 단계: 12단계 — 부대 지정과 단축키 설정
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계
 - 검수 승인: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계 승인
-- `main` 반영: 1단계부터 10단계까지 반영 완료
+- `main` 반영: 1단계부터 10단계까지 반영 완료. 11단계는 검수 전 작업 브랜치에만 반영
 ## 9단계 유닛 스킬과 단일 선택 전용 스킬 UI 결정
 
 - 결정: 스킬은 슬롯 번호가 아니라 `unitDefinitionId`에 연결한다.

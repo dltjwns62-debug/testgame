@@ -1,5 +1,40 @@
 # 현재 개발 상태
 
+## Stage 11 shop and recruitment submission
+
+- 제출 태그: `review-stage-11-v1`
+- 작업 브랜치: `stage-11-shop-recruitment`
+- 전체 단계: 17단계
+- 현재 단계: 11단계 — 상점·용병 구매 기능
+- 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업: 11단계 상점·용병 구매 구현 완료 — `review-stage-11-v1` 검수 대기 중
+- 완료된 단계: 1단계~10단계
+- 검수 통과된 단계: 1단계~10단계
+- 다음 단계: 12단계 — 부대 지정과 단축키 설정
+- `main` 정식 반영 여부: 미반영
+- 사용자 실행 테스트: 사용자 요청에 따라 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+- 현재 알려진 문제: 기존 `favicon.ico` 404 비차단 경고
+
+### 11단계 구현 요약
+
+- Phaser registry 기반 Gold를 도입하고 전투 승리 보상과 상점 소비를 같은 잔액에 연결했다.
+- Swordsman·Guardian·Scout 고정 상품, 한 번만 구매 가능한 원자 구매, 최대 13명 보유 검증을 추가했다.
+- 구매 직후 용병은 Bench에 남으며, Formation의 초기 10슬롯과 전투 roster 최대 10명 규칙을 유지한다.
+- ShopScene, FieldScene Shop 버튼·Gold·Owned 표시, 최대 13명 FormationScene 표시와 Reset Default 보존을 추가했다.
+
+### 11단계 검증 기록
+
+- 순수 Gold·Formation·구매 원자성 검사: 통과
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작 및 종료 (`passed`)
+- 브라우저 자동 확인: Stage 11 필드·Shop 카드·Gold 부족 메시지·잔액/보유 수 불변·콘솔 오류 없음 확인
+- 자동화로 직접 확인하지 못한 구매 후 편성·실전 전투·세 상품 전체·Reset 시나리오는 통과로 기록하지 않음
+
+마지막 갱신: 2026-07-27 (Asia/Seoul)
+
 ## Stage 10 final approval status
 
 - Submission: `review-stage-10-v3` on `stage-10-formation-roster`
@@ -26,25 +61,25 @@
 ## 단계 정보
 
 - 전체 단계: 17단계
-- 현재 단계: 10단계
-- 현재 단계 이름: 편성·슬롯 재배치와 주인공 필수 편성
-- 현재 단계 상태: 완료 (`completed`)
-- 상태 코드: `completed`
-- 현재 작업 브랜치: `main`
-- 검수 태그: `review-stage-10-v3` (승인, v1·v2 수정 요청 이력 보존)
+- 현재 단계: 11단계
+- 현재 단계 이름: 상점·용병 구매 기능
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 상태 코드: `review_pending`
+- 현재 작업 브랜치: `stage-11-shop-recruitment`
+- 검수 태그: `review-stage-11-v1`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계
-- 현재 작업: 10단계 완료 — 11단계 시작 명령 대기 중
-- 다음 단계: 11단계 — 상점·용병 구매 기능
-- 사용자 실행 테스트: 통과 (`passed`)
-- ChatGPT 코드 검수: 승인 (`approved`)
-- `main` 정식 반영 여부: 반영 완료
+- 현재 작업: 11단계 상점·용병 구매 구현 완료 — review-stage-11-v1 검수 대기 중
+- 다음 단계: 12단계 — 부대 지정과 단축키 설정
+- 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+- `main` 정식 반영 여부: 미반영
 
-현재 단계 번호는 10으로 유지한다. 1단계부터 10단계까지 `main`에 반영되어 완료됐고, 별도의 11단계 시작 명령 전에는 상점·용병 구매 기능을 구현하지 않는다.
+현재 단계 번호는 11로 유지한다. 1단계부터 10단계까지 `main`에 반영되어 완료됐고, 11단계는 작업 브랜치에서 검수 대기 중이다. 11단계 승인 전에는 `main`을 변경하지 않으며 12단계는 시작하지 않는다.
 
 ## 마지막 작업 요약
 
-10단계에서 보유 유닛 정확히 10명 검증, 1~10명 배치, slotIndex 정렬, FormationScene의 역할·Required·Q/W·Slot/Bench 표시, Reset 저장 안내와 Apply 저장 메시지, 선택 토글·Scene 진입 초기화·작업 후 자동 해제를 구현했다. 자동 검사와 개발 서버, 기존 브라우저 기록 및 사용자가 제공한 통합 테스트 결과를 바탕으로 승인·병합을 완료했다.
+11단계에서 registry Gold, 고정 상점 상품 3종, 원자적 용병 구매, 10~13명 보유 검증, 구매 유닛 Bench 보존, ShopScene과 최대 13명 Formation 표시를 구현했다. 순수 로직 검사와 npm 검사, 개발 서버 및 제한된 브라우저 자동 확인을 완료했으며 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 실시하지 않았다.
 
 ## 검증 기록
 

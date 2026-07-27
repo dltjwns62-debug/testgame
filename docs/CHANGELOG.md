@@ -1,5 +1,20 @@
 # 변경 이력
 
+## 2026-07-27 — 11단계 상점·용병 구매 기능 — 검수 대기
+
+- registry 기반 세션 Gold와 전투 보상 연결
+- Swordsman·Guardian·Scout 고정 상품과 정확한 가격·능력치 추가
+- Gold·Formation을 함께 검증하는 동기식 원자 구매와 중복 구매 방지
+- 신규 용병을 `ownedUnits`에 추가하고 구매 직후 Bench로 유지
+- 기본 10명 필수 보존, 최대 13명 보유 검증, 전투 roster 최대 10명 유지
+- 최대 13명 FormationScene 표시와 구매 유닛을 삭제하지 않는 Reset Default
+- FieldScene Shop 버튼·Gold·Owned 표시 및 ShopScene 추가
+- 순수 로직 검사, npm 검사, 개발 서버와 제한된 브라우저 자동 확인 완료
+- 사용자 수동 테스트는 사용자 요청으로 생략 (`skipped_by_user`), 통과로 기록하지 않음
+- ChatGPT 코드 검수는 `not_reviewed`, `main`은 미반영
+- 검수 태그 `review-stage-11-v1` 제출
+- 12단계 부대 지정·단축키 기능은 구현하지 않음
+
 ## 2026-07-27 — 10단계 v3 최종 승인 및 main 반영 — 완료
 
 - `review-stage-10-v3` 승인 및 사용자 통합 테스트 통과

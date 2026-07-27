@@ -1,4 +1,57 @@
-# 2단계 실행 및 수동 테스트
+# 실행 및 테스트 기록
+
+## Stage 11 상점·용병 구매 기능 — v1 검수 제출
+
+- 현재 작업 브랜치: `stage-11-shop-recruitment`
+- 현재 검수 태그: `review-stage-11-v1`
+- 11단계 상태: 검수 대기 (`review_pending`)
+
+### 순수 로직 검사
+
+- [x] 초기 Gold 0 및 유효한 Gold 유지
+- [x] 음수·소수·문자열·손상된 Gold의 안전한 복구 또는 구매 거부
+- [x] Gold 추가·차감과 안전한 정수 범위 검증
+- [x] 기본 FormationState 10명, Hero 필수 배치, 슬롯 10개 검증
+- [x] Swordsman·Guardian·Scout 구매 후 13명까지 유효
+- [x] 기본 유닛 누락·구매 정보 변조·중복·14명 상태 거부
+- [x] Gold 부족 구매 시 Gold와 FormationState 불변
+- [x] 정상 구매 시 가격 한 번 차감, 동일 상품 재구매 거부
+- [x] 구매 직후 슬롯 불변 및 구매 유닛 Bench 유지
+- [x] Reset Default가 구매 유닛을 보존하고 초기 슬롯만 복원
+- [x] 배치 roster에는 배치된 구매 유닛만 포함되고 Bench 유닛은 제외
+
+### 자동 검사
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 정상 시작 확인 후 종료 (`passed`)
+
+### 브라우저 자동 확인
+
+- [x] Field에 Stage 11 제목 표시
+- [x] Formation과 Shop 버튼 표시 및 버튼 영역 분리
+- [x] Field에 Gold 0, Owned 10/13, Formation 10/10 표시
+- [x] ShopScene에 상품 카드 3개, 이름·설명·가격·핵심 능력치 표시
+- [x] Gold 0 상태에서 Swordsman 구매 시 `Not enough Gold.` 표시
+- [x] Gold 부족 구매 후 Gold 0과 Owned 10/13 유지
+- [x] 콘솔 error/warn 로그 없음
+
+다음 항목은 이번 브라우저 자동 확인에서 실행하지 않았으며 통과로 기록하지 않는다.
+
+- [ ] 전투 승리 보상·Return 후 Gold 갱신과 중복 결과 방지
+- [ ] 20 Gold 이상 확보 후 Swordsman 구매·중복 클릭·정확한 차감
+- [ ] 구매 용병의 Formation Bench 표시와 슬롯 교체·Apply 유지
+- [ ] 구매 용병의 실제 전투 위치·능력치·Auto Hunt·MOVE 연결
+- [ ] 세 상품 전부 구매한 13명 화면과 Roster full 처리
+- [ ] 구매 용병 배치 후 Reset Default 보존 및 Apply
+
+11단계 사용자 수동 테스트: 사용자 요청에 따라 생략 (`skipped_by_user`)
+
+사유: 사용자 요청에 따라 단계별 수동 테스트를 생략하고 12단계 주요 마일스톤에서 통합 테스트 예정
+
+11단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+11단계 `main` 반영: 미반영
 
 ## Stage 9 v3 local guard defense regression checklist
 

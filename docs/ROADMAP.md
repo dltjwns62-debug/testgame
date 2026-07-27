@@ -1,18 +1,19 @@
 # Test Game 개발 로드맵
 
-## Stage 12 v2 current submission
+## Stage 12 v3 current submission
 
 - 전체 단계: 17단계
 - 현재 단계: 12단계 — 부대 지정과 단축키 설정
 - 단계 상태: `review_pending`
 - 작업 브랜치: `stage-12-control-groups-keybinds`
-- 검수 태그: `review-stage-12-v2`
+- 검수 태그: `review-stage-12-v3`
 - 완료된 단계: 1단계~11단계
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 - `main` 반영 여부: 미반영
 - 사용자 실행 테스트: `not_tested`
 - ChatGPT 코드 검수: `not_reviewed`
 - v1 결과: `changes_requested` — 중앙 부대 패널이 전투 유닛을 가리고 Group 10이 Group 0으로 표시됨
+- v2 결과: `changes_requested` — 부대가 BattleScene마다 초기화되고 사망·UI 조회가 부대 원본을 삭제함
 
 ## Stage 9 v3 resubmission scope
 
@@ -63,14 +64,15 @@
 - 10단계 완료 태그: `stage-10-completed`
 - 11단계 검수 태그: `review-stage-11-v1` (승인, 과거 이력)
 - 11단계 완료 태그: `stage-11-completed`
-- 12단계 이전 검수 태그: `review-stage-12-v1` — UI 수정 요청
-- 12단계 현재 검수 태그: `review-stage-12-v2`
+- 12단계 최초 검수 태그: `review-stage-12-v1` — UI 수정 요청
+- 12단계 2차 검수 태그: `review-stage-12-v2` — 사용자 통합 테스트 수정 요청
+- 12단계 현재 검수 태그: `review-stage-12-v3`
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - `main` 반영 여부: 1단계부터 11단계까지 반영 완료
 
-현재 단계 번호는 12이며, 12단계 `review-stage-12-v2` UI 수정본을 작업 브랜치에 제출하고 검수를 기다리는 중이다. 13단계는 별도의 승인·시작 명령 전까지 시작하지 않는다.
+현재 단계 번호는 12이며, 12단계 `review-stage-12-v3` 전투 간 지속 수정본을 작업 브랜치에 제출하고 검수를 기다리는 중이다. 13단계는 별도의 승인·시작 명령 전까지 시작하지 않는다.
 
 각 단계의 상태는 다음 값으로 관리한다.
 
@@ -556,7 +558,7 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 
 ### 단계 상태
 
-`review_pending` — `review-stage-12-v2` 제출, `main` 미반영
+`review_pending` — `review-stage-12-v3` 제출, `main` 미반영
 
 ### 목표
 
@@ -583,6 +585,12 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 - [x] FieldScene과 BattleScene UI에 실제 키가 표시되고 기존 하단 슬롯·스킬 패널과 겹치지 않는다.
 - [x] 부대 상태 UI는 `RTS_ARENA_BOUNDS` 밖의 좌측 하단 소형 5×2 표시이며 선택 정보·하단 슬롯·Skill 패널과 겹치지 않는다.
 - [x] 정식 부대 이름은 Group 1~Group 10이고, 실제 호출키는 1~9·0이며 Group 10의 기본키는 0이다.
+- [x] `CONTROL_GROUPS_REGISTRY_KEY`에 10개 부대를 `rosterUnitId` 기준으로 깊은 복사 저장·로드한다.
+- [x] BattleScene마다 부대 구성을 초기화하지 않고, 현재 편성된 생존 유닛만 호출한다.
+- [x] 사망·Bench 유닛은 부대 원본에 유지하고, UI는 생존/저장 총원으로 표시한다.
+- [x] Bench 유닛의 일반 용병 슬롯 직접 대체 시 기존 부대 지정을 새 유닛에게 승계한다.
+- [x] 승리·패배·Field·Formation·Shop 이동 후 부대 구성을 유지한다.
+- [x] 새로고침 이후 영구 저장은 구현하지 않는다.
 - [x] `npm ci`, typecheck, build, dev 및 제한된 브라우저 자동 확인을 완료한다.
 - [ ] 사용자 수동 통합 테스트를 실행한다.
 - [ ] ChatGPT 코드 검수를 승인받고 `main`에 반영한다.

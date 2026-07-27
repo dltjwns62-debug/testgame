@@ -1,5 +1,19 @@
 # 프로젝트 결정 사항
 
+## 12단계 v3 전투 간 부대 지속 결정 (검수 재제출)
+
+- 결정: 부대 구성은 BattleScene별 임시 상태가 아니라 같은 게임 세션에서 유지되는 registry 상태다.
+- 결정: `CONTROL_GROUPS_REGISTRY_KEY`에 10개 부대를 `rosterUnitId` 배열로 저장하고 registry 읽기·쓰기에 깊은 복사를 사용한다.
+- 결정: FormationState의 전체 `ownedUnits`를 부대 ID 유효성 기준으로 사용하며 Bench 유닛도 부대 정의에 유지한다.
+- 결정: 전투 사망은 현재 선택과 조회 결과에만 영향을 주고 persistent 부대 정의는 삭제하지 않는다.
+- 결정: recall과 UI 인원수 조회는 원본 그룹을 수정하지 않으며, 현재 생존·편성 유닛만 선택 가능하게 한다.
+- 결정: Bench 유닛이 점유된 일반 용병 슬롯을 직접 대체하고 Apply하면 기존 유닛의 모든 부대 지정을 새 `rosterUnitId`로 승계한다.
+- 결정: 구매만 한 경우, 빈 슬롯 배치, 배치 유닛 간 슬롯 교환, 단순 Bench 이동에는 부대 승계를 적용하지 않는다.
+- 결정: 승리·패배·Field·Formation·Shop 이동 후에도 부대 구성과 KeyBindingState를 유지한다.
+- 결정: 브라우저 새로고침 이후 영구 저장은 15단계에서 처리하며 이번 단계에서 localStorage는 사용하지 않는다.
+- 결정: `review-stage-12-v2`는 사용자 통합 테스트 실패와 changes_requested로 보존하고 수정본은 `review-stage-12-v3`로 `review_pending` 제출한다.
+- 상태: 확정
+
 ## 12단계 v2 UI 수정 결정 (검수 재제출)
 
 - 결정: 부대 상태 UI는 `RTS_ARENA_BOUNDS` 밖의 좌측 하단 소형 5×2 영역에 배치하고 전투장 중앙에 큰 패널을 두지 않는다.

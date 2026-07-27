@@ -1,6 +1,57 @@
 # 실행 및 테스트 기록
 
-## Stage 12 부대 지정과 단축키 설정 — v2 검수 대기
+## Stage 12 부대 지정과 단축키 설정 — v3 검수 대기
+
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 검수 태그: `review-stage-12-v3`
+- 12단계 상태: 검수 대기 (`review_pending`)
+- v1 결과: `changes_requested` — 중앙 부대 UI 겹침과 Group 10 표기 오류
+- v2 결과: `changes_requested` / 사용자 통합 테스트 실패 — BattleScene마다 부대가 초기화되고 사망·UI 조회가 원본을 삭제함
+
+### v3 순수 로직 검사
+
+- [x] PersistentControlGroupState의 빈 상태·10개 그룹·손상 길이 검증
+- [x] 그룹 내부 중복·알 수 없는 ID 제거와 정상 그룹 보존
+- [x] 서로 다른 그룹의 같은 rosterUnitId 허용
+- [x] Bench 유닛 ID 유지와 깊은 복사
+- [x] Map↔persistent 변환과 왕복 구성 보존
+- [x] recall/UI 조회가 원본 그룹을 변경하지 않음
+- [x] 사망·미배치 유닛은 조회에서 제외되지만 persistent 그룹에 유지
+- [x] 다음 전투에서 다시 살아난 유닛이 조회에 복귀
+- [x] 빈 저장·특정 그룹 교체·다른 그룹 보존
+- [x] 직접 Bench 교체 시 부대 구성 승계 및 중복 제거
+- 결과: 25개 통과
+
+### v3 자동 검사
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- `project-status.json` JSON 파싱: 통과
+
+### v3 브라우저 자동 확인
+
+- [x] 첫 전투에서 저장한 Group 1이 Field 복귀 후 다음 BattleScene에 `1/1`로 유지된다.
+- [x] 다음 전투에서 `1` 호출 시 Group 1의 저장 유닛이 선택되고 `Group 1 recalled: 1 living units.` 로그가 표시된다.
+- [x] 전투 중 일부 유닛이 사망해도 Group 원본 삭제 없이 UI가 `0/1`처럼 현재/저장 총원으로 표시된다.
+- [x] Bench Swordsman을 Merc 4 슬롯에 직접 배치하고 Apply한 뒤 다음 전투 Group 2가 `1/1`로 유지된다.
+- [x] 다음 전투에서 `2` 호출 시 Swordsman이 선택되고 `Group 2 recalled: 1 living units.` 로그가 표시된다.
+- [x] 전투장 밖 부대 UI·Group 10 표기·기존 슬롯·스킬 패널 UI가 유지된다.
+- [x] 브라우저 console error/warn 로그가 없다.
+
+실행하지 못한 항목은 통과로 기록하지 않는다.
+
+- [ ] 패배 후 복귀와 세 번째 연속 전투까지 모든 그룹 유지
+- [ ] 여러 유닛·여러 그룹·Skill Merc 스킬 UI의 전체 사용자 통합 시나리오
+- [ ] Bench 이동 후 재편성, 빈 슬롯 배치, 단순 배치 유닛 슬롯 교환의 전체 회귀 시나리오
+- [ ] 새로고침 이후 저장 — 15단계 범위
+
+12단계 v3 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 v3 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 v3 `main` 반영: 미반영
+
+## Stage 12 부대 지정과 단축키 설정 — v2 검수 기록
 
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
 - 현재 검수 태그: `review-stage-12-v2`

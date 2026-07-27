@@ -1,5 +1,19 @@
 # 변경 이력
 
+## 2026-07-28 — 12단계 v2 사용자 테스트 수정 및 v3 재제출 — 검수 대기
+
+- v2 사용자 통합 테스트에서 BattleScene마다 부대 구성이 초기화되는 치명적 설계 문제를 확인
+- `CONTROL_GROUPS_REGISTRY_KEY` 기반 세션 지속 `PersistentControlGroupState`를 추가
+- 부대 저장 ID를 `rosterUnitId`로 유지하고 FormationState의 전체 ownedUnits를 기준으로 검증
+- 전투 사망·Bench·UI 조회에서 persistent 원본을 삭제하지 않도록 수정
+- recall은 현재 생존·편성 유닛만 반환하고 UI는 현재/저장 총원으로 표시
+- Bench 유닛이 일반 용병 슬롯을 직접 대체하면 Apply 시 기존 부대 지정을 승계
+- 첫 전투 Group 1 유지·호출 및 Swordsman의 Merc 4 슬롯 대체 후 Group 2 승계를 브라우저에서 확인
+- `review-stage-12-v2`는 `changes_requested`, 사용자 통합 테스트 실패 이력으로 보존
+- 새 검수 태그 `review-stage-12-v3`로 작업 브랜치에 재제출
+- 사용자 실행 테스트 상태는 `not_tested`, 13단계는 구현하지 않음
+- 12단계는 아직 `main`에 병합하지 않음
+
 ## 2026-07-28 — 12단계 v1 UI 수정 및 v2 재제출 — 검수 대기
 
 - v1 정적 코드 검수에서 중앙 부대 상태 패널이 적군 초기 대형과 겹치는 문제를 수정 요청받음

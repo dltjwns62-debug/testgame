@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 12 scope note: the submitted v2 work is limited to temporary BattleScene control groups, Ctrl+number save and number recall, dead-unit cleanup, registry-based configurable group and skill key bindings, KeySettingsScene, FieldScene key-settings access, dynamic BattleScene help/UI, and moving the compact group UI outside the battle arena with separate Group 1~10 names and 1~9/0 keys. It does not implement stage 13 experience, levels, stats, repeat purchases, sales, inventory, save, or online features.
+Stage 12 scope note: the submitted v3 work is limited to session-persistent registry control groups keyed by rosterUnitId, Ctrl+number save and number recall, non-destructive dead/Bench filtering, direct Bench replacement inheritance in FormationScene, registry-based configurable group and skill key bindings, KeySettingsScene, FieldScene key-settings access, dynamic BattleScene help/UI, and the compact group UI outside the battle arena. It does not implement stage 13 experience, levels, stats, browser-refresh persistence, repeat purchases, sales, inventory, save, or online features.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -61,8 +61,9 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 10단계 완료 태그: `stage-10-completed`
 - 11단계 검수 태그: `review-stage-11-v1` (승인, 과거 이력)
 - 11단계 완료 태그: `stage-11-completed`
-- 12단계 이전 검수 태그: `review-stage-12-v1` — UI 수정 요청
-- 12단계 현재 검수 태그: `review-stage-12-v2`
+- 12단계 최초 검수 태그: `review-stage-12-v1` — UI 수정 요청
+- 12단계 2차 검수 태그: `review-stage-12-v2` — 사용자 통합 테스트 수정 요청
+- 12단계 현재 검수 태그: `review-stage-12-v3`
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
@@ -71,4 +72,4 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
 완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 11단계까지 완료됐고, 12단계는 `stage-12-control-groups-keybinds`에서 구현 후 `review_pending`으로 제출했다. 검수 전에는 작업 브랜치에만 push하며, 승인 없이 `main`을 변경하지 않는다. 다음 13단계 경험치·레벨·능력치 성장 기능은 별도 승인 명령 전까지 구현하지 않는다.
 
-8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의 기반 Skill Mercenary 스킬과 주둔 지역 자동 방어를 구현했다. 10단계에서는 `FormationState`, 보유 유닛과 1~10명의 배치 roster 분리, FormationScene, Hero 필수 편성, 슬롯 교체·제거·초기화와 선택 상태 제어를 구현했다. 11단계에서는 registry Gold, 고정 상점 3종, 한 번만 구매 가능한 용병, 최대 13명 보유 검증, Bench 보존과 ShopScene을 다뤘다. 12단계에서는 전투마다 초기화되는 부대 10개, 사용자 지정 키 설정과 BattleScene·FieldScene 연동만 다룬다. 13단계 경험치·레벨·능력치, 반복 구매·판매·환불, 인벤토리, 저장 데이터, 온라인 기능은 구현하지 않는다.
+8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의 기반 Skill Mercenary 스킬과 주둔 지역 자동 방어를 구현했다. 10단계에서는 `FormationState`, 보유 유닛과 1~10명의 배치 roster 분리, FormationScene, Hero 필수 편성, 슬롯 교체·제거·초기화와 선택 상태 제어를 구현했다. 11단계에서는 registry Gold, 고정 상점 3종, 한 번만 구매 가능한 용병, 최대 13명 보유 검증, Bench 보존과 ShopScene을 다뤘다. 12단계에서는 session registry에 유지되는 10개 부대, 사용자 지정 키 설정, BattleScene·FieldScene 연동, 그리고 점유된 일반 용병 슬롯을 Bench 용병으로 직접 교체할 때의 부대 지정 승계를 다룬다. 13단계 경험치·레벨·능력치, 반복 구매·판매·환불, 인벤토리, 저장 데이터, 온라인 기능은 구현하지 않는다.

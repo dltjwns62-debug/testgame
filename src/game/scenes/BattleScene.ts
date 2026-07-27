@@ -16,12 +16,17 @@ import {
 } from "../constants";
 import {
   createEmptyControlGroups,
+  controlGroupMapToPersistentState,
+  getAvailableControlGroupMemberIds,
   getControlGroupOrdinalLabel,
-  removeUnitFromAllControlGroups,
+  getOrCreatePersistentControlGroupState,
+  persistentStateToControlGroupMap,
   recallControlGroup,
   saveControlGroup,
+  setPersistentControlGroupState,
   type ControlGroupMap,
 } from "../controlGroups";
+import { getOrCreateFormationState } from "../formationState";
 import {
   createDefaultKeyBindingState,
   findControlGroupIndexByCode,
@@ -237,7 +242,10 @@ export class BattleScene extends Phaser.Scene {
     this.dataError = null;
     this.combatTimeMs = 0;
     this.keyBindingState = getOrCreateKeyBindingState(this.game.registry);
-    this.controlGroups = createEmptyControlGroups();
+    const formation = getOrCreateFormationState(this.game.registry);
+    const ownedRosterUnitIds = new Set(formation.ownedUnits.map((unit) => unit.rosterUnitId));
+    const persistentControlGroups = getOrCreatePersistentControlGroupState(this.game.registry, ownedRosterUnitIds);
+    this.controlGroups = persistentStateToControlGroupMap(persistentControlGroups);
     this.controlGroupTexts.clear();
     const storedAutoHunt = this.game.registry.get(AUTO_HUNT_REGISTRY_KEY);
     this.autoHuntEnabled = storedAutoHunt === true;
@@ -1219,7 +1227,6 @@ export class BattleScene extends Phaser.Scene {
     unit.commandDestination = null;
     unit.attackElapsedMs = 0;
     this.selectedUnitIds.delete(unit.battleUnitId);
-    removeUnitFromAllControlGroups(this.controlGroups, unit.battleUnitId);
     this.unitVisuals.get(unit.battleUnitId)?.interactionZone.disableInteractive();
   }
 
@@ -1301,6 +1308,7 @@ export class BattleScene extends Phaser.Scene {
     }
 
     const ids = saveControlGroup(this.controlGroups, groupIndex, this.selectedUnitIds, this.units.values());
+    setPersistentControlGroupState(this.game.registry, controlGroupMapToPersistentState(this.controlGroups));
     const groupLabel = getControlGroupOrdinalLabel(groupIndex);
     this.addAttackLog(ids.length > 0
       ? `Group ${groupLabel} saved: ${ids.length} units.`
@@ -1530,9 +1538,10 @@ export class BattleScene extends Phaser.Scene {
         continue;
       }
       const key = getKeyCodeLabel(this.keyBindingState.controlGroupCodes[groupIndex]);
-      const livingCount = recallControlGroup(this.controlGroups, groupIndex, this.units).length;
+      const totalCount = this.controlGroups.get(groupIndex)?.length ?? 0;
+      const livingCount = getAvailableControlGroupMemberIds(this.controlGroups, groupIndex, this.units).length;
       const ordinal = getControlGroupOrdinalLabel(groupIndex);
-      visual.setText(`G${ordinal} [${key}]: ${livingCount > 0 ? livingCount : "--"}`);
+      visual.setText(`G${ordinal} [${key}]: ${totalCount > 0 ? `${livingCount}/${totalCount}` : "--"}`);
     }
   }
 

@@ -35,6 +35,7 @@ export const AUTO_HUNT_REGISTRY_KEY = "testgame.autoHuntEnabled";
 export const FORMATION_REGISTRY_KEY = "testgame.formationState";
 export const PLAYER_GOLD_REGISTRY_KEY = "testgame.playerGold";
 export const KEY_BINDINGS_REGISTRY_KEY = "testgame.keyBindings";
+export const CONTROL_GROUPS_REGISTRY_KEY = "testgame.controlGroups";
 export const INITIAL_OWNED_UNIT_COUNT = 10;
 export const MAX_OWNED_UNIT_COUNT = 13;
 

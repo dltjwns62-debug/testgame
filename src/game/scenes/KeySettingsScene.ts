@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH } from "../constants";
 import {
-  getControlGroupDisplayNumber,
+  getControlGroupOrdinalLabel,
   type ControlGroupIndex,
 } from "../controlGroups";
 import {
@@ -262,11 +262,11 @@ export class KeySettingsScene extends Phaser.Scene {
       return;
     }
     const swappedIndex = swapControlGroupBinding(this.draftKeyBindings, action.groupIndex, code);
-    const groupLabel = getControlGroupDisplayNumber(action.groupIndex);
+    const groupLabel = getControlGroupOrdinalLabel(action.groupIndex);
     if (swappedIndex === null) {
       this.setStatus(`Group ${groupLabel} binding unchanged.`, "#c4e4d0");
     } else {
-      this.setStatus(`Group ${groupLabel} and Group ${getControlGroupDisplayNumber(swappedIndex)} bindings swapped.`, "#9ce4b0");
+      this.setStatus(`Group ${groupLabel} and Group ${getControlGroupOrdinalLabel(swappedIndex)} bindings swapped.`, "#9ce4b0");
     }
     this.captureAction = null;
     this.refreshUi();
@@ -311,7 +311,7 @@ export class KeySettingsScene extends Phaser.Scene {
 
   private refreshUi(): void {
     for (const [groupIndex, visual] of this.groupVisuals) {
-      const label = getControlGroupDisplayNumber(groupIndex);
+      const label = getControlGroupOrdinalLabel(groupIndex);
       const key = getKeyCodeLabel(this.draftKeyBindings.controlGroupCodes[groupIndex]);
       const active = this.captureAction?.kind === "GROUP" && this.captureAction.groupIndex === groupIndex;
       visual.label.setText(`Group ${label}\nRecall: ${key} · Save: Ctrl + ${key}`);
@@ -329,7 +329,7 @@ export class KeySettingsScene extends Phaser.Scene {
     }
 
     if (this.captureAction?.kind === "GROUP") {
-      this.captureText.setText(`Press a number key for Group ${getControlGroupDisplayNumber(this.captureAction.groupIndex)}. Escape cancels.`);
+      this.captureText.setText(`Press a number key for Group ${getControlGroupOrdinalLabel(this.captureAction.groupIndex)}. Escape cancels.`);
     } else if (this.captureAction?.kind === "SKILL") {
       this.captureText.setText(`Press a letter key for ${this.captureAction.skillId === "whirlwind" ? "Whirlwind" : "First Aid"}. Escape cancels.`);
     } else {

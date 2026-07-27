@@ -19,6 +19,10 @@ export function getControlGroupDisplayNumber(groupIndex: ControlGroupIndex): str
   return groupIndex === 9 ? "0" : String(groupIndex + 1);
 }
 
+export function getControlGroupOrdinalLabel(groupIndex: ControlGroupIndex): string {
+  return String(groupIndex + 1);
+}
+
 export function saveControlGroup(
   groups: ControlGroupMap,
   groupIndex: ControlGroupIndex,

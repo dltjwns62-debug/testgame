@@ -16,7 +16,7 @@ import {
 } from "../constants";
 import {
   createEmptyControlGroups,
-  getControlGroupDisplayNumber,
+  getControlGroupOrdinalLabel,
   removeUnitFromAllControlGroups,
   recallControlGroup,
   saveControlGroup,
@@ -717,7 +717,7 @@ export class BattleScene extends Phaser.Scene {
 
   private addSelectionUi(): void {
     this.selectionGraphics = this.add.graphics();
-    this.selectedInfoText = this.add.text(260, 426, "", {
+    this.selectedInfoText = this.add.text(260, 407, "", {
       color: "#f6e8ad",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "13px",
@@ -736,24 +736,18 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addControlGroupUi(): void {
-    this.add.rectangle(400, 143, 238, 132, 0x172033, 0.94)
+    this.add.rectangle(265, 441, 474, 38, 0x172033, 0.72)
       .setStrokeStyle(1, 0x54748a, 1)
       .setDepth(4);
-    this.add.text(290, 82, "Control Groups", {
-      color: "#f6e8ad",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-    }).setDepth(5);
 
     for (let index = 0; index < RTS_ALLY_COUNT; index += 1) {
       const groupIndex = index as ControlGroupIndex;
-      const column = index < 5 ? 0 : 1;
-      const row = index % 5;
-      const text = this.add.text(300 + column * 112, 104 + row * 20, "", {
+      const column = index % 5;
+      const row = Math.floor(index / 5);
+      const text = this.add.text(40 + column * 92, 432 + row * 16, "", {
         color: "#b9cad7",
         fontFamily: "Segoe UI, sans-serif",
-        fontSize: "10px",
+        fontSize: "9px",
         fontStyle: "bold",
       }).setDepth(5);
       this.controlGroupTexts.set(groupIndex, text);
@@ -1307,7 +1301,7 @@ export class BattleScene extends Phaser.Scene {
     }
 
     const ids = saveControlGroup(this.controlGroups, groupIndex, this.selectedUnitIds, this.units.values());
-    const groupLabel = getControlGroupDisplayNumber(groupIndex);
+    const groupLabel = getControlGroupOrdinalLabel(groupIndex);
     this.addAttackLog(ids.length > 0
       ? `Group ${groupLabel} saved: ${ids.length} units.`
       : `Group ${groupLabel} cleared.`);
@@ -1323,7 +1317,7 @@ export class BattleScene extends Phaser.Scene {
     this.selectedUnitIds.clear();
     ids.forEach((unitId) => this.selectedUnitIds.add(unitId));
     this.refreshAllVisuals();
-    const groupLabel = getControlGroupDisplayNumber(groupIndex);
+    const groupLabel = getControlGroupOrdinalLabel(groupIndex);
     this.addAttackLog(ids.length > 0
       ? `Group ${groupLabel} recalled: ${ids.length} living units.`
       : `Group ${groupLabel} has no living units.`);
@@ -1537,7 +1531,8 @@ export class BattleScene extends Phaser.Scene {
       }
       const key = getKeyCodeLabel(this.keyBindingState.controlGroupCodes[groupIndex]);
       const livingCount = recallControlGroup(this.controlGroups, groupIndex, this.units).length;
-      visual.setText(`${key}: ${livingCount > 0 ? livingCount : "--"}`);
+      const ordinal = getControlGroupOrdinalLabel(groupIndex);
+      visual.setText(`G${ordinal} [${key}]: ${livingCount > 0 ? livingCount : "--"}`);
     }
   }
 

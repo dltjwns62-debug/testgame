@@ -391,12 +391,30 @@
 - 결정: 10단계는 별도의 시작 명령 전까지 구현하지 않는다.
 - 상태: 확정
 
+## 10단계 편성·슬롯 재배치와 주인공 필수 편성 결정
+
+- 결정: 보유 유닛과 전투 슬롯은 `FormationState`의 `ownedUnits`와 `slots`로 분리한다.
+- 결정: `OwnedRosterUnit`에는 `slotIndex`를 저장하지 않고, `FormationSlot`에는 유닛 정의나 역할을 복제하지 않는다.
+- 결정: Hero의 `unitRole`과 `rosterUnitId`를 슬롯 번호와 독립적인 정체성으로 유지한다.
+- 결정: 유효한 편성에는 MAIN_CHARACTER가 정확히 1개 포함되고 반드시 슬롯에 배치되어야 한다.
+- 결정: Hero는 1번 슬롯에 고정하지 않으며 1~10번 슬롯으로 이동할 수 있다.
+- 결정: 이미 배치된 유닛을 점유 슬롯으로 이동하면 교체하고, 미배치 일반 용병은 점유 일반 용병과 교체할 수 있다.
+- 결정: Hero는 Remove from Formation 대상이 아니며, Hero가 없는 편성은 적용하지 않는다.
+- 결정: FormationScene의 draft는 registry 원본과 분리하고 Apply & Return 때만 검증 후 저장한다. Cancel은 변경을 폐기한다.
+- 결정: Reset Default는 draft만 기본값으로 되돌리고 Apply 전에는 registry를 변경하지 않는다.
+- 결정: FieldScene은 유효한 FormationState를 `buildBattleRosterFromFormation()`으로 변환해 BattleScene에 전달한다.
+- 결정: 전투 roster는 1~10명의 아군을 허용하고, 빈 슬롯은 전투 하단 UI에 EMPTY로 표시한다.
+- 결정: 잘못된 FormationState 또는 roster는 기본 전투 편성으로 대체하지 않고 전투를 시작하지 않는다.
+- 결정: 10단계는 `review_pending`으로 기록하고 `review-stage-10-v1`로 검수 제출한다.
+- 결정: 11단계 상점·용병 구매 기능은 별도의 시작 명령 전까지 구현하지 않는다.
+- 상태: 확정
+
 ## 공통 단계 정보
 
 - 전체 단계: 17단계
-- 현재 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
-- 현재 단계 상태: 완료 (`completed`)
-- 작업 브랜치: `main`
+- 현재 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 작업 브랜치: `stage-10-formation-roster`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -412,8 +430,9 @@
 - 7단계 현재 검수 태그: `review-stage-07-v7`
 - 8단계 현재 검수 태그: `review-stage-08-v3`
 - 8단계 완료 태그: `stage-08-completed`
-- 9단계 현재 검수 태그: `review-stage-09-v3`
-- 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
+- 9단계 현재 검수 태그: `review-stage-09-v3` (완료)
+- 10단계 현재 검수 태그: `review-stage-10-v1`
+- 다음 단계: 11단계 — 상점·용병 구매 기능
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
 - 검수 승인: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계 승인
 - `main` 반영: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계 반영 완료
@@ -430,5 +449,5 @@
 - 결정: 스킬 피해 사망은 기존 공통 사망 처리와 전투 승패 판정을 사용한다.
 - 결정: MOVE·FOCUS_ATTACK 명령과 기존 Auto Hunt, 근접 사거리, 동료 지원 동작은 9단계에서 변경하지 않는다.
 - 결정: 9단계는 `review_pending`으로 기록하고 `review-stage-09-v1`로 검수 제출한다.
-- 결정: 10단계 편성·슬롯 재배치와 주인공 필수 편성은 별도 승인 및 시작 명령 전까지 구현하지 않는다.
+- 결정: 10단계 편성·슬롯 재배치와 주인공 필수 편성은 이 작업 브랜치에서 구현했으며 `review-stage-10-v1` 검수 대기 상태다.
 - 상태: 확정

@@ -1,5 +1,20 @@
 # 변경 이력
 
+## 2026-07-27 — 10단계 편성·슬롯 재배치와 주인공 필수 편성 — 검수 대기
+
+- `FormationState`로 보유 유닛과 전투 슬롯을 분리
+- Hero의 `unitRole`·`rosterUnitId`를 슬롯 번호와 독립적으로 유지
+- Hero 필수 1개 편성과 1~10번 슬롯 이동, 슬롯 교체와 빈 슬롯 배치 구현
+- 일반 용병 Remove from Formation, Reset Default, Cancel과 Apply & Return 구현
+- registry 기반 편성 저장과 FieldScene·BattleScene roster 전달 구현
+- 빈 슬롯 전투 UI와 잘못된 roster 전투 시작 차단 구현
+- `npm ci`, typecheck, build, 개발 서버 HTTP 200 및 Formation 브라우저 확인 완료
+- 사용자 수동 테스트는 아직 미실시 (`not_tested`)
+- ChatGPT 코드 검수는 아직 미실시 (`not_reviewed`)
+- 현재 상태는 `review_pending`
+- 검수 태그는 `review-stage-10-v1`
+- 11단계 상점·용병 구매 기능은 구현하지 않음
+
 ## 2026-07-27 — 9단계 v3 검수 승인 및 main 반영 — 완료
 
 - 검수 태그 `review-stage-09-v3`와 승인 커밋 `40abfb77036d08decfc4369324ca9201ffae38ea` 확인

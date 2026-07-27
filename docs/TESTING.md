@@ -628,6 +628,41 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 9단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 9단계 `main` 반영: 미반영
 
+## 10단계 편성·슬롯 재배치와 주인공 필수 편성 — v1
+
+- 현재 작업 브랜치: `stage-10-formation-roster`
+- 현재 검수 태그: `review-stage-10-v1`
+- 10단계 상태: 검수 대기 (`review_pending`)
+
+자동 검사:
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`)
+- `npm run dev`: 개발 서버 HTTP 200 확인 후 종료 (`passed`)
+
+브라우저 자동 확인:
+
+- [x] Field 화면의 Stage 10 제목, Formation 버튼, 10/10 및 Hero Slot 1 표시
+- [x] FormationScene의 10개 슬롯과 보유 유닛 목록 표시
+- [x] Skill Merc를 5번 슬롯으로 교체하고 기존 Merc4가 2번 슬롯으로 이동
+- [x] 일반 용병 제거 시 EMPTY/UNDEPLOYED 표시
+- [x] Hero 제거 시도 차단 및 안내 문구 표시
+- [x] Reset Default로 기본 편성 복원
+- [x] Cancel로 draft 변경 폐기
+- [x] 적용된 편성이 BattleScene에 전달되고 Skill Merc 5번, Merc4 2번으로 표시
+- [x] Return to Field 후 편성 요약 유지
+- [x] 브라우저 콘솔 error/warn 로그 없음
+
+사용자 수동 테스트 대기:
+
+- [ ] 전체 사용자 수동 테스트는 아직 실행하지 않음
+- [ ] 장시간 전투와 추가 편성 시나리오는 사용자 확인 대기
+
+10단계 사용자 실행 테스트: 미실시 (`not_tested`)
+10단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+10단계 `main` 반영: 미반영
+
 ## 9단계 v3 최종 승인 및 main 반영
 
 - 승인 검수 태그: `review-stage-09-v3`

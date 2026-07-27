@@ -1,12 +1,12 @@
 # Test Game
 
-## Stage 12 review submission
+## Stage 12 v2 review submission
 
-12단계 **부대 지정과 단축키 설정**을 `stage-12-control-groups-keybinds` 브랜치에서 구현했다. 현재 상태는 `review_pending`이며 검수 태그는 `review-stage-12-v1`이다. 이 제출은 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않았다.
+12단계 **부대 지정과 단축키 설정**의 v1 UI 지적 사항을 수정했다. 현재 상태는 `review_pending`이며 검수 태그는 `review-stage-12-v2`이다. 이 제출은 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않았다.
 
-이번 단계에는 BattleScene의 Ctrl+숫자 부대 저장·숫자 부대 호출, 전투마다 초기화되는 임시 부대 상태, 사망 유닛 제거, registry 기반 사용자 지정 숫자·스킬 키 설정, KeySettingsScene, FieldScene 진입 버튼과 동적 BattleScene 도움말을 포함한다.
+부대 상태 UI를 RTS 전투장 밖의 좌측 하단 소형 5×2 표시로 이동해 유닛·선택 영역·하단 슬롯·스킬 패널과 겹치지 않게 했다. 내부 groupIndex는 유지하면서 정식 이름은 Group 1~Group 10, 실제 호출키는 1~9·0으로 분리했으며 Group 10은 `Recall: 0 · Save: Ctrl + 0`으로 표시한다.
 
-자동 검사와 순수 로직 검사는 실행했고, 브라우저에서는 키 설정 화면·키 교환·초기화·저장·BattleScene 동적 UI와 콘솔 error/warn 부재를 확인했다. 실제 부대 저장·호출과 전투 중 사망 정리 등의 통합 시나리오는 사용자 실행 테스트를 하지 않았으므로 `not_tested`로 남긴다. ChatGPT 코드 검수도 아직 `not_reviewed`다.
+자동 검사와 순수 로직 검사는 다시 실행했고, 브라우저에서는 전투장 밖 부대 UI·Group 10 설정·Group 10 저장 로그·콘솔 error/warn 부재를 확인했다. 실제 생존 유닛 호출 로그와 전체 통합 시나리오는 사용자 실행 테스트를 하지 않았으므로 `not_tested`로 남긴다. ChatGPT 코드 검수도 아직 `not_reviewed`다.
 
 ## Stage 11 final approval history
 
@@ -51,7 +51,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 현재 단계 이름: 부대 지정과 단축키 설정
 - 현재 상태: 검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
-- 검수 태그: `review-stage-12-v1`
+- 검수 태그: `review-stage-12-v2`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 

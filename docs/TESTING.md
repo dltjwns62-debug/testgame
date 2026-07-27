@@ -1,6 +1,42 @@
 # 실행 및 테스트 기록
 
-## Stage 12 부대 지정과 단축키 설정 — v1 검수 대기
+## Stage 12 부대 지정과 단축키 설정 — v2 검수 대기
+
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 검수 태그: `review-stage-12-v2`
+- 12단계 상태: 검수 대기 (`review_pending`)
+- v1 결과: `changes_requested` — 중앙 부대 상태 패널이 적군 초기 대형을 가리고 Group 10이 Group 0으로 표시됨
+
+### v2 자동 검사
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- 기존 순수 부대·키 바인딩 로직 검사 24개: 통과
+- `project-status.json` JSON 파싱: 통과
+
+### v2 브라우저 자동 확인
+
+- [x] 전투 시작 직후 초기 적 대형이 부대 UI에 가려지지 않는다.
+- [x] 부대 UI 배경과 텍스트가 `RTS_ARENA_BOUNDS` 아래의 좌측 하단에 표시된다.
+- [x] 부대 UI가 아군 초기 대형·전투 이동 영역·선택 드래그 영역·적 우클릭 영역을 덮지 않는다.
+- [x] 하단 10개 슬롯 및 Skill Merc 스킬 패널과 겹치지 않는다.
+- [x] KeySettingsScene에 `Group 10`, `Recall: 0 · Save: Ctrl + 0`이 표시된다.
+- [x] `Ctrl+0` 빈 선택 저장 로그가 `Group 10 cleared.`로 표시된다.
+- [x] 브라우저 console error/warn 로그가 없다.
+
+실행하지 못한 항목은 통과로 기록하지 않는다.
+
+- [ ] 살아 있는 유닛을 Ctrl+0으로 저장한 뒤 성공 로그를 확인
+- [ ] 0 호출 로그가 `Group 10 recalled: N living units.`로 표시되는지 확인
+- [ ] Group 10 호출 후 선택 상태·동적 Skill UI·기존 MOVE/FOCUS/Auto Hunt/guard 동작 확인
+
+12단계 v2 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 v2 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 v2 `main` 반영: 미반영
+
+## Stage 12 부대 지정과 단축키 설정 — v1 검수 기록
 
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
 - 현재 검수 태그: `review-stage-12-v1`

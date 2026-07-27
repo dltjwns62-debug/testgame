@@ -1,13 +1,13 @@
 # 현재 개발 상태
 
-## Stage 12 부대 지정과 단축키 설정 — 검수 대기
+## Stage 12 부대 지정과 단축키 설정 — v2 검수 대기
 
-- 현재 검수 태그: `review-stage-12-v1`
+- 현재 검수 태그: `review-stage-12-v2`
 - 작업 브랜치: `stage-12-control-groups-keybinds`
 - 전체 단계: 17단계
 - 현재 단계: 12단계 — 부대 지정과 단축키 설정
 - 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업: 12단계 부대 지정과 키 설정 구현 완료 — `review-stage-12-v1` 검수 대기 중
+- 현재 작업: 12단계 부대 UI 위치와 Group 10 표시 수정 완료 — `review-stage-12-v2` 검수 대기 중
 - 완료된 단계: 1단계~11단계
 - 검수 통과된 단계: 1단계~11단계
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
@@ -22,6 +22,8 @@
 - 부대는 BattleScene 인스턴스에만 존재하고 전투 시작 때 10개 모두 초기화되며, 사망·무효 ID는 즉시 제거된다.
 - KeySettingsScene에서 숫자 부대 키와 Whirlwind·First Aid 키를 registry에 저장하고, 충돌 시 같은 종류의 바인딩을 교환한다.
 - FieldScene Keys 진입과 BattleScene 동적 도움말·부대 UI를 추가했으며 기존 명령·스킬 우선순위를 유지한다.
+- v1에서 중앙 전투장을 덮던 238×132 패널을 제거하고 `RTS_ARENA_BOUNDS` 아래 좌측의 소형 5×2 UI로 이동했다.
+- 정식 이름 Group 1~Group 10과 실제 호출키 1~9·0을 분리해 Group 10을 `Recall: 0 · Save: Ctrl + 0`으로 표시한다.
 
 ### 12단계 검증 기록
 
@@ -30,7 +32,8 @@
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
 - `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
-- 브라우저 자동 확인: KeySettingsScene의 10개 그룹·Q/W, 키 교환·초기화·저장, BattleScene 동적 키와 UI 겹침 없음, error/warn 없음 확인
+- 브라우저 자동 확인: 전투장 밖 부대 UI, 초기 적 대형 비가림, Group 10 설정·저장 로그, error/warn 없음 확인
+- v1 검수 결과: `changes_requested` — 중앙 부대 패널 겹침 및 Group 10 표기 오류
 - 실제 부대 저장·호출, 사망 정리, 명령 보존과 사용자 통합 전투 시나리오는 사용자 실행 테스트 대기이며 통과로 기록하지 않음
 
 12단계 사용자 실행 테스트: 미실시 (`not_tested`)
@@ -105,11 +108,11 @@
 - 현재 단계 상태: 검수 대기 (`review_pending`)
 - 상태 코드: `review_pending`
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
-- 검수 태그: `review-stage-12-v1`
+- 검수 태그: `review-stage-12-v2`
 - 완료 태그: 없음 (검수 대기)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
-- 현재 작업: 12단계 부대 지정과 키 설정 구현 완료 — `review-stage-12-v1` 검수 대기 중
+- 현재 작업: 12단계 부대 UI 위치와 Group 10 표시 수정 완료 — `review-stage-12-v2` 검수 대기 중
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)

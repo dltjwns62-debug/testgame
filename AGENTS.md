@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 12 scope note: the submitted work is limited to temporary BattleScene control groups, Ctrl+number save and number recall, dead-unit cleanup, registry-based configurable group and skill key bindings, KeySettingsScene, FieldScene key-settings access, and dynamic BattleScene help/UI. It does not implement stage 13 experience, levels, stats, repeat purchases, sales, inventory, save, or online features.
+Stage 12 scope note: the submitted v2 work is limited to temporary BattleScene control groups, Ctrl+number save and number recall, dead-unit cleanup, registry-based configurable group and skill key bindings, KeySettingsScene, FieldScene key-settings access, dynamic BattleScene help/UI, and moving the compact group UI outside the battle arena with separate Group 1~10 names and 1~9/0 keys. It does not implement stage 13 experience, levels, stats, repeat purchases, sales, inventory, save, or online features.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -61,7 +61,8 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 10단계 완료 태그: `stage-10-completed`
 - 11단계 검수 태그: `review-stage-11-v1` (승인, 과거 이력)
 - 11단계 완료 태그: `stage-11-completed`
-- 12단계 현재 검수 태그: `review-stage-12-v1`
+- 12단계 이전 검수 태그: `review-stage-12-v1` — UI 수정 요청
+- 12단계 현재 검수 태그: `review-stage-12-v2`
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계

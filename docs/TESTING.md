@@ -1,10 +1,10 @@
 # 실행 및 테스트 기록
 
-## Stage 11 상점·용병 구매 기능 — v1 검수 제출
+## Stage 11 상점·용병 구매 기능 — v1 최종 승인
 
-- 현재 작업 브랜치: `stage-11-shop-recruitment`
+- 현재 작업 브랜치: `main`
 - 현재 검수 태그: `review-stage-11-v1`
-- 11단계 상태: 검수 대기 (`review_pending`)
+- 11단계 상태: 완료 (`completed`)
 
 ### 순수 로직 검사
 
@@ -50,8 +50,16 @@
 
 사유: 사용자 요청에 따라 단계별 수동 테스트를 생략하고 12단계 주요 마일스톤에서 통합 테스트 예정
 
-11단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
-11단계 `main` 반영: 미반영
+11단계 ChatGPT 코드 검수: 승인 (`approved`)
+11단계 `main` 반영: 완료 (`stage-11-completed`)
+11단계 사용자 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+
+11단계 최종 승인 기록:
+
+- 승인 태그: `review-stage-11-v1`
+- 승인 커밋: `c63369ce05e19b23d43eff5d753b8f9159736bdc`
+- no-ff 병합 후 완료 문서 커밋 및 `stage-11-completed` 태그 생성 완료
+- 사용자 수동 테스트 생략은 통과를 의미하지 않음
 
 ## Stage 9 v3 local guard defense regression checklist
 

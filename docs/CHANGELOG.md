@@ -1,5 +1,17 @@
 # 변경 이력
 
+## 2026-07-28 — 11단계 검수 승인 및 main 반영 — 완료
+
+- 검수 태그 `review-stage-11-v1`과 승인 커밋 `c63369ce05e19b23d43eff5d753b8f9159736bdc` 확인
+- registry 기반 세션 Gold, ShopScene, Swordsman·Guardian·Scout 구매 기능 승인
+- 구매 중복·이중 차감 방지, 구매 직후 Bench, 최대 13명 보유와 최대 10명 전투 편성 승인
+- Reset Default 구매 유닛 보존과 FormationScene 최대 13명 표시 승인
+- 승인 작업을 `main`에 no-ff 병합
+- 11단계를 `completed`로 확정하고 `stage-11-completed` 태그 생성
+- 사용자 수동 테스트는 사용자 요청으로 생략 (`skipped_by_user`), 통과로 기록하지 않음
+- 다음 단계는 12단계 부대 지정과 단축키 설정이며 아직 시작하지 않음
+- 반복 구매·판매·환불·원거리·투사체·경험치·아이템·영구 저장·온라인 기능은 아직 구현하지 않음
+
 ## 2026-07-27 — 11단계 상점·용병 구매 기능 — 검수 대기
 
 - registry 기반 세션 Gold와 전투 보상 연결

@@ -4,11 +4,11 @@
   "totalStages": 17,
   "currentStage": 11,
   "currentStageName": "상점·용병 구매 기능",
-  "stageStatus": "review_pending",
-  "activeTask": "11단계 상점·용병 구매 구현 완료 — review-stage-11-v1 검수 대기 중",
-  "workingBranch": "stage-11-shop-recruitment",
-  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "stageStatus": "completed",
+  "activeTask": "11단계 완료 — 12단계 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
   "nextStage": 12,
   "nextStageName": "부대 지정과 단축키 설정",
   "reviewSubmission": {
@@ -24,14 +24,15 @@
       "tag": "review-stage-11-v1",
       "version": 1,
       "submitted": true,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
-      "commit": null,
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-28T00:39:06+09:00",
+      "commit": "c63369ce05e19b23d43eff5d753b8f9159736bdc",
+      "codeCommit": "3d654a2a5cc34578833b345236d436e296cd6f15",
       "userRunTest": "skipped_by_user",
       "userRunTestReason": "사용자 요청에 따라 단계별 수동 테스트를 생략하고 12단계 주요 마일스톤에서 통합 테스트 예정",
-      "mainBranchMerged": false
+      "mainBranchMerged": true
     },
     {
       "stage": 10,
@@ -370,9 +371,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-28T00:39:06+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -382,11 +383,11 @@
     "browserAutomation": "passed",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "사용자 요청에 따라 단계별 수동 테스트를 생략하고 12단계 주요 마일스톤에서 통합 테스트 예정",
-    "chatGptCodeReview": "not_reviewed"
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-27T18:40:28+09:00"
+  "lastUpdated": "2026-07-28T00:43:07+09:00"
 }

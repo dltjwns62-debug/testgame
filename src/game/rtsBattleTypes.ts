@@ -55,6 +55,7 @@ export type RTSBattleUnit = {
   attackRange: number;
   collisionRadius: number;
   position: BattlePosition;
+  /** Fixed defense anchor for local aggro/leash checks; never an automatic return destination. */
   guardPosition: BattlePosition;
   state: BattleUnitState;
   currentTargetId: string | null;

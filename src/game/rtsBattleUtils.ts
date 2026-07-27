@@ -15,6 +15,25 @@ export function distanceBetween(first: BattlePosition, second: BattlePosition): 
   return Number.isFinite(distance) ? distance : Number.POSITIVE_INFINITY;
 }
 
+export function isWithinDistanceFromAnchor(
+  anchor: BattlePosition,
+  target: BattlePosition,
+  maxDistance: number,
+): boolean {
+  if (
+    !Number.isFinite(anchor.x) ||
+    !Number.isFinite(anchor.y) ||
+    !Number.isFinite(target.x) ||
+    !Number.isFinite(target.y) ||
+    !Number.isFinite(maxDistance) ||
+    maxDistance < 0
+  ) {
+    return false;
+  }
+
+  return distanceBetween(anchor, target) <= maxDistance;
+}
+
 export function constrainToArena(position: BattlePosition, radius: number): BattlePosition {
   const safeRadius = Number.isFinite(radius) ? Math.max(0, radius) : 0;
   return {

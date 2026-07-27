@@ -705,9 +705,48 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 - [x] Hero 한 명 전투 진입과 빈 슬롯 EMPTY UI 확인
 - [x] 브라우저 error/warn 로그 없음
 
-10단계 v2 사용자 실행 테스트: 미실시 (`not_tested`)
+10단계 v2 사용자 실행 테스트: 실패 (`failed`)
 10단계 v2 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 10단계 v2 `main` 반영: 미반영
+
+10단계 v2 사용자 테스트 결과: 실패 (`failed`)
+
+- 선택된 유닛이 슬롯 이동·교환 후에도 남고, 동일 유닛·동일 슬롯·Scene 재진입 선택 취소가 보장되지 않아 v3 수정 요청됨
+
+## 10단계 편성·슬롯 재배치와 주인공 필수 편성 — v3
+
+- 현재 작업 브랜치: `stage-10-formation-roster`
+- 현재 검수 태그: `review-stage-10-v3`
+- 10단계 상태: 검수 대기 (`review_pending`)
+
+선택 상태 브라우저 재현:
+
+- [x] 최초 FormationScene 진입 시 `Selected: None`, 선택 강조 없음, Remove 비활성
+- [x] 같은 Owned Unit 카드 재클릭 시 `Selection cleared.`와 `Selected: None`
+- [x] 같은 유닛의 현재 슬롯 재클릭 시 선택 취소 및 슬롯 유지
+- [x] Hero와 일반 용병 슬롯 교환 후 `Selected: None` 및 강조 해제
+- [x] 교환 직후 다른 슬롯 클릭 시 해당 용병만 선택되고 추가 교환 없음
+- [x] 일반 용병 두 명 연속 Remove 후 각각 Bench 이동, 선택 자동 해제
+- [x] 선택 후 Cancel로 복귀하고 FormationScene 재진입 시 `Selected: None`
+
+기존 기능 회귀 확인:
+
+- [x] Apply 후 `Formation saved.` 표시
+- [x] Hero Required·Skill Merc Q/W·빈 슬롯 표시 유지
+- [x] 기본 10/10 BattleScene roster 및 Return to Field 확인
+- [ ] Auto Hunt·MOVE·FOCUS_ATTACK·Skill 사용 전체 수동 흐름은 v3에서 재실행하지 않음 (`not_tested`)
+- [x] 브라우저 error/warn 로그 없음
+
+자동 검사:
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 개발 서버 정상 시작 및 HTTP 200 확인 후 종료 (`passed`)
+
+10단계 v3 사용자 실행 테스트: 미실시 (`not_tested`)
+10단계 v3 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+10단계 v3 `main` 반영: 미반영
 
 ## 9단계 v3 최종 승인 및 main 반영
 

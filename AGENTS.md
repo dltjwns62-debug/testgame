@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 10 scope note: the submitted work is limited to formation state, roster ownership, slot rearrangement, Hero-required validation, FormationScene, battle roster integration, and the v2 review fixes for exact owned-unit validation, slot ordering, identity display, and save feedback. It does not implement stage 11 shop or mercenary purchase features, or any deferred inventory, save, or online features.
+Stage 10 scope note: the submitted work is limited to formation state, roster ownership, slot rearrangement, Hero-required validation, FormationScene, battle roster integration, v2 validation/display fixes, and the v3 selection clear/toggle behavior fix. It does not implement stage 11 shop or mercenary purchase features, or any deferred inventory, save, or online features.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -56,7 +56,8 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 9단계 검수 태그: `review-stage-09-v3` (완료)
 - 9단계 완료 태그: `stage-09-completed`
 - 10단계 최초 검수 태그: `review-stage-10-v1` — 수정 요청
-- 10단계 현재 검수 태그: `review-stage-10-v2`
+- 10단계 2차 검수 태그: `review-stage-10-v2` — 사용자 테스트 수정 요청
+- 10단계 현재 검수 태그: `review-stage-10-v3`
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
@@ -65,4 +66,4 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
 완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 9단계까지 완료됐고, 10단계는 이 작업 브랜치에서 구현 후 검수 대기 중이다. 검수 전에는 작업 브랜치에만 push하며, 승인 없이 `main`을 변경하지 않는다.
 
-8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의 기반 Skill Mercenary 스킬과 주둔 지역 자동 방어를 구현했다. 10단계에서는 `FormationState`, 정확히 10명의 보유 유닛과 1~10명의 배치 roster 분리, FormationScene, Hero 필수 편성, 슬롯 교체·제거·초기화, 역할·Required·Q/W 표시, slotIndex 정렬과 저장 피드백만 다룬다. 상점·용병 구매, 인벤토리, 저장 데이터 시스템, 온라인 기능 및 11단계 기능은 구현하지 않는다.
+8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의 기반 Skill Mercenary 스킬과 주둔 지역 자동 방어를 구현했다. 10단계에서는 `FormationState`, 정확히 10명의 보유 유닛과 1~10명의 배치 roster 분리, FormationScene, Hero 필수 편성, 슬롯 교체·제거·초기화, 역할·Required·Q/W 표시, slotIndex 정렬, 저장 피드백과 선택 상태 제어만 다룬다. 상점·용병 구매, 인벤토리, 저장 데이터 시스템, 온라인 기능 및 11단계 기능은 구현하지 않는다.

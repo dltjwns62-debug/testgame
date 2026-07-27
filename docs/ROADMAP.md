@@ -44,13 +44,14 @@
 - 8단계 완료 태그: `stage-08-completed`
 - 9단계 현재 검수 태그: `review-stage-09-v3` (완료)
 - 10단계 최초 검수 태그: `review-stage-10-v1` — 수정 요청
-- 10단계 현재 검수 태그: `review-stage-10-v2`
+- 10단계 2차 검수 태그: `review-stage-10-v2` — 사용자 테스트 수정 요청
+- 10단계 현재 검수 태그: `review-stage-10-v3`
 - 다음 단계: 11단계 — 상점·용병 구매 기능
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
 - `main` 반영 여부: 9단계 반영 완료, 10단계 미반영
 
-현재 단계 번호는 10이며, 현재 10단계는 `review_pending` 상태다. v1 정적 검수 수정 요청을 반영해 `review-stage-10-v2`로 재제출했으며, 10단계는 `stage-10-formation-roster`에서 검수 후에만 `main`에 반영한다. 다음 11단계는 별도의 시작 명령 전까지 구현하지 않는다.
+현재 단계 번호는 10이며, 현재 10단계는 `review_pending` 상태다. v2 사용자 테스트에서 발견된 선택 상태 잔존 문제를 수정해 `review-stage-10-v3`로 재제출했으며, 10단계는 `stage-10-formation-roster`에서 검수 후에만 `main`에 반영한다. 다음 11단계는 별도의 시작 명령 전까지 구현하지 않는다.
 
 각 단계의 상태는 다음 값으로 관리한다.
 
@@ -454,7 +455,7 @@
 
 ### 단계 상태
 
-`review_pending` — v1 수정 요청 반영 완료, `stage-10-formation-roster`에서 `review-stage-10-v2` 검수 대기
+`review_pending` — v1·v2 수정 요청 반영 완료, `stage-10-formation-roster`에서 `review-stage-10-v3` 검수 대기
 
 ### 목표
 
@@ -469,6 +470,7 @@
 - 슬롯 교체, 빈 슬롯 배치, 일반 용병 제거와 Reset Default
 - FormationScene의 Apply, Cancel, Reset Default 및 registry 저장
 - 역할·Required·Q/W 스킬·Slot/Bench 정체성 표시와 Apply 저장 피드백
+- Scene 진입 선택 초기화, 동일 유닛·동일 슬롯 재클릭 토글 취소, 작업 성공 후 선택 자동 해제
 - 적용된 FormationState의 FieldScene·BattleScene roster 전달
 - 전투 roster의 `slotIndex` 오름차순 정렬
 - 빈 슬롯 전투 UI와 잘못된 roster 전투 시작 차단
@@ -484,6 +486,7 @@
 - [x] 적용된 FormationState가 FieldScene을 거쳐 BattleScene roster로 전달된다.
 - [x] 배치 roster가 `slotIndex` 오름차순으로 정렬되어 전달된다.
 - [x] Formation 화면에서 역할·Required·Q/W 스킬·Slot/Bench 정보와 Apply 저장 피드백이 표시된다.
+- [x] Scene 진입·동일 유닛·동일 슬롯·슬롯 작업·편성 제외 후 선택 상태가 요구대로 초기화·해제된다.
 - [x] 비어 있는 슬롯은 전투 하단 UI에 EMPTY로 표시되고 잘못된 roster는 전투를 시작하지 않는다.
 - [x] `npm ci`, typecheck, build, dev 확인과 브라우저 UI 검증을 완료했다.
 

@@ -2,14 +2,15 @@
 
 ## Stage 10 resubmission status
 
-- Submission: `review-stage-10-v2` on `stage-10-formation-roster`
+- Submission: `review-stage-10-v3` on `stage-10-formation-roster`
 - Stage status: `review_pending`
-- Active task: 10단계 수정 완료 — `review-stage-10-v2` 검수 대기 중
+- Active task: 10단계 선택 토글과 작업 후 선택 해제 수정 완료 — `review-stage-10-v3` 검수 대기 중
 - 9단계는 `main`에 반영되어 완료됐고, 10단계는 아직 `main`에 반영하지 않음
 - User run test: `not_tested`
 - ChatGPT code review: `not_reviewed`
-- The 10단계 work adds FormationState, exact 10-unit ownership, 1~10-unit deployment, FormationScene identity display, slot ordering, save feedback, Hero-required validation, and battle roster integration.
+- The 10단계 work adds FormationState, exact 10-unit ownership, 1~10-unit deployment, FormationScene identity display, slot ordering, save feedback, Hero-required validation, battle roster integration, and selection reset/toggle behavior.
 - v1 정적 코드 검수 결과: 수정 요청 (`changes_requested`)
+- v2 사용자 테스트 결과: 실패 (`failed`) — 선택 상태가 슬롯 작업 후 남고 동일 유닛·동일 슬롯·Scene 재진입 취소가 보장되지 않음
 
 ## Stage 9 v2 resubmission history (superseded by v3)
 
@@ -29,10 +30,10 @@
 - 현재 단계 상태: 검수 대기 (`review_pending`)
 - 상태 코드: `review_pending`
 - 현재 작업 브랜치: `stage-10-formation-roster`
-- 검수 태그: `review-stage-10-v2` (v1 수정 요청 이력 보존)
+- 검수 태그: `review-stage-10-v3` (v1·v2 수정 요청 이력 보존)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
-- 현재 작업: 10단계 수정 완료 — `review-stage-10-v2` 검수 대기 중
+- 현재 작업: 10단계 선택 토글과 작업 후 선택 해제 수정 완료 — `review-stage-10-v3` 검수 대기 중
 - 다음 단계: 11단계 — 상점·용병 구매 기능
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)
@@ -42,7 +43,7 @@
 
 ## 마지막 작업 요약
 
-10단계에서 보유 유닛 정확히 10명 검증, 1~10명 배치, slotIndex 정렬, FormationScene의 역할·Required·Q/W·Slot/Bench 표시, Reset 저장 안내와 Apply 저장 메시지를 보완했다. 자동 검사와 개발 서버, 브라우저 UI 확인은 완료했으며 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 실시하지 않았다.
+10단계에서 보유 유닛 정확히 10명 검증, 1~10명 배치, slotIndex 정렬, FormationScene의 역할·Required·Q/W·Slot/Bench 표시, Reset 저장 안내와 Apply 저장 메시지를 보완했고, v3에서 선택 토글·Scene 진입 초기화·작업 후 자동 해제를 수정했다. 자동 검사와 개발 서버, 브라우저 재현 확인은 완료했으며 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 실시하지 않았다.
 
 ## 검증 기록
 
@@ -83,7 +84,8 @@
 - 9단계 완료 태그: `stage-09-completed`
 - 10단계 FormationState·FormationScene·슬롯 교체·Hero 필수 편성: 구현 완료, 검수 대기
 - 10단계 v1 검수: 보유 유닛 검증·roster 정렬·정체성 표시·Reset 저장 안내 수정 요청
-- 10단계 v2 자동 브라우저 확인: 역할·Required·Q/W·Bench 표시, Reset 안내, Apply 저장 메시지, Hero 단독 전투와 빈 슬롯 UI 확인
+- 10단계 v2 검수: 사용자 테스트에서 선택 상태 잔존 문제로 수정 요청 (`failed`)
+- 10단계 v3 브라우저 확인: 선택 토글·동일 슬롯 취소·교환 후 해제·연속 제외·재진입 초기화, Apply, 10/10 전투와 Return 확인
 - 10단계 사용자 수동 테스트: 미실시
 - 10단계 ChatGPT 코드 검수: 미실시
 - 유닛별 `assistRange`: 미구현, 후속 데이터 확장 대상으로 기록

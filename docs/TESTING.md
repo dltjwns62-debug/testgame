@@ -627,3 +627,16 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 9단계 사용자 실행 테스트: 미실시 (`not_tested`)
 9단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 9단계 `main` 반영: 미반영
+
+## 9단계 v3 최종 승인 및 main 반영
+
+- 승인 검수 태그: `review-stage-09-v3`
+- 승인 커밋: `40abfb77036d08decfc4369324ca9201ffae38ea`
+- 자동 검사: `npm ci`, `npm run typecheck`, `npm run build`, 개발 서버 HTTP 200 확인 — 통과
+- 브라우저 자동 검사: 기존 실제 기록 유지
+- 사용자 전체 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- 생략된 수동 테스트는 통과로 간주하지 않음
+- ChatGPT 코드 검수: 승인 (`approved`)
+- 주둔 지역 자동 방어, `guardPosition`, MOVE 정규화, guard leash와 시각화 반영
+- 승인 작업을 `main`에 no-ff 병합
+- `main` 반영: 완료

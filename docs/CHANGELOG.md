@@ -1,5 +1,18 @@
 # 변경 이력
 
+## 2026-07-27 — 9단계 v3 검수 승인 및 main 반영 — 완료
+
+- 검수 태그 `review-stage-09-v3`와 승인 커밋 `40abfb77036d08decfc4369324ca9201ffae38ea` 확인
+- Skill Mercenary, Whirlwind·First Aid, 단일 선택 전용 스킬 UI를 승인
+- 각 아군 `guardPosition` 기반 주둔 지역 자동 방어와 MOVE 정규화를 승인
+- 140px guard aggro, 180px guard leash, 주둔 위치 복귀와 범위 표시를 승인
+- 기존 Skill Q/W, Auto Hunt, 수동 명령 우선순위를 유지
+- 사용자 전체 수동 테스트는 요청에 따라 생략 (`skipped_by_user`)
+- 생략된 수동 테스트는 통과로 기록하지 않음
+- 자동 검사와 ChatGPT 코드 검수 승인 후 작업 브랜치를 `main`에 no-ff 병합
+- 9단계를 `completed`로 확정하고 완료 태그 `stage-09-completed` 생성
+- 다음 단계는 10단계이며 아직 시작하지 않음
+
 ## 2026-07-27 — Stage 9 v3 per-unit guard defense resubmission
 
 - Adds independent `guardPosition` data for every battle unit.

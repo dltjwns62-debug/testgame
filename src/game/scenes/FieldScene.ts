@@ -329,11 +329,11 @@ export class FieldScene extends Phaser.Scene {
     this.scene.launch("FormationScene");
   }
 
-  public returnFromFormation(): void {
+  public returnFromFormation(savedMessage?: string): void {
     this.scene.stop("FormationScene");
     this.scene.resume();
     this.state = "IDLE";
-    this.formationMessage = null;
+    this.formationMessage = savedMessage ?? null;
     this.updateStatusText();
   }
 

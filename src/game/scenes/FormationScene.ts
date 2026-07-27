@@ -7,6 +7,7 @@ import {
   isValidFormationState,
   setFormationState,
 } from "../formationState";
+import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import type { FormationState, OwnedRosterUnit } from "../rtsBattleTypes";
 import type { FieldScene } from "./FieldScene";
 
@@ -67,7 +68,7 @@ export class FormationScene extends Phaser.Scene {
   }
 
   private addFormationSlots(): void {
-    this.add.text(36, 84, "Formation Slots", {
+    this.add.text(36, 76, "Formation Slots", {
       color: "#f6e8ad",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "13px",
@@ -121,8 +122,8 @@ export class FormationScene extends Phaser.Scene {
       const column = index % 5;
       const row = Math.floor(index / 5);
       const x = 126 + column * 150;
-      const y = 270 + row * 52;
-      const background = this.add.rectangle(x, y, 136, 42, 0x26394b, 1)
+      const y = 270 + row * 58;
+      const background = this.add.rectangle(x, y, 136, 54, 0x26394b, 1)
         .setStrokeStyle(1, 0x54748a, 1)
         .setInteractive({ useHandCursor: true });
       background.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
@@ -131,16 +132,18 @@ export class FormationScene extends Phaser.Scene {
           this.selectUnit(unit.rosterUnitId);
         }
       });
-      const nameText = this.add.text(x - 61, y - 12, unit.displayName, {
+      const nameText = this.add.text(x - 61, y - 21, unit.displayName, {
         color: "#d9f2ff",
         fontFamily: "Segoe UI, sans-serif",
         fontSize: "10px",
         fontStyle: "bold",
       });
-      const stateText = this.add.text(x - 61, y + 3, "", {
+      const stateText = this.add.text(x - 61, y - 4, "", {
         color: "#b9cad7",
         fontFamily: "Segoe UI, sans-serif",
-        fontSize: "9px",
+        fontSize: "8px",
+        lineSpacing: 1,
+        wordWrap: { width: 124 },
       });
       this.ownedVisuals.set(unit.rosterUnitId, { background, nameText, stateText });
     });
@@ -275,7 +278,7 @@ export class FormationScene extends Phaser.Scene {
       return;
     }
     setFormationState(this.game.registry, this.draft);
-    this.returnToField();
+    this.returnToField("Formation saved.");
   }
 
   private cancelAndReturn(): void {
@@ -285,13 +288,13 @@ export class FormationScene extends Phaser.Scene {
   private resetDefault(): void {
     this.draft = createDefaultFormationState();
     this.selectedRosterUnitId = null;
-    this.setStatus("Draft reset to the default formation.", "#c4e4d0");
+    this.setStatus("Default formation restored. Apply to save.", "#c4e4d0");
     this.refreshUi();
   }
 
-  private returnToField(): void {
+  private returnToField(savedMessage?: string): void {
     const fieldScene = this.scene.get("FieldScene") as FieldScene;
-    fieldScene.returnFromFormation();
+    fieldScene.returnFromFormation(savedMessage);
   }
 
   private getSelectedUnit(): OwnedRosterUnit | null {
@@ -324,7 +327,7 @@ export class FormationScene extends Phaser.Scene {
 
   private refreshUi(): void {
     const selected = this.getSelectedUnit();
-    this.selectedInfoText.setText(selected ? `Selected: ${selected.displayName}` : "Selected: None");
+    this.selectedInfoText.setText(selected ? `Selected: ${this.getUnitSummary(selected)}` : "Selected: None");
     for (let slotIndex = 0; slotIndex < RTS_ALLY_COUNT; slotIndex += 1) {
       const visual = this.slotVisuals.get(slotIndex);
       if (!visual) {
@@ -336,7 +339,7 @@ export class FormationScene extends Phaser.Scene {
         .setFillStyle(isSelected ? 0x4b3670 : 0x26394b, 1)
         .setStrokeStyle(1, isSelected ? 0xe9ddff : 0x54748a, 1);
       visual.nameText.setText(unit?.displayName ?? "EMPTY").setColor(unit ? "#d9f2ff" : "#8795a8");
-      visual.stateText.setText(unit ? (unit.unitRole === "MAIN_CHARACTER" ? "HERO" : "DEPLOYED") : "AVAILABLE");
+      visual.stateText.setText(unit ? this.getSlotStatus(unit) : "Available");
     }
 
     for (const unit of this.draft.ownedUnits) {
@@ -349,11 +352,38 @@ export class FormationScene extends Phaser.Scene {
       visual.background
         .setFillStyle(isSelected ? 0x4b3670 : 0x26394b, 1)
         .setStrokeStyle(1, isSelected ? 0xe9ddff : 0x54748a, 1);
-      visual.stateText.setText(deployed ? `Slot ${getFormationSlotLabel(this.findSlotForUnit(unit.rosterUnitId) ?? 0)}` : "UNDEPLOYED");
+      visual.stateText.setText(this.getOwnedUnitDetails(unit, deployed ? this.findSlotForUnit(unit.rosterUnitId) : null));
     }
 
     const canRemove = Boolean(selected && selected.unitRole !== "MAIN_CHARACTER" && this.findSlotForUnit(selected.rosterUnitId) !== null);
     this.removeButton.setFillStyle(canRemove ? 0x7b5e3b : 0x293044, 1).setAlpha(canRemove ? 1 : 0.55);
     this.removeButtonLabel.setColor(canRemove ? "#fff1d0" : "#8795a8");
+  }
+
+  private getUnitSummary(unit: OwnedRosterUnit, slotIndex = this.findSlotForUnit(unit.rosterUnitId)): string {
+    const role = unit.unitRole === "MAIN_CHARACTER" ? "Main Character" : "Mercenary";
+    const required = unit.unitRole === "MAIN_CHARACTER" ? " · Required" : "";
+    const skills = this.hasSkills(unit) ? " · Skills Q/W" : "";
+    const placement = slotIndex === null ? "Bench" : `Slot ${getFormationSlotLabel(slotIndex)}`;
+    return `${unit.displayName} · ${role}${required}${skills} · ${placement}`;
+  }
+
+  private getOwnedUnitDetails(unit: OwnedRosterUnit, slotIndex: number | null): string {
+    const role = unit.unitRole === "MAIN_CHARACTER" ? "Main Character" : "Mercenary";
+    const required = unit.unitRole === "MAIN_CHARACTER" ? " · Required" : "";
+    const skills = this.hasSkills(unit) ? " · Skills Q/W" : "";
+    const placement = slotIndex === null ? "Bench" : `Slot ${getFormationSlotLabel(slotIndex)}`;
+    return `${role}${required}${skills}\n${placement}`;
+  }
+
+  private getSlotStatus(unit: OwnedRosterUnit): string {
+    if (unit.unitRole === "MAIN_CHARACTER") {
+      return "Required";
+    }
+    return this.hasSkills(unit) ? "Skills Q/W" : "Mercenary";
+  }
+
+  private hasSkills(unit: OwnedRosterUnit): boolean {
+    return (getAllyUnitDefinition(unit.unitDefinitionId)?.skills.length ?? 0) > 0;
   }
 }

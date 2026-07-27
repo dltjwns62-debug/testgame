@@ -35,7 +35,7 @@ export function isValidFormationState(value: unknown): value is FormationState {
   }
 
   const candidate = value as Partial<FormationState>;
-  if (!Array.isArray(candidate.ownedUnits) || candidate.ownedUnits.length < 1 || candidate.ownedUnits.length > RTS_ALLY_COUNT ||
+  if (!Array.isArray(candidate.ownedUnits) || candidate.ownedUnits.length !== RTS_ALLY_COUNT ||
     !Array.isArray(candidate.slots) || candidate.slots.length !== RTS_ALLY_COUNT) {
     return false;
   }
@@ -109,6 +109,7 @@ export function buildBattleRosterFromFormation(state: FormationState): RosterEnt
   const ownedById = new Map(state.ownedUnits.map((unit) => [unit.rosterUnitId, unit]));
   return state.slots
     .filter((slot) => slot.rosterUnitId !== null)
+    .sort((left, right) => left.slotIndex - right.slotIndex)
     .map((slot) => {
       const owned = ownedById.get(slot.rosterUnitId as string);
       if (!owned) {

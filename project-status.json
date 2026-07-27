@@ -2,22 +2,68 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 8,
-  "currentStageName": "자동사냥 ON/OFF와 수동 명령 우선 처리",
-  "stageStatus": "completed",
-  "activeTask": "8단계 완료 — 9단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 9,
+  "currentStageName": "유닛 스킬과 단일 선택 전용 스킬 UI",
+  "stageStatus": "review_pending",
+  "activeTask": "9단계 주둔 지역 자동 방어 수정 완료 — review-stage-09-v3 검수 대기 중",
+  "workingBranch": "stage-09-unit-skills-ui",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8],
-  "nextStage": 9,
-  "nextStageName": "유닛 스킬과 단일 선택 전용 스킬 UI",
+  "nextStage": 10,
+  "nextStageName": "편성·슬롯 재배치와 주인공 필수 편성",
   "reviewSubmission": {
-    "branch": "stage-08-auto-hunt-controls",
-    "tag": "review-stage-08-v3",
+    "branch": "stage-09-unit-skills-ui",
+    "tag": "review-stage-09-v3",
     "version": 3,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 9,
+      "branch": "stage-09-unit-skills-ui",
+      "tag": "review-stage-09-v3",
+      "version": 3,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 9,
+      "branch": "stage-09-unit-skills-ui",
+      "tag": "review-stage-09-v2",
+      "version": 2,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": "70c58aa9f8c6234316064c5ddbd712956d70ecb6",
+      "codeCommit": "b69135aeff423dc05fa61fcff5ad808c08696be4",
+      "reason": "지역 지원이 위협받는 아군 중심으로만 계산되어 지원 유닛 자신의 주변 적을 감지하지 못함",
+      "userRunTest": "failed",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 9,
+      "branch": "stage-09-unit-skills-ui",
+      "tag": "review-stage-09-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": "e61441e1f651350a1d204dd35738e171d6e0bd36",
+      "codeCommit": "aa96165058a595583e67929ed5f789cea834d332",
+      "reason": "지역 동료 지원이 실제 피해 순간에만 실행되고 완료되거나 잘못 남은 MOVE 상태를 실제 활성 이동과 구분하지 못함",
+      "userRunTest": "failed",
+      "mainBranchMerged": false
+    },
     {
       "stage": 8,
       "branch": "stage-08-auto-hunt-controls",
@@ -260,22 +306,22 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-26T22:22:07+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
     "typecheck": "passed",
     "build": "passed",
     "devServer": "passed",
-    "browserAutomation": "not_tested",
-    "userRunTest": "passed",
-    "chatGptCodeReview": "approved"
+    "browserAutomation": "passed",
+    "userRunTest": "not_tested",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-26T22:22:07+09:00"
+  "lastUpdated": "2026-07-27T01:22:18+09:00"
 }

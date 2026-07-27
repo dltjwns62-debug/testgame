@@ -1,4 +1,4 @@
-import { RTS_ARENA_BOUNDS, RTS_FORMATION_SPACING } from "./constants";
+import { RTS_ARENA_BOUNDS, RTS_FORMATION_SPACING, RTS_MOVE_ARRIVAL_EPSILON } from "./constants";
 import type { BattlePosition, RTSBattleUnit } from "./rtsBattleTypes";
 
 export function clampNumber(value: number, min: number, max: number): number {
@@ -132,7 +132,7 @@ export function moveToward(
   const safeSpeed = Number.isFinite(unit.moveSpeed) ? Math.max(0, unit.moveSpeed) : 0;
   const travelDistance = safeSpeed * (safeDeltaMs / 1000);
 
-  if (!Number.isFinite(distance) || distance <= 2 || travelDistance >= distance) {
+  if (!Number.isFinite(distance) || distance <= RTS_MOVE_ARRIVAL_EPSILON || travelDistance >= distance) {
     unit.position = safeDestination;
     return true;
   }

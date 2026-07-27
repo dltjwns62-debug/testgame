@@ -1,5 +1,7 @@
 # 개발 AI 작업 규칙
 
+Stage 9 v3 scope note: the submitted fix is limited to per-unit guard defense, completed/stale MOVE normalization, and the guard-range indicator. It does not implement stage 10 formation changes or any deferred skill, inventory, save, or online features.
+
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
 1. 작업을 시작하기 전에 반드시 `README.md`, `docs/ROADMAP.md`, `docs/STATUS.md`, `docs/DECISIONS.md`, `project-status.json`을 읽는다.
@@ -32,9 +34,9 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 ## 현재 단계 기준
 
 - 전체 단계: 17단계
-- 현재 단계: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
-- 현재 단계 상태: 완료 (`completed`)
-- 현재 작업 브랜치: `main`
+- 현재 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-09-unit-skills-ui`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -49,14 +51,15 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 6단계 완료 태그: `stage-06-completed`
 - 7단계 검수 태그: `review-stage-07-v7`
 - 7단계 완료 태그: `stage-07-completed`
-- 8단계 검수 태그: `review-stage-08-v3`
+- 8단계 검수 태그: `review-stage-08-v3` (완료)
 - 8단계 완료 태그: `stage-08-completed`
-- 사용자 실행 테스트: 통과 (`passed`)
-- ChatGPT 코드 검수: 승인 (`approved`)
+- 9단계 검수 태그: `review-stage-09-v3`
+- 사용자 실행 테스트: 미실시 (`not_tested`)
+- ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
-- 다음 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
+- 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 
-완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 8단계까지 완료됐고, 다음 단계는 별도의 시작 명령 전까지 구현하지 않는다. 검수 전에는 작업 브랜치에만 push하며, 승인 없이 `main`을 변경하지 않는다.
+완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 8단계까지 완료됐고, 9단계는 이 작업 브랜치에서 구현 후 검수 대기 중이다. 검수 전에는 작업 브랜치에만 push하며, 승인 없이 `main`을 변경하지 않는다.
 
-8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시만 구현했다. 현재 동료 지원 범위는 공통 상수를 사용하며 유닛별 `assistRange`는 아직 구현하지 않는다. 원거리 유닛·투사체, 스킬, 상점, 편성 재배치, 부대 지정, 경험치·레벨·아이템·저장·온라인 기능은 구현하지 않는다. 별도의 9단계 시작 명령 전에는 새 게임 코드를 작성하지 않는다.
+8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의에 스킬을 연결하고 단일 선택 Skill Mercenary에게만 Q Whirlwind와 W First Aid를 제공한다. v3에서는 각 아군의 guardPosition을 중심으로 주둔 지역 자동 방어를 수행하고, 기존 AllyAssistThreat 방식은 제거한다. 스킬은 수동 사용과 전투별 쿨다운만 다루며 Auto Hunt가 자동 사용하지 않는다. 편성 재배치, 부대 지정, 경험치·레벨·아이템·저장·온라인 기능 및 10단계 기능은 구현하지 않는다.

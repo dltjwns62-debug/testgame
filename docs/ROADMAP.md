@@ -1,12 +1,31 @@
 # Test Game 개발 로드맵
 
+## Stage 9 v3 resubmission scope
+
+- Each ally stores an independent `guardPosition` initialized from its spawn position.
+- Successful MOVE completion updates `guardPosition`; malformed MOVE cleanup preserves it.
+- Auto Hunt OFF detects any nearby enemy within 140px of the guard position without requiring damage or enemy target ownership.
+- Local engagements leash at 180px and return to the guard position when no local enemy remains.
+- Auto Hunt ON keeps global search, while FOCUS_ATTACK and active MOVE retain priority.
+- The v2 AllyAssistThreat system is removed from combat decisions.
+- The current review tag is `review-stage-09-v3`; v1 and v2 remain immutable.
+
+## Stage 9 v2 resubmission history (superseded by v3)
+
+- Nearby enemy pursuit is a local threat even before the first successful hit.
+- Threats are stored for 2500ms and refreshed while the enemy keeps the ally as its local target.
+- Support candidates are re-evaluated during the threat window, including allies that enter range later.
+- Completed and malformed MOVE commands are normalized; only active MOVE retains movement priority.
+- Support remains local and does not expand Auto Hunt OFF into whole-field searching.
+- v1 is preserved; the historical v2 review tag is `review-stage-09-v2`.
+
 ## 로드맵 기준
 
 - 전체 단계: 17단계
-- 현재 단계: 8단계
-- 현재 단계 이름: 자동사냥 ON/OFF와 수동 명령 우선 처리
-- 현재 단계 상태: 완료 (`completed`)
-- 현재 작업 브랜치: `main`
+- 현재 단계: 9단계
+- 현재 단계 이름: 유닛 스킬과 단일 선택 전용 스킬 UI
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-09-unit-skills-ui`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -21,9 +40,10 @@
 - 6단계 완료 태그: `stage-06-completed`
 - 7단계 현재 검수 태그: `review-stage-07-v7`
 - 7단계 완료 태그: `stage-07-completed`
-- 8단계 현재 검수 태그: `review-stage-08-v3`
+- 8단계 현재 검수 태그: `review-stage-08-v3` (완료)
 - 8단계 완료 태그: `stage-08-completed`
-- 다음 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
+- 9단계 현재 검수 태그: `review-stage-09-v3`
+- 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - `main` 반영 여부: 8단계 반영 완료
@@ -37,7 +57,7 @@
 - `approved`: 검수 통과, 병합 대기
 - `completed`: `main` 반영까지 완료
 
-각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 8이며, 현재 8단계는 `completed` 상태다. 1단계부터 8단계까지 `main` 반영이 완료됐고, 별도의 9단계 시작 명령 전에는 9단계를 시작하지 않는다.
+각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 9이며, 현재 9단계는 `review_pending` 상태다. 1단계부터 8단계까지 `main` 반영이 완료됐고, 9단계는 `stage-09-unit-skills-ui`에서 검수 후에만 `main`에 반영한다.
 
 검수 대상 버전은 tracked 파일 안의 현재 커밋 해시가 아니라 변경되지 않는 Git 태그로 관리한다. 검수 태그는 `review-stage-XX-vN` 형식을 사용하고, 기존 원격 태그는 이동하거나 덮어쓰지 않는다. 1단계 승인 태그는 `review-stage-01-v1`이며, 2단계 최초 검수 태그 `review-stage-02-v1`은 수정 요청 기록으로 보존하고 현재 재검수 태그는 `review-stage-02-v2`다.
 
@@ -397,7 +417,7 @@
 
 ### 단계 상태
 
-`not_started`
+`review_pending` — `stage-09-unit-skills-ui`에서 주둔 지역 자동 방어 수정까지 구현 완료, `review-stage-09-v3` 검수 대기
 
 ### 목표
 
@@ -405,13 +425,20 @@
 
 ### 주요 구현 항목
 
-- 스킬 데이터
-- 단일 선택 전용 스킬 UI
-- 스킬 사용과 재사용 대기시간
+- 유닛 정의 기반 스킬 데이터와 `UnitSkillId` 타입
+- Skill Mercenary의 `Whirlwind`와 `First Aid` 정의
+- 단일 생존 스킬 유닛 선택 시에만 표시되는 Q/W 스킬 UI
+- 수동 Q/W 입력, 스킬별·유닛별 전투 쿨다운, 성공 시에만 쿨다운 시작
+- Auto Hunt와 MOVE·FOCUS_ATTACK 명령이 스킬을 자동 사용하지 않도록 유지
 
 ### 완료 조건
 
-- 스킬 보유 유닛 1마리 선택 시에만 스킬 UI가 표시된다.
+- [ ] 유닛 정의에 스킬이 연결되고 Skill Mercenary가 정확한 정의로 생성된다.
+- [ ] 스킬 보유 생존 유닛 1마리 선택 시에만 Q/W 스킬 UI가 표시된다.
+- [ ] 다중 선택·스킬 미보유·전투 종료 상태에서는 개별 스킬 UI가 숨겨진다.
+- [ ] Whirlwind와 First Aid가 수동 입력으로만 사용되고 유효한 성공에만 쿨다운이 적용된다.
+- [ ] Auto Hunt, MOVE, FOCUS_ATTACK 및 기존 전투 사망·승리 처리가 유지된다.
+- [ ] `npm ci`, typecheck, build, dev 확인 후 코드 검수를 요청한다.
 
 ### 해당 단계에서 구현하지 않을 항목
 

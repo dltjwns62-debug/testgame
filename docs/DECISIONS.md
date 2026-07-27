@@ -1,5 +1,28 @@
 # 프로젝트 결정 사항
 
+## Stage 9 v3 per-unit guard defense decisions
+
+- Auto Hunt OFF allies each own an independent `guardPosition`, initially copied from their spawn position.
+- A successful floor MOVE stores the constrained arrival position as the new guard position; invalid MOVE cleanup does not change it.
+- An ally detects any living enemy within `RTS_GUARD_AGGRO_RANGE = 140` of its own guard position, regardless of damage or enemy `currentTargetId`.
+- Local defense uses `RTS_GUARD_LEASH_RANGE = 180`; targets beyond it are released and the ally returns home.
+- Guard aggro targets are distributed by assigned count, current distance, and `battleUnitId`.
+- Only active MOVE blocks guard defense. FOCUS_ATTACK ignores guard leash, and Auto Hunt ON keeps global search.
+- Auto Hunt OFF transition copies each AUTO_HUNT ally's current position into a new guard position before clearing its target.
+- The v2 AllyAssistThreat request system is replaced rather than run alongside guard defense.
+- A single selected ally in Auto Hunt OFF shows the guard range centered on `guardPosition`; per-unit ranges remain deferred.
+
+## Stage 9 v2 persistent local ally assistance decisions (historical; superseded by v3)
+
+- Local assistance reacts to real damage and to nearby enemies that are pursuing an ally through `currentTargetId`.
+- A distant target assignment alone does not create a threat; the enemy and target must be within `RTS_LOCAL_ENGAGEMENT_RANGE`.
+- `AllyAssistThreat` entries remain valid for `RTS_ALLY_ASSIST_THREAT_MEMORY_MS = 2500`ms and are refreshed while pursuit continues.
+- Support candidates are checked continuously within the shared `RTS_ALLY_ASSIST_RANGE = 140`; per-unit `assistRange` remains deferred.
+- Only active MOVE has priority over support. Completed or stale MOVE is normalized immediately.
+- `FOCUS_ATTACK`, `AUTO_HUNT`, and an existing valid `LOCAL_ENGAGE` target are not overwritten.
+- Multiple threats and targets use deterministic distance, attacker, pursuit, target-count, and `battleUnitId` ordering.
+- `review-stage-09-v1` is preserved; the v2 submission is `review-stage-09-v2` and is recorded as `changes_requested`.
+
 현재 단계 기준: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
 
 ## 결정 목록
@@ -356,9 +379,9 @@
 ## 공통 단계 정보
 
 - 전체 단계: 17단계
-- 현재 단계: 8단계 — 자동사냥 ON/OFF와 수동 명령 우선 처리
-- 현재 단계 상태: 완료 (`completed`)
-- 작업 브랜치: `main`
+- 현재 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 작업 브랜치: `stage-09-unit-skills-ui`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -374,7 +397,23 @@
 - 7단계 현재 검수 태그: `review-stage-07-v7`
 - 8단계 현재 검수 태그: `review-stage-08-v3`
 - 8단계 완료 태그: `stage-08-completed`
-- 다음 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
+- 9단계 현재 검수 태그: `review-stage-09-v3`
+- 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 승인: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계 승인
 - `main` 반영: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계 반영 완료
+## 9단계 유닛 스킬과 단일 선택 전용 스킬 UI 결정
+
+- 결정: 스킬은 슬롯 번호가 아니라 `unitDefinitionId`에 연결한다.
+- 결정: 9단계 테스트 편성에는 `trial-skill-mercenary` 정의와 `ally-skill-mercenary` 슬롯을 사용한다.
+- 결정: Skill Mercenary는 Q `Whirlwind`와 W `First Aid` 두 스킬만 보유한다.
+- 결정: 살아 있는 스킬 보유 아군을 정확히 1개 선택했을 때만 개별 스킬 UI를 표시한다.
+- 결정: 다중 선택, 스킬 미보유 유닛, 전투 종료 상태에서는 Q/W UI를 숨긴다.
+- 결정: Q/W 스킬은 수동 입력으로만 사용하고 Auto Hunt는 스킬을 자동 사용하지 않는다.
+- 결정: Whirlwind는 효과 범위 안의 적에게 피해를 주며, First Aid는 자신만 회복한다.
+- 결정: 스킬 쿨다운은 유닛별·스킬별 전투 상태로 관리하고 실제 성공한 사용에만 시작한다.
+- 결정: 스킬 피해 사망은 기존 공통 사망 처리와 전투 승패 판정을 사용한다.
+- 결정: MOVE·FOCUS_ATTACK 명령과 기존 Auto Hunt, 근접 사거리, 동료 지원 동작은 9단계에서 변경하지 않는다.
+- 결정: 9단계는 `review_pending`으로 기록하고 `review-stage-09-v1`로 검수 제출한다.
+- 결정: 10단계 편성·슬롯 재배치와 주인공 필수 편성은 별도 승인 및 시작 명령 전까지 구현하지 않는다.
+- 상태: 확정

@@ -6,7 +6,48 @@ import {
   RTS_TRIAL_MAIN_CHARACTER,
   RTS_TRIAL_MERCENARY,
 } from "./constants";
-import type { EnemyDefinition, RosterEntry } from "./rtsBattleTypes";
+import type { EnemyDefinition, RosterEntry, UnitRole, UnitSkillId } from "./rtsBattleTypes";
+
+export type AllyUnitDefinition = {
+  id: string;
+  displayName: string;
+  unitRole: UnitRole;
+  color: number;
+  maxHp: number;
+  attackDamage: number;
+  attackIntervalMs: number;
+  moveSpeed: number;
+  attackRange: number;
+  collisionRadius: number;
+  skills: readonly UnitSkillId[];
+};
+
+const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
+  {
+    id: "trial-main-character",
+    displayName: "Hero",
+    unitRole: "MAIN_CHARACTER",
+    color: 0xf4d35e,
+    ...RTS_TRIAL_MAIN_CHARACTER,
+    skills: [],
+  },
+  {
+    id: "trial-mercenary",
+    displayName: "Merc",
+    unitRole: "MERCENARY",
+    color: 0x63b3ed,
+    ...RTS_TRIAL_MERCENARY,
+    skills: [],
+  },
+  {
+    id: "trial-skill-mercenary",
+    displayName: "Skill Merc",
+    unitRole: "MERCENARY",
+    color: 0xa78bfa,
+    ...RTS_TRIAL_MERCENARY,
+    skills: ["whirlwind", "first-aid"],
+  },
+];
 
 const statsByMonsterId = {
   "slime-1": RTS_SLIME_STATS.slime1,
@@ -42,6 +83,15 @@ export function createTrialRoster(): RosterEntry[] {
       };
     }
 
+    if (index === 1) {
+      return {
+        rosterUnitId: "ally-skill-mercenary",
+        unitDefinitionId: "trial-skill-mercenary",
+        unitRole: "MERCENARY",
+        slotIndex: index,
+      };
+    }
+
     return {
       rosterUnitId: `ally-mercenary-${String(index).padStart(2, "0")}`,
       unitDefinitionId: "trial-mercenary",
@@ -51,8 +101,8 @@ export function createTrialRoster(): RosterEntry[] {
   });
 }
 
-export function getTrialUnitStats(role: RosterEntry["unitRole"]): typeof RTS_TRIAL_MAIN_CHARACTER {
-  return role === "MAIN_CHARACTER" ? RTS_TRIAL_MAIN_CHARACTER : RTS_TRIAL_MERCENARY;
+export function getAllyUnitDefinition(unitDefinitionId: string): AllyUnitDefinition | null {
+  return allyUnitDefinitions.find((definition) => definition.id === unitDefinitionId) ?? null;
 }
 
 export function createEnemyIds(enemyDefinitionId: string, count = RTS_ENEMY_COUNT): string[] {

@@ -1,5 +1,41 @@
 # 2단계 실행 및 수동 테스트
 
+## Stage 9 v3 local guard defense regression checklist
+
+- [ ] Each ally starts with an independent guard position copied from its spawn position.
+- [ ] A successful MOVE updates only that unit's guard position to the constrained arrival point.
+- [ ] Invalid or stale MOVE cleanup preserves the previous guard position.
+- [ ] Auto Hunt OFF detects nearby enemies within 140px of the unit's own guard position.
+- [ ] Guard aggro does not require real damage or the enemy to target another ally.
+- [ ] A local target is released after moving beyond 180px from the guard position.
+- [ ] With no local enemies, the ally returns to its guard position.
+- [ ] Multiple local enemies are distributed deterministically.
+- [ ] Active MOVE remains higher priority than guard defense.
+- [ ] FOCUS_ATTACK ignores guard leash and retains its manually selected target.
+- [ ] Auto Hunt ON keeps global enemy search; switching OFF adopts current positions as guard positions.
+- [ ] A single selected ally shows a 140px guard range centered on guardPosition only when Auto Hunt is OFF.
+- [ ] Skill Merc Q/W, melee range, victory, defeat, Gold, and Return to Field remain functional.
+- [ ] No fatal browser console error occurs.
+
+The v3 user-run checklist remains `not_tested` until the manual scenarios A-G are performed.
+
+## Stage 9 v2 local ally assistance regression checklist (historical; superseded by v3)
+
+- [ ] Nearby enemy pursuit creates a local threat before real damage is dealt.
+- [ ] An ally that enters the support range later can join while the threat is remembered.
+- [ ] Threat memory refreshes while pursuit continues and expires after 2.5 seconds when it stops.
+- [ ] Distant enemy target assignment alone does not trigger support.
+- [ ] Support is limited to `RTS_ALLY_ASSIST_RANGE` and local enemies.
+- [ ] An actually moving ally keeps its MOVE command and is not reassigned.
+- [ ] A completed or stale MOVE is normalized and can support afterward.
+- [ ] Completed MOVE retaliates normally after Auto Hunt OFF normalization.
+- [ ] Multiple threats and support targets are selected deterministically and distributed.
+- [ ] Existing `LOCAL_ENGAGE`, `FOCUS_ATTACK`, and `AUTO_HUNT` behavior is preserved.
+- [ ] Skill Merc Q/W, multi-selection skill blocking, melee attacks, victory, defeat, and Gold remain functional.
+- [ ] No fatal browser console error occurs during the scenarios.
+
+The v2 user-run checklist remains `not_tested` and is retained only as review history; v3 guard-defense scenarios are listed above.
+
 ## 설치
 
 ```bash
@@ -553,3 +589,41 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 - 현재 동료 지원 범위는 공통 설정값을 사용한다.
 - 유닛별 `assistRange`는 아직 구현하지 않았으며 후속 유닛 데이터 확장 대상으로 남긴다.
 - 원거리 유닛과 투사체는 아직 구현하지 않았다.
+## 9단계 유닛 스킬과 단일 선택 전용 스킬 UI — v1
+
+- 현재 작업 브랜치: `stage-09-unit-skills-ui`
+- 현재 검수 태그: `review-stage-09-v1`
+- 9단계 상태: 검수 대기 (`review_pending`)
+
+자동 검사:
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`)
+- `npm run dev`: 개발 서버 실행 및 HTTP 응답 확인 후 종료 (`passed`)
+
+브라우저 자동 확인:
+
+- [x] 필드 화면에서 Stage 9 제목과 스킬 안내 문구가 표시된다.
+- [x] 10대10 전투가 `RUNNING`으로 표시되고 기존 전투 화면이 열린다.
+- [x] 두 번째 슬롯이 `Skill Merc`로 표시되고 전용 색상이 적용된다.
+- [x] Skill Merc 단일 선택 시 `Skill Merc Skills` 패널이 표시된다.
+- [x] 단일 선택 패널에서 Q Whirlwind와 W First Aid가 표시된다.
+- [x] 초기 상태에서 Q는 `READY`, W는 체력이 가득 차 `FULL HP`로 표시된다.
+- [x] 전투 종료 시 개별 스킬 패널이 숨겨지는 것을 확인했다.
+- [x] 브라우저 치명적 콘솔 오류가 없다.
+
+브라우저에서 직접 확정하지 못한 항목은 통과로 기록하지 않는다.
+
+- [ ] Whirlwind의 실제 범위 피해와 다중 적중
+- [ ] Whirlwind 성공 후 쿨다운과 재사용 제한
+- [ ] First Aid의 실제 회복과 회복 후 쿨다운
+- [ ] 체력이 가득 찬 First Aid가 쿨다운을 소비하지 않는지
+- [ ] 다중 선택 시 개별 스킬 패널이 숨겨지는지
+- [ ] MOVE·FOCUS_ATTACK 중 스킬이 수동 명령을 덮어쓰지 않는지
+- [ ] Auto Hunt가 스킬을 자동 사용하지 않는지
+- [ ] 스킬로 마지막 적을 처치할 때 전투 결과가 정상 전환되는지
+
+9단계 사용자 실행 테스트: 미실시 (`not_tested`)
+9단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+9단계 `main` 반영: 미반영

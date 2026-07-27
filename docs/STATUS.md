@@ -1,27 +1,47 @@
 # 현재 개발 상태
 
+## Stage 9 v3 resubmission status
+
+- Submission: `review-stage-09-v3` on `stage-09-unit-skills-ui`
+- Stage status: `review_pending`
+- Active task: per-unit local guard defense completed; waiting for v3 review
+- v1 and v2 tags remain preserved; `main` is not changed
+- User run test: `not_tested`
+- ChatGPT code review: `not_reviewed`
+- The v3 fix replaces persistent AllyAssistThreat processing with guardPosition-based aggro, leash, return, and visualization.
+
+## Stage 9 v2 resubmission history (superseded by v3)
+
+- Submission: `review-stage-09-v2` on `stage-09-unit-skills-ui`
+- Stage status: `changes_requested` (historical)
+- Historical result: v2 local ally assistance fix was superseded after user testing
+- v1 `review-stage-09-v1` remains preserved; `main` is not changed
+- User run test: `not_tested`
+- ChatGPT code review: `not_reviewed`
+- The fix adds pursuit-based threat refresh, 2500ms threat memory, continuous deterministic support assignment, and completed/stale MOVE normalization.
+
 ## 단계 정보
 
 - 전체 단계: 17단계
-- 현재 단계: 8단계
-- 현재 단계 이름: 자동사냥 ON/OFF와 수동 명령 우선 처리
-- 현재 단계 상태: 완료 (`completed`)
-- 상태 코드: `completed`
-- 현재 작업 브랜치: `main`
-- 검수 태그: `review-stage-08-v3`
+- 현재 단계: 9단계
+- 현재 단계 이름: 유닛 스킬과 단일 선택 전용 스킬 UI
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 상태 코드: `review_pending`
+- 현재 작업 브랜치: `stage-09-unit-skills-ui`
+- 검수 태그: `review-stage-09-v3`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계
-- 현재 작업: 8단계 완료 — 9단계 시작 명령 대기 중
-- 다음 단계: 9단계 — 유닛 스킬과 단일 선택 전용 스킬 UI
-- 사용자 실행 테스트: 통과 (`passed`)
-- ChatGPT 코드 검수: 승인 (`approved`)
-- `main` 정식 반영 여부: 반영 완료
+- 현재 작업: 9단계 주둔 지역 자동 방어 수정 완료 — `review-stage-09-v3` 검수 대기 중
+- 다음 단계: 10단계 — 편성·슬롯 재배치와 주인공 필수 편성
+- 사용자 실행 테스트: 미실시 (`not_tested`)
+- ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+- `main` 정식 반영 여부: 미반영
 
-현재 단계 번호는 8로 유지한다. 8단계는 `main`에 반영되어 완료됐고, 별도의 9단계 시작 명령 전에는 현재 단계 번호를 9로 변경하지 않는다.
+현재 단계 번호는 9로 유지한다. 1단계부터 8단계까지 `main`에 반영되어 완료됐고, 9단계는 작업 브랜치에서 검수 대기 중이다. 별도의 승인 명령 전에는 `main` 반영이나 10단계 시작을 하지 않는다.
 
 ## 마지막 작업 요약
 
-8단계 v3의 동료 지원 타깃 기억 수정을 포함한 Auto Hunt·지역 동료 지원 기능을 검수 승인하고 `main`에 no-ff 병합했다. 사용자는 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 지원, 타깃 분산, 근접 사거리 축소와 기존 조작이 정상 작동함을 확인했다.
+9단계에서 유닛 정의 기반 Skill Mercenary와 Whirlwind·First Aid를 추가하고, 생존 스킬 유닛 단일 선택 시에만 Q/W UI를 표시하도록 구현했다. 자동 검사와 개발 서버, 브라우저에서 Stage 9 화면·Skill Mercenary·단일 선택 스킬 패널을 확인했으며 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 실시하지 않았다.
 
 ## 검증 기록
 
@@ -52,6 +72,11 @@
 - 8단계 v3 ChatGPT 코드 검수: 승인
 - 8단계 v3 no-ff 병합: 완료
 - 8단계 완료 태그: `stage-08-completed`
+- 9단계 Skill Mercenary 정의·Q/W 스킬·단일 선택 UI: 구현 완료, 검수 대기
+- 9단계 검수 제출 태그: `review-stage-09-v3` (v1·v2 수정 요청 보존)
+- 9단계 자동 브라우저 확인: Stage 9 제목, Skill Mercenary 슬롯·색상, 단일 선택 Q/W 패널과 콘솔 오류 없음 확인
+- 9단계 사용자 수동 테스트: 미실시
+- 9단계 ChatGPT 코드 검수: 미실시
 - 유닛별 `assistRange`: 미구현, 후속 데이터 확장 대상으로 기록
 - v6 초기 10대10 `RUNNING`, 집중 공격 명령, 공격 이동 명령, 콘솔 치명 오류 없음 확인
 - v6 피격 후 목적지 복귀와 집중 공격 대상 사망 후 지역 재탐색: 사용자 수동 테스트 필요

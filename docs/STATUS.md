@@ -1,16 +1,17 @@
 # 현재 개발 상태
 
-## Stage 10 resubmission status
+## Stage 10 final approval status
 
 - Submission: `review-stage-10-v3` on `stage-10-formation-roster`
-- Stage status: `review_pending`
-- Active task: 10단계 선택 토글과 작업 후 선택 해제 수정 완료 — `review-stage-10-v3` 검수 대기 중
-- 9단계는 `main`에 반영되어 완료됐고, 10단계는 아직 `main`에 반영하지 않음
-- User run test: `not_tested`
-- ChatGPT code review: `not_reviewed`
+- Stage status: `completed`
+- Active task: 10단계 완료 — 11단계 시작 명령 대기 중
+- 9단계와 10단계는 `main`에 반영되어 완료됨
+- User run test: `passed`
+- ChatGPT code review: `approved`
 - The 10단계 work adds FormationState, exact 10-unit ownership, 1~10-unit deployment, FormationScene identity display, slot ordering, save feedback, Hero-required validation, battle roster integration, and selection reset/toggle behavior.
 - v1 정적 코드 검수 결과: 수정 요청 (`changes_requested`)
 - v2 사용자 테스트 결과: 실패 (`failed`) — 선택 상태가 슬롯 작업 후 남고 동일 유닛·동일 슬롯·Scene 재진입 취소가 보장되지 않음
+- v3 검수 결과: 승인 (`approved`), 사용자 통합 테스트: 통과 (`passed`)
 
 ## Stage 9 v2 resubmission history (superseded by v3)
 
@@ -27,23 +28,23 @@
 - 전체 단계: 17단계
 - 현재 단계: 10단계
 - 현재 단계 이름: 편성·슬롯 재배치와 주인공 필수 편성
-- 현재 단계 상태: 검수 대기 (`review_pending`)
-- 상태 코드: `review_pending`
-- 현재 작업 브랜치: `stage-10-formation-roster`
-- 검수 태그: `review-stage-10-v3` (v1·v2 수정 요청 이력 보존)
-- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
-- 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
-- 현재 작업: 10단계 선택 토글과 작업 후 선택 해제 수정 완료 — `review-stage-10-v3` 검수 대기 중
+- 현재 단계 상태: 완료 (`completed`)
+- 상태 코드: `completed`
+- 현재 작업 브랜치: `main`
+- 검수 태그: `review-stage-10-v3` (승인, v1·v2 수정 요청 이력 보존)
+- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계
+- 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계
+- 현재 작업: 10단계 완료 — 11단계 시작 명령 대기 중
 - 다음 단계: 11단계 — 상점·용병 구매 기능
-- 사용자 실행 테스트: 미실시 (`not_tested`)
-- ChatGPT 코드 검수: 미실시 (`not_reviewed`)
-- `main` 정식 반영 여부: 미반영
+- 사용자 실행 테스트: 통과 (`passed`)
+- ChatGPT 코드 검수: 승인 (`approved`)
+- `main` 정식 반영 여부: 반영 완료
 
-현재 단계 번호는 10으로 유지한다. 1단계부터 9단계까지 `main`에 반영되어 완료됐고, 10단계는 작업 브랜치에서 검수 대기 중이다. 별도의 승인 명령 전에는 `main` 반영이나 11단계 시작을 하지 않는다.
+현재 단계 번호는 10으로 유지한다. 1단계부터 10단계까지 `main`에 반영되어 완료됐고, 별도의 11단계 시작 명령 전에는 상점·용병 구매 기능을 구현하지 않는다.
 
 ## 마지막 작업 요약
 
-10단계에서 보유 유닛 정확히 10명 검증, 1~10명 배치, slotIndex 정렬, FormationScene의 역할·Required·Q/W·Slot/Bench 표시, Reset 저장 안내와 Apply 저장 메시지를 보완했고, v3에서 선택 토글·Scene 진입 초기화·작업 후 자동 해제를 수정했다. 자동 검사와 개발 서버, 브라우저 재현 확인은 완료했으며 사용자 수동 테스트와 ChatGPT 코드 검수는 아직 실시하지 않았다.
+10단계에서 보유 유닛 정확히 10명 검증, 1~10명 배치, slotIndex 정렬, FormationScene의 역할·Required·Q/W·Slot/Bench 표시, Reset 저장 안내와 Apply 저장 메시지, 선택 토글·Scene 진입 초기화·작업 후 자동 해제를 구현했다. 자동 검사와 개발 서버, 기존 브라우저 기록 및 사용자가 제공한 통합 테스트 결과를 바탕으로 승인·병합을 완료했다.
 
 ## 검증 기록
 
@@ -82,12 +83,14 @@
 - 9단계 사용자 전체 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
 - 9단계 ChatGPT 코드 검수: 승인
 - 9단계 완료 태그: `stage-09-completed`
-- 10단계 FormationState·FormationScene·슬롯 교체·Hero 필수 편성: 구현 완료, 검수 대기
+- 10단계 FormationState·FormationScene·슬롯 교체·Hero 필수 편성: 구현 완료
 - 10단계 v1 검수: 보유 유닛 검증·roster 정렬·정체성 표시·Reset 저장 안내 수정 요청
 - 10단계 v2 검수: 사용자 테스트에서 선택 상태 잔존 문제로 수정 요청 (`failed`)
 - 10단계 v3 브라우저 확인: 선택 토글·동일 슬롯 취소·교환 후 해제·연속 제외·재진입 초기화, Apply, 10/10 전투와 Return 확인
-- 10단계 사용자 수동 테스트: 미실시
-- 10단계 ChatGPT 코드 검수: 미실시
+- 10단계 사용자 통합 테스트: 사용자 확인 결과 통과 (`passed`)
+- 10단계 ChatGPT 코드 검수: 승인 (`approved`)
+- 10단계 `main` no-ff 병합: 완료
+- 10단계 완료 태그: `stage-10-completed`
 - 유닛별 `assistRange`: 미구현, 후속 데이터 확장 대상으로 기록
 - v6 초기 10대10 `RUNNING`, 집중 공격 명령, 공격 이동 명령, 콘솔 치명 오류 없음 확인
 - v6 피격 후 목적지 복귀와 집중 공격 대상 사망 후 지역 재탐색: 사용자 수동 테스트 필요

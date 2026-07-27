@@ -713,11 +713,11 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 
 - 선택된 유닛이 슬롯 이동·교환 후에도 남고, 동일 유닛·동일 슬롯·Scene 재진입 선택 취소가 보장되지 않아 v3 수정 요청됨
 
-## 10단계 편성·슬롯 재배치와 주인공 필수 편성 — v3
+## 10단계 편성·슬롯 재배치와 주인공 필수 편성 — v3 최종 승인
 
-- 현재 작업 브랜치: `stage-10-formation-roster`
+- 현재 작업 브랜치: `main`
 - 현재 검수 태그: `review-stage-10-v3`
-- 10단계 상태: 검수 대기 (`review_pending`)
+- 10단계 상태: 완료 (`completed`)
 
 선택 상태 브라우저 재현:
 
@@ -744,9 +744,21 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 - `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
 - `npm run dev`: 개발 서버 정상 시작 및 HTTP 200 확인 후 종료 (`passed`)
 
-10단계 v3 사용자 실행 테스트: 미실시 (`not_tested`)
-10단계 v3 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
-10단계 v3 `main` 반영: 미반영
+사용자 통합 테스트:
+
+- [x] 최초 진입 `Selected: None` 및 Hero 자동 선택 없음
+- [x] 동일 유닛 재클릭 선택 취소
+- [x] Hero 슬롯 교환 후 선택 자동 해제
+- [x] 일반 용병 연속 편성 제외
+- [x] Apply 후 편성 유지
+- [x] 전투 EMPTY 슬롯 확인
+- [x] Skill Merc Q/W 유지
+
+10단계 v3 사용자 실행 테스트: 통과 (`passed`)
+10단계 v3 사용자 테스트 근거: 사용자가 Formation 선택 취소, 슬롯 교환 후 선택 해제, 일반 용병 연속 편성 제외, Apply 유지, EMPTY 슬롯 및 Skill Merc Q/W를 직접 확인함
+10단계 v3 ChatGPT 코드 검수: 승인 (`approved`)
+10단계 v3 `main` 반영: 완료
+10단계 완료 태그: `stage-10-completed`
 
 ## 9단계 v3 최종 승인 및 main 반영
 

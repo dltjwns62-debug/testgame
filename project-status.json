@@ -4,11 +4,11 @@
   "totalStages": 17,
   "currentStage": 10,
   "currentStageName": "편성·슬롯 재배치와 주인공 필수 편성",
-  "stageStatus": "review_pending",
-  "activeTask": "10단계 선택 토글과 작업 후 선택 해제 수정 완료 — review-stage-10-v3 검수 대기 중",
-  "workingBranch": "stage-10-formation-roster",
-  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9],
-  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  "stageStatus": "completed",
+  "activeTask": "10단계 완료 — 11단계 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   "nextStage": 11,
   "nextStageName": "상점·용병 구매 기능",
   "reviewSubmission": {
@@ -24,13 +24,16 @@
       "tag": "review-stage-10-v3",
       "version": 3,
       "submitted": true,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
-      "commit": null,
-      "userRunTest": "not_tested",
-      "mainBranchMerged": false
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-27T17:19:38+09:00",
+      "commit": "c4b13edc4b41e4a9f91010610c853b7924b63065",
+      "codeCommit": "a8c76b9d8142d33082dacba8e4819e2178b63d64",
+      "reason": "보유 유닛과 슬롯 분리, 주인공 필수 편성, 빈 슬롯과 Bench, 실제 편성 기반 전투 roster, 유닛 정체성 유지, 선택 토글 및 편성 작업 후 선택 자동 해제가 코드 검수와 사용자 통합 테스트를 통과함",
+      "userRunTest": "passed",
+      "userRunTestReason": "사용자가 Formation 선택 상태, 슬롯 교환, 연속 편성 제외, Apply 유지, EMPTY 슬롯과 Skill Merc Q/W를 직접 확인함",
+      "mainBranchMerged": true
     },
     {
       "stage": 10,
@@ -352,9 +355,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-27T17:19:38+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -362,12 +365,13 @@
     "build": "passed",
     "devServer": "passed",
     "browserAutomation": "passed",
-    "userRunTest": "not_tested",
-    "chatGptCodeReview": "not_reviewed"
+    "userRunTest": "passed",
+    "userRunTestReason": "사용자가 Formation 선택 취소, 슬롯 교환 후 선택 해제, 일반 용병 연속 편성 제외, Apply 후 편성 유지, EMPTY 슬롯 및 Skill Merc Q/W를 직접 확인함",
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-27T16:59:00+09:00"
+  "lastUpdated": "2026-07-27T17:19:38+09:00"
 }

@@ -1,5 +1,17 @@
 # 변경 이력
 
+## 2026-07-28 — 12단계 부대 지정과 단축키 설정 — 검수 대기
+
+- BattleScene에 10개 임시 부대의 Ctrl+숫자 저장과 숫자 호출을 추가
+- 저장·호출 시 생존 ALLY, 중복 제거, 결정적 정렬과 사망 유닛 정리를 적용
+- registry 기반 숫자 그룹 키와 Whirlwind·First Aid 사용자 지정 키를 추가
+- KeySettingsScene, FieldScene Keys 진입, BattleScene 동적 키 도움말·그룹 UI를 추가
+- 순수 로직 24개와 자동 검사, 제한된 브라우저 자동 확인을 실행
+- 사용자 실행 테스트는 아직 미실시 (`not_tested`), ChatGPT 코드 검수는 미실시 (`not_reviewed`)
+- 검수 태그 `review-stage-12-v1`로 작업 브랜치에 제출
+- 12단계는 아직 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않음
+- 13단계 경험치·레벨·능력치 성장 기능은 구현하지 않음
+
 ## 2026-07-28 — 11단계 검수 승인 및 main 반영 — 완료
 
 - 검수 태그 `review-stage-11-v1`과 승인 커밋 `c63369ce05e19b23d43eff5d753b8f9159736bdc` 확인

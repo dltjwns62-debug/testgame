@@ -2,22 +2,36 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 11,
-  "currentStageName": "상점·용병 구매 기능",
-  "stageStatus": "completed",
-  "activeTask": "11단계 완료 — 12단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 12,
+  "currentStageName": "부대 지정과 단축키 설정",
+  "stageStatus": "review_pending",
+  "activeTask": "12단계 부대 지정과 키 설정 구현 완료 — review-stage-12-v1 검수 대기 중",
+  "workingBranch": "stage-12-control-groups-keybinds",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-  "nextStage": 12,
-  "nextStageName": "부대 지정과 단축키 설정",
+  "nextStage": 13,
+  "nextStageName": "경험치·레벨·능력치 성장",
   "reviewSubmission": {
-    "branch": "stage-11-shop-recruitment",
-    "tag": "review-stage-11-v1",
+    "branch": "stage-12-control-groups-keybinds",
+    "tag": "review-stage-12-v1",
     "version": 1,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 12,
+      "branch": "stage-12-control-groups-keybinds",
+      "tag": "review-stage-12-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
     {
       "stage": 11,
       "branch": "stage-11-shop-recruitment",
@@ -371,9 +385,9 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-28T00:39:06+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
@@ -381,13 +395,13 @@
     "build": "passed",
     "devServer": "passed",
     "browserAutomation": "passed",
-    "userRunTest": "skipped_by_user",
-    "userRunTestReason": "사용자 요청에 따라 단계별 수동 테스트를 생략하고 12단계 주요 마일스톤에서 통합 테스트 예정",
-    "chatGptCodeReview": "approved"
+    "userRunTest": "not_tested",
+    "userRunTestReason": "12단계 검수 제출 시점에는 사용자 통합 테스트를 아직 실행하지 않음",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-28T00:43:07+09:00"
+  "lastUpdated": "2026-07-28T01:26:49+09:00"
 }

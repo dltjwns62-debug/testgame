@@ -1,8 +1,16 @@
 # Test Game
 
-## Stage 11 final approval
+## Stage 12 review submission
 
-11단계 **상점·용병 구매 기능**이 정적 코드 검수를 승인받아 `main`에 no-ff 병합됐다. 승인 검수 태그는 `review-stage-11-v1`, 완료 태그는 `stage-11-completed`다. 현재 단계는 11단계이며 상태는 `completed`다. 12단계는 `부대 지정과 단축키 설정`이며 아직 시작하지 않았다.
+12단계 **부대 지정과 단축키 설정**을 `stage-12-control-groups-keybinds` 브랜치에서 구현했다. 현재 상태는 `review_pending`이며 검수 태그는 `review-stage-12-v1`이다. 이 제출은 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않았다.
+
+이번 단계에는 BattleScene의 Ctrl+숫자 부대 저장·숫자 부대 호출, 전투마다 초기화되는 임시 부대 상태, 사망 유닛 제거, registry 기반 사용자 지정 숫자·스킬 키 설정, KeySettingsScene, FieldScene 진입 버튼과 동적 BattleScene 도움말을 포함한다.
+
+자동 검사와 순수 로직 검사는 실행했고, 브라우저에서는 키 설정 화면·키 교환·초기화·저장·BattleScene 동적 UI와 콘솔 error/warn 부재를 확인했다. 실제 부대 저장·호출과 전투 중 사망 정리 등의 통합 시나리오는 사용자 실행 테스트를 하지 않았으므로 `not_tested`로 남긴다. ChatGPT 코드 검수도 아직 `not_reviewed`다.
+
+## Stage 11 final approval history
+
+11단계 **상점·용병 구매 기능**이 정적 코드 검수를 승인받아 `main`에 no-ff 병합됐다. 승인 검수 태그는 `review-stage-11-v1`, 완료 태그는 `stage-11-completed`다. 이 내용은 이전 단계의 승인 이력이다.
 
 11단계에서는 전투 Gold를 registry 세션 상태로 유지하고, ShopScene에서 Swordsman·Guardian·Scout을 한 번씩 구매하며, 구매한 용병을 Formation의 Bench에 추가하고 최대 10명까지 전투에 배치할 수 있다. 사용자 수동 테스트는 사용자 요청에 따라 생략했으며 통과로 기록하지 않는다. ChatGPT 정적 코드 검수는 승인됐다.
 
@@ -39,13 +47,13 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 프로젝트 이름: Test Game
 - 장르: 자동사냥 방치형 웹게임
 - 전체 개발 단계: 17단계
-- 현재 단계: 11단계
-- 현재 단계 이름: 상점·용병 구매 기능
-- 현재 상태: 완료 (`completed`)
-- 현재 작업 브랜치: `main`
-- 검수 태그: `review-stage-11-v1`
+- 현재 단계: 12단계
+- 현재 단계 이름: 부대 지정과 단축키 설정
+- 현재 상태: 검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 검수 태그: `review-stage-12-v1`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
-- 다음 단계: 12단계 — 부대 지정과 단축키 설정
+- 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 
 7단계 10대10 RTS 핵심 전투와 8단계 Auto Hunt·지역 동료 지원 기능은 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다.
 
@@ -66,7 +74,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - HP 감소·사망·선택 해제·전멸 승패
 - 기존 Gold 1회 지급·월드맵 몬스터 제거·3초 재생성 연결
 
-자동사냥, 실제 스킬, 상점, 용병 구매, 편성 재배치, 부대 단축키, 경험치·레벨·아이템·저장·온라인 기능은 이번 단계에서 구현하지 않았다.
+12단계에서는 경험치·레벨·능력치 성장, 반복 구매·판매·환불, 인벤토리, 저장·온라인 기능을 구현하지 않았다.
 
 ## 알려진 문제
 
@@ -99,4 +107,4 @@ npm run typecheck
 npm run build
 ```
 
-7단계부터 11단계까지는 `main`에 반영됐다. 다음 예정 단계는 12단계이며, 별도 시작 명령 전에는 12단계 기능을 구현하지 않는다.
+1단계부터 11단계까지는 `main`에 반영됐다. 12단계는 `stage-12-control-groups-keybinds`에서 검수 대기 중이며, 다음 예정 단계는 13단계다. 13단계 기능은 별도 승인·시작 명령 전까지 구현하지 않는다.

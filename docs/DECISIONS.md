@@ -1,5 +1,17 @@
 # 프로젝트 결정 사항
 
+## 12단계 부대 지정과 단축키 설정 결정 (검수 제출)
+
+- 결정: 부대는 BattleScene 인스턴스의 임시 상태로만 유지하고 새 전투마다 10개 그룹을 초기화한다.
+- 결정: Ctrl+1…Ctrl+9·Ctrl+0은 생존한 선택 ALLY를 저장하고, 1…9·0은 현재 살아 있는 그룹 멤버만 호출한다.
+- 결정: 그룹 멤버는 현재 `battleUnitId`를 사용하고 `slotIndex` 오름차순, `battleUnitId` 순으로 결정적으로 정렬한다.
+- 결정: 사망·오래된 ID는 선택과 모든 그룹에서 제거하며, 부대 호출은 명령·목표·목적지·Guard·Auto Hunt·스킬 쿨다운을 변경하지 않는다.
+- 결정: 숫자 그룹 키와 Whirlwind·First Aid 키는 `testgame.keyBindings` registry에 저장하고, 손상된 값은 전체 기본값으로 복구한다.
+- 결정: 같은 종류의 키 충돌은 두 설정을 교환하고, KeySettingsScene의 Cancel은 draft를 폐기하며 Apply 때만 registry에 저장한다.
+- 결정: 12단계는 `review-stage-12-v1`로 `review_pending` 제출하며 사용자 실행 테스트는 `not_tested`, ChatGPT 코드 검수는 `not_reviewed`로 기록한다.
+- 결정: 12단계 승인 전에는 `main`을 변경하지 않고, 13단계 경험치·레벨·능력치 기능을 구현하지 않는다.
+- 상태: 확정
+
 ## 11단계 최종 승인 및 main 반영 결정
 
 - 결정: `review-stage-11-v1`의 정적 코드 검수를 승인한다.

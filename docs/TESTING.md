@@ -1,5 +1,56 @@
 # 실행 및 테스트 기록
 
+## Stage 12 부대 지정과 단축키 설정 — v1 검수 대기
+
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 검수 태그: `review-stage-12-v1`
+- 12단계 상태: 검수 대기 (`review_pending`)
+
+### 순수 로직 검사
+
+- [x] 기본 키 설정이 숫자 10개와 서로 다른 Q/W 기본 스킬 키를 사용한다.
+- [x] 잘못된 키·중복 키·손상된 registry는 전체 기본값으로 복구된다.
+- [x] registry 읽기·쓰기에서 deep clone을 사용한다.
+- [x] 그룹·스킬 키 충돌은 같은 종류 설정을 교환한다.
+- [x] 그룹 저장은 생존 ALLY만 slotIndex와 battleUnitId 기준으로 정렬하고 중복을 제거한다.
+- [x] 그룹 교체·복수 그룹·빈 그룹 저장을 확인한다.
+- [x] 그룹 호출은 생존 유닛만 남기고 오래된 ID·사망 유닛을 제거한다.
+- [x] 모든 그룹에서 사망 유닛을 제거하고 결정적 정렬을 확인한다.
+- 결과: 24개 통과
+
+### 자동 검사
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- `project-status.json` JSON 파싱: 통과
+
+### 브라우저 자동 확인
+
+- [x] Field에 Stage 12 제목, Formation·Shop·Keys 버튼, Gold·Owned·Formation 정보가 겹치지 않게 표시된다.
+- [x] KeySettingsScene에 그룹 1~9·0과 Whirlwind·First Aid가 표시된다.
+- [x] Group 1 키를 2로 변경하면 Group 2와 교환되고 상태 메시지가 표시된다.
+- [x] Whirlwind 키를 W로 변경하면 First Aid와 교환되고 상태 메시지가 표시된다.
+- [x] Cancel은 draft 변경을 버리고, Apply는 사용자 지정 키를 저장한다.
+- [x] Reset Defaults는 draft만 기본값으로 되돌리고 Cancel 시 저장된 설정을 보존한다.
+- [x] BattleScene에 Stage 12 제목, 실제 그룹·스킬 키 도움말, 10개 그룹 UI가 표시되고 하단 슬롯·스킬 패널과 겹치지 않는다.
+- [x] 브라우저 error/warn 로그가 없다.
+
+다음 항목은 브라우저 자동 확인에서 실행하지 않았으며 통과로 기록하지 않는다.
+
+- [ ] 실제 전투에서 Ctrl+1~0 저장과 1~0 호출
+- [ ] 부대 호출 시 선택 상태·스킬 패널·동적 스킬 키 갱신
+- [ ] 유닛 사망·전투 종료·다음 전투 시작 시 그룹 정리와 초기화
+- [ ] MOVE·FOCUS_ATTACK·AUTO_HUNT·Guard·스킬 쿨다운이 부대 호출로 변경되지 않는지
+- [ ] 반복 keydown·Shift/Alt/Meta·Escape·Scene 재진입에서 중복 리스너가 없는지
+- [ ] 전투 중 KeySettings 진입 차단과 이동 중 안내
+- [ ] 모든 구매 용병과 10명 roster의 실제 통합 동작
+
+12단계 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 `main` 반영: 미반영
+
 ## Stage 11 상점·용병 구매 기능 — v1 최종 승인
 
 - 현재 작업 브랜치: `main`

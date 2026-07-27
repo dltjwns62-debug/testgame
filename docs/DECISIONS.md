@@ -409,6 +409,20 @@
 - 결정: 11단계 상점·용병 구매 기능은 별도의 시작 명령 전까지 구현하지 않는다.
 - 상태: 확정
 
+## 10단계 v2 검수 수정 결정
+
+- 결정: `FormationState.ownedUnits`는 정확히 10명의 보유 유닛을 유지하고, 실제 `slots` 배치만 1~10명을 허용한다.
+- 결정: 일반 용병을 Bench로 이동해도 보유 유닛 목록에서는 삭제하지 않는다.
+- 결정: Hero 한 명만 남은 손상 registry와 9명 또는 11명의 보유 목록은 무효로 판정하고 기본 10명 편성으로 복구한다.
+- 결정: `buildBattleRosterFromFormation()`은 빈 슬롯을 제외하고 `slotIndex` 오름차순으로 roster를 반환한다.
+- 결정: FormationScene 슬롯 카드와 보유 유닛 카드에는 역할, Required, Q/W 스킬, Slot/Bench 정보를 표시한다.
+- 결정: 선택 유닛 정보는 이름, 역할, Required 여부, Q/W 스킬 여부, 현재 Slot/Bench를 한 줄로 표시한다.
+- 결정: Reset Default는 draft만 변경하고 `Default formation restored. Apply to save.` 안내를 표시한다.
+- 결정: Apply 성공 때만 registry를 저장하고 FieldScene에 `Formation saved.` 메시지를 전달한다. Cancel은 저장 성공 메시지를 표시하지 않는다.
+- 결정: 10단계 v1 검수 결과는 `changes_requested`로 보존하고, 수정 후 `review-stage-10-v2`로 재제출한다.
+- 결정: 10단계는 계속 `review_pending`이며 `main` 병합과 11단계 시작은 별도 승인 명령 전까지 하지 않는다.
+- 상태: 확정
+
 ## 공통 단계 정보
 
 - 전체 단계: 17단계
@@ -431,7 +445,8 @@
 - 8단계 현재 검수 태그: `review-stage-08-v3`
 - 8단계 완료 태그: `stage-08-completed`
 - 9단계 현재 검수 태그: `review-stage-09-v3` (완료)
-- 10단계 현재 검수 태그: `review-stage-10-v1`
+- 10단계 최초 검수 태그: `review-stage-10-v1` — 수정 요청
+- 10단계 현재 검수 태그: `review-stage-10-v2`
 - 다음 단계: 11단계 — 상점·용병 구매 기능
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계
 - 검수 승인: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계 승인
@@ -449,5 +464,5 @@
 - 결정: 스킬 피해 사망은 기존 공통 사망 처리와 전투 승패 판정을 사용한다.
 - 결정: MOVE·FOCUS_ATTACK 명령과 기존 Auto Hunt, 근접 사거리, 동료 지원 동작은 9단계에서 변경하지 않는다.
 - 결정: 9단계는 `review_pending`으로 기록하고 `review-stage-09-v1`로 검수 제출한다.
-- 결정: 10단계 편성·슬롯 재배치와 주인공 필수 편성은 이 작업 브랜치에서 구현했으며 `review-stage-10-v1` 검수 대기 상태다.
+- 결정: 10단계 편성·슬롯 재배치와 주인공 필수 편성은 이 작업 브랜치에서 구현했으며 최초 제출 태그 `review-stage-10-v1` 이력을 보존한다.
 - 상태: 확정

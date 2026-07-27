@@ -632,7 +632,7 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 
 - 현재 작업 브랜치: `stage-10-formation-roster`
 - 현재 검수 태그: `review-stage-10-v1`
-- 10단계 상태: 검수 대기 (`review_pending`)
+- 10단계 v1 상태: 수정 요청 (`changes_requested`)
 
 자동 검사:
 
@@ -662,6 +662,52 @@ v7 사용자 수동 실행 테스트: 통과 (`passed`)
 10단계 사용자 실행 테스트: 미실시 (`not_tested`)
 10단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 10단계 `main` 반영: 미반영
+
+10단계 v1 정적 코드 검수 결과: 수정 요청 (`changes_requested`)
+
+- 보유 유닛 1~10명 허용, roster 정렬, 편성 정체성 표시, Reset 저장 안내가 미흡해 수정 요청됨
+
+## 10단계 편성·슬롯 재배치와 주인공 필수 편성 — v2
+
+- 현재 작업 브랜치: `stage-10-formation-roster`
+- 현재 검수 태그: `review-stage-10-v2`
+- 10단계 상태: 검수 대기 (`review_pending`)
+
+순수 함수 검사:
+
+- [x] 기본 FormationState는 valid
+- [x] ownedUnits 10명, Hero만 배치된 상태는 valid
+- [x] Hero 한 명만 보유, ownedUnits 9명·11명은 invalid
+- [x] Hero 미배치, Hero 중복 슬롯, 슬롯 rosterUnitId 중복은 invalid
+- [x] 슬롯 배열 순서가 섞여도 valid
+- [x] buildBattleRosterFromFormation() 결과는 slotIndex 오름차순
+- [x] 빈 슬롯은 전투 roster에서 제외
+- [x] draft 수정은 registry 원본에 영향을 주지 않음
+- [x] 잘못된 registry는 기본 10명 상태로 복구
+
+자동 검사:
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 개발 서버 정상 시작 및 HTTP 200 확인 후 종료 (`passed`)
+
+브라우저 자동 확인:
+
+- [x] Hero 카드에 Main Character · Required 표시
+- [x] Skill Merc 카드에 Mercenary · Skills Q/W 표시
+- [x] 일반 용병 카드에 Mercenary 표시
+- [x] 선택 정보에 이름·역할·Required/스킬·Slot/Bench 표시
+- [x] 일반 용병 Remove 후 EMPTY와 Bench 표시
+- [x] Reset Default 후 `Default formation restored. Apply to save.` 표시
+- [x] Apply 후 FieldScene에 `Formation saved.` 표시
+- [x] Hero만 배치하고 나머지를 Bench로 둔 편성 적용
+- [x] Hero 한 명 전투 진입과 빈 슬롯 EMPTY UI 확인
+- [x] 브라우저 error/warn 로그 없음
+
+10단계 v2 사용자 실행 테스트: 미실시 (`not_tested`)
+10단계 v2 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+10단계 v2 `main` 반영: 미반영
 
 ## 9단계 v3 최종 승인 및 main 반영
 

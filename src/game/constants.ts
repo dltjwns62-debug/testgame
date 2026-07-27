@@ -32,6 +32,7 @@ export const RTS_GUARD_AGGRO_RANGE = 140;
 export const RTS_GUARD_LEASH_RANGE = 180;
 export const RTS_RETALIATION_MEMORY_MS = 2500;
 export const AUTO_HUNT_REGISTRY_KEY = "testgame.autoHuntEnabled";
+export const FORMATION_REGISTRY_KEY = "testgame.formationState";
 
 // attackRange is the additional melee reach beyond the unit's body radius.
 // The center-to-center attack distance also includes both collision radii.

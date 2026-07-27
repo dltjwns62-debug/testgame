@@ -16,7 +16,25 @@ export type RosterEntry = {
   rosterUnitId: string;
   unitDefinitionId: string;
   unitRole: UnitRole;
+  displayName: string;
   slotIndex: number;
+};
+
+export type OwnedRosterUnit = {
+  rosterUnitId: string;
+  unitDefinitionId: string;
+  unitRole: UnitRole;
+  displayName: string;
+};
+
+export type FormationSlot = {
+  slotIndex: number;
+  rosterUnitId: string | null;
+};
+
+export type FormationState = {
+  ownedUnits: OwnedRosterUnit[];
+  slots: FormationSlot[];
 };
 
 export type RTSBattleUnit = {

@@ -11,7 +11,7 @@ import {
   PLAYER_RADIUS,
   type MonsterDefinition,
 } from "../constants";
-import { createTrialRoster } from "../rtsBattleDefinitions";
+import { buildBattleRosterFromFormation, getOrCreateFormationState, isValidFormationState } from "../formationState";
 import type { RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
@@ -33,6 +33,9 @@ export class FieldScene extends Phaser.Scene {
   private battleTransitionStarted = false;
   private battleResultApplied = false;
   private playerGold = 0;
+  private formationButton!: Phaser.GameObjects.Rectangle;
+  private formationButtonLabel!: Phaser.GameObjects.Text;
+  private formationMessage: string | null = null;
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
@@ -43,9 +46,11 @@ export class FieldScene extends Phaser.Scene {
   }
 
   public create(): void {
+    getOrCreateFormationState(this.game.registry);
     this.drawField();
     this.addStageNotice();
     this.addStatusText();
+    this.addFormationButton();
     this.player = this.addPlayer();
 
     MONSTERS.forEach((monster) => this.addMonster(monster));
@@ -79,14 +84,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 9: Unit Skills", {
+    this.add.text(48, 36, "Stage 10: Formation", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Enter battle to test single-unit skill controls.", {
+    this.add.text(50, 66, "Arrange your roster before entering battle.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -102,6 +107,24 @@ export class FieldScene extends Phaser.Scene {
       lineSpacing: 8,
     });
     this.updateStatusText();
+  }
+
+  private addFormationButton(): void {
+    this.formationButton = this.add.rectangle(520, 66, 112, 28, 0x4b8b6d, 1)
+      .setStrokeStyle(1, 0x9ce4b0, 1)
+      .setInteractive({ useHandCursor: true });
+    this.formationButtonLabel = this.add.text(520, 66, "Formation", {
+      color: "#f3f8e9",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "11px",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+    this.formationButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      if (pointer.button === 0) {
+        this.openFormation();
+      }
+    });
   }
 
   private addPlayer(): Phaser.GameObjects.Container {
@@ -260,10 +283,19 @@ export class FieldScene extends Phaser.Scene {
     this.updateStatusText();
 
     const target = this.targetMonster.definition;
+    const formation = getOrCreateFormationState(this.game.registry);
+    const allyRoster = buildBattleRosterFromFormation(formation);
+    if (!isValidFormationState(formation) || allyRoster.length < 1 || allyRoster.length > 10) {
+      this.battleTransitionStarted = false;
+      this.state = "IDLE";
+      this.formationMessage = "Formation is invalid. Open Formation to repair it.";
+      this.updateStatusText();
+      return;
+    }
     const battleData: RTSBattleSceneData = {
       sourceWorldMonsterId: target.id,
       enemyCount: 10,
-      allyRoster: createTrialRoster(),
+      allyRoster,
     };
 
     this.scene.pause();
@@ -279,6 +311,29 @@ export class FieldScene extends Phaser.Scene {
     this.state = "IDLE";
     this.scene.stop("BattleScene");
     this.scene.resume();
+    this.updateStatusText();
+  }
+
+  public openFormation(): void {
+    if (this.battleTransitionStarted) {
+      return;
+    }
+    if (this.state === "MOVING") {
+      this.formationMessage = "Formation is unavailable while the player is moving.";
+      this.updateStatusText();
+      return;
+    }
+
+    this.formationMessage = null;
+    this.scene.pause();
+    this.scene.launch("FormationScene");
+  }
+
+  public returnFromFormation(): void {
+    this.scene.stop("FormationScene");
+    this.scene.resume();
+    this.state = "IDLE";
+    this.formationMessage = null;
     this.updateStatusText();
   }
 
@@ -378,10 +433,18 @@ export class FieldScene extends Phaser.Scene {
       return;
     }
 
+    const formation = getOrCreateFormationState(this.game.registry);
+    const deployedCount = formation.slots.filter((slot) => slot.rosterUnitId !== null).length;
+    const hero = formation.ownedUnits.find((unit) => unit.unitRole === "MAIN_CHARACTER");
+    const heroSlot = formation.slots.find((slot) => slot.rosterUnitId === hero?.rosterUnitId)?.slotIndex;
+    this.formationButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
+    this.formationButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.stateText.setText([
       `State: ${this.state}`,
       `Target: ${this.targetMonster?.definition.name ?? "None"}`,
       `Gold: ${this.playerGold}`,
+      `Formation: ${deployedCount}/10 · Hero Slot: ${heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1}`,
+      ...(this.formationMessage ? [this.formationMessage] : []),
     ]);
   }
 }

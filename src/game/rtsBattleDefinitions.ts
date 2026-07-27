@@ -6,7 +6,7 @@ import {
   RTS_TRIAL_MAIN_CHARACTER,
   RTS_TRIAL_MERCENARY,
 } from "./constants";
-import type { EnemyDefinition, RosterEntry, UnitRole, UnitSkillId } from "./rtsBattleTypes";
+import type { EnemyDefinition, OwnedRosterUnit, RosterEntry, UnitRole, UnitSkillId } from "./rtsBattleTypes";
 
 export type AllyUnitDefinition = {
   id: string;
@@ -79,6 +79,7 @@ export function createTrialRoster(): RosterEntry[] {
         rosterUnitId: "ally-main-character",
         unitDefinitionId: "trial-main-character",
         unitRole: "MAIN_CHARACTER",
+        displayName: "Hero",
         slotIndex: 0,
       };
     }
@@ -88,6 +89,7 @@ export function createTrialRoster(): RosterEntry[] {
         rosterUnitId: "ally-skill-mercenary",
         unitDefinitionId: "trial-skill-mercenary",
         unitRole: "MERCENARY",
+        displayName: "Skill Merc",
         slotIndex: index,
       };
     }
@@ -96,9 +98,19 @@ export function createTrialRoster(): RosterEntry[] {
       rosterUnitId: `ally-mercenary-${String(index).padStart(2, "0")}`,
       unitDefinitionId: "trial-mercenary",
       unitRole: "MERCENARY",
+      displayName: `Merc ${index}`,
       slotIndex: index,
     };
   });
+}
+
+export function createTrialOwnedUnits(): OwnedRosterUnit[] {
+  return createTrialRoster().map(({ rosterUnitId, unitDefinitionId, unitRole, displayName }) => ({
+    rosterUnitId,
+    unitDefinitionId,
+    unitRole,
+    displayName,
+  }));
 }
 
 export function getAllyUnitDefinition(unitDefinitionId: string): AllyUnitDefinition | null {

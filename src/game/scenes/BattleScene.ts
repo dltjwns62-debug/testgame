@@ -241,14 +241,14 @@ export class BattleScene extends Phaser.Scene {
     }
 
     const allyPositions = createFormationDestinations({ x: GAME_WIDTH / 2, y: 338 }, RTS_ALLY_COUNT);
-    roster.slice(0, RTS_ALLY_COUNT).forEach((entry, index) => {
-      const ally = this.createAllyUnit(entry, allyPositions[index]);
+    roster.forEach((entry) => {
+      const ally = this.createAllyUnit(entry, allyPositions[entry.slotIndex]);
       if (ally) {
         this.units.set(entry.rosterUnitId, ally);
       }
     });
 
-    if (this.units.size !== RTS_ALLY_COUNT) {
+    if (this.units.size !== roster.length) {
       this.dataError = "The ally roster contains invalid unit definitions.";
       this.units.clear();
       return;
@@ -276,7 +276,7 @@ export class BattleScene extends Phaser.Scene {
       team: "ALLY",
       unitRole: entry.unitRole,
       definitionId: entry.unitDefinitionId,
-      displayName: definition.displayName === "Merc" ? `Merc ${entry.slotIndex}` : definition.displayName,
+      displayName: entry.displayName,
       color: definition.color,
       sourceWorldMonsterId: null,
       currentHp: definition.maxHp,
@@ -349,7 +349,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 12, "Stage 9: Unit Skills", {
+    this.add.text(32, 12, "Stage 10: Formation Battle", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
@@ -360,7 +360,7 @@ export class BattleScene extends Phaser.Scene {
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "12px",
     });
-    this.add.text(34, 57, "Select one skill unit to use Q/W skills · multi-selection hides individual skills.", {
+    this.add.text(34, 57, "Formation slots and fixed unit identities persist into battle.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "11px",
@@ -1414,7 +1414,14 @@ export class BattleScene extends Phaser.Scene {
     for (let index = 0; index < RTS_ALLY_COUNT; index += 1) {
       const unit = [...this.units.values()].find((candidate) => candidate.team === "ALLY" && candidate.slotIndex === index);
       const visual = this.slotVisuals.get(index);
-      if (!unit || !visual) {
+      if (!visual) {
+        continue;
+      }
+
+      if (!unit) {
+        visual.nameText.setText("EMPTY").setColor("#8795a8");
+        visual.stateText.setText("AVAILABLE").setColor("#8795a8");
+        visual.hpFill.setDisplaySize(0, 4);
         continue;
       }
 
@@ -1484,12 +1491,15 @@ export class BattleScene extends Phaser.Scene {
       Number.isSafeInteger(candidate.enemyCount) &&
       candidate.enemyCount === RTS_ENEMY_COUNT &&
       Array.isArray(candidate.allyRoster) &&
-      candidate.allyRoster.length === RTS_ALLY_COUNT)) {
+      candidate.allyRoster.length >= 1 &&
+      candidate.allyRoster.length <= RTS_ALLY_COUNT)) {
       return false;
     }
 
     const roster = candidate.allyRoster as unknown[];
     const validSlots = new Set<number>();
+    const rosterIds = new Set<string>();
+    let mainCharacterCount = 0;
     return (
       typeof candidate.sourceWorldMonsterId === "string" &&
       roster.every((entry) => {
@@ -1499,16 +1509,23 @@ export class BattleScene extends Phaser.Scene {
         const rosterEntry = entry as Record<string, unknown>;
         const valid = typeof rosterEntry.rosterUnitId === "string" &&
           typeof rosterEntry.unitDefinitionId === "string" &&
+          typeof rosterEntry.displayName === "string" &&
+          rosterEntry.displayName.length > 0 &&
           (rosterEntry.unitRole === "MAIN_CHARACTER" || rosterEntry.unitRole === "MERCENARY") &&
+          !rosterIds.has(rosterEntry.rosterUnitId as string) &&
           Number.isSafeInteger(rosterEntry.slotIndex) &&
           (rosterEntry.slotIndex as number) >= 0 &&
           (rosterEntry.slotIndex as number) < RTS_ALLY_COUNT &&
           !validSlots.has(rosterEntry.slotIndex as number);
         if (valid) {
           validSlots.add(rosterEntry.slotIndex as number);
+          rosterIds.add(rosterEntry.rosterUnitId as string);
+          if (rosterEntry.unitRole === "MAIN_CHARACTER") {
+            mainCharacterCount += 1;
+          }
         }
         return valid;
-      }) && validSlots.size === RTS_ALLY_COUNT
+      }) && validSlots.size === roster.length && rosterIds.size === roster.length && mainCharacterCount === 1
     );
   }
 }

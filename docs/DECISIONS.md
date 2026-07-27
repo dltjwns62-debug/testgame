@@ -1,5 +1,20 @@
 # 프로젝트 결정 사항
 
+## 12단계 v4 지역 방어 기준점 결정 (검수 재제출)
+
+- 결정: Auto Hunt OFF 아군은 고정 `guardPosition` 기준으로 지역 방어를 수행한다.
+- 결정: `guardPosition`은 자동 복귀 목적지가 아니라 지역 적 탐색과 교전 leash의 defense anchor다.
+- 결정: NONE 상태의 최초 적 탐색은 guardPosition 기준 `RTS_GUARD_AGGRO_RANGE = 140`px다.
+- 결정: LOCAL_ENGAGE 재탐색과 최대 추적 범위는 guardPosition 기준 `RTS_GUARD_LEASH_RANGE = 180`px다.
+- 결정: 타깃을 잃으면 180px 안의 다른 적을 먼저 찾고, 다른 적이 없으면 현재 위치에서 IDLE로 멈춘다.
+- 결정: 지역 전투 종료 후 유닛은 이전 생성 위치나 guardPosition으로 자동 귀환하지 않는다.
+- 결정: guardPosition은 전투 시작, 사용자의 MOVE 정상 완료, Auto Hunt ON→OFF 전환 때만 갱신한다.
+- 결정: 자동 전투 이동·타깃 손실·타깃 전환·분리 충돌은 guardPosition을 갱신하지 않는다.
+- 결정: Auto Hunt ON은 전장 전체 탐색을 유지하고, FOCUS_ATTACK은 guard leash 예외를 유지한다.
+- 결정: 전투맵 크기, 카메라 이동·확대는 이번 수정 범위가 아니다.
+- 결정: `review-stage-12-v3`는 사용자 테스트 실패와 `changes_requested`로 보존하고, 수정본은 `review-stage-12-v4`로 `review_pending` 제출한다.
+- 상태: 확정
+
 ## 12단계 v3 전투 간 부대 지속 결정 (검수 재제출)
 
 - 결정: 부대 구성은 BattleScene별 임시 상태가 아니라 같은 게임 세션에서 유지되는 registry 상태다.

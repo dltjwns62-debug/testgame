@@ -5,7 +5,7 @@
   "currentStage": 12,
   "currentStageName": "부대 지정과 단축키 설정",
   "stageStatus": "review_pending",
-  "activeTask": "12단계 전투 간 부대 구성 지속 수정 완료 — review-stage-12-v3 검수 대기 중",
+  "activeTask": "12단계 지역 방어 자동 귀환 제거와 제한된 재탐색 수정 완료 — review-stage-12-v4 검수 대기 중",
   "workingBranch": "stage-12-control-groups-keybinds",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -13,16 +13,16 @@
   "nextStageName": "경험치·레벨·능력치 성장",
   "reviewSubmission": {
     "branch": "stage-12-control-groups-keybinds",
-    "tag": "review-stage-12-v3",
-    "version": 3,
+    "tag": "review-stage-12-v4",
+    "version": 4,
     "submitted": true
   },
   "reviewHistory": [
     {
       "stage": 12,
       "branch": "stage-12-control-groups-keybinds",
-      "tag": "review-stage-12-v3",
-      "version": 3,
+      "tag": "review-stage-12-v4",
+      "version": 4,
       "submitted": true,
       "approved": false,
       "result": "review_pending",
@@ -30,6 +30,22 @@
       "reviewedAt": null,
       "commit": null,
       "userRunTest": "not_tested",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 12,
+      "branch": "stage-12-control-groups-keybinds",
+      "tag": "review-stage-12-v3",
+      "version": 3,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": null,
+      "commit": "c40cc3c483f2e9820cacb40f7c1129bac7e9b52a",
+      "userRunTest": "failed",
+      "userRunTestReason": "Auto Hunt OFF 상태에서 M8과 M9가 지역 적에게 접근한 뒤 원래 guardPosition으로 자동 귀환함",
+      "reason": "LOCAL_ENGAGE 타깃을 잃고 대체 적을 찾지 못한 아군에게 updateUnitReturningToGuard가 실행되어, 적에게 접근한 M8과 M9가 전투 시작 직후 기존 생성 위치로 돌아가는 현상이 발생함",
       "mainBranchMerged": false
     },
     {
@@ -426,14 +442,14 @@
     "typecheck": "passed",
     "build": "passed",
     "devServer": "passed",
-    "browserAutomation": "passed",
+    "browserAutomation": "not_tested",
     "userRunTest": "not_tested",
-    "userRunTestReason": "12단계 v3 검수 제출 시점에는 사용자 통합 테스트를 아직 실행하지 않음",
+    "userRunTestReason": "12단계 v4 M8/M9 지역 방어 사용자 통합 테스트는 아직 실행하지 않음",
     "chatGptCodeReview": "not_reviewed"
   },
   "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-28T02:36:31+09:00"
+  "lastUpdated": "2026-07-28T03:13:44+09:00"
 }

@@ -1,12 +1,14 @@
 # Test Game
 
-## Stage 12 v3 review submission
+## Stage 12 v4 review submission
 
-12단계 **부대 지정과 단축키 설정**의 v2 사용자 통합 테스트 지적 사항을 수정했다. 현재 상태는 `review_pending`이며 검수 태그는 `review-stage-12-v3`이다. 이 제출은 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않았다.
+12단계 **부대 지정과 단축키 설정**의 v3 사용자 실행 테스트에서 발견된 지역 방어 자동 귀환 문제를 수정했다. 현재 상태는 `review_pending`이며 검수 태그는 `review-stage-12-v4`이다. 이 제출은 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않았다.
 
 부대 구성은 `CONTROL_GROUPS_REGISTRY_KEY` registry에 `rosterUnitId` 기준으로 저장해 같은 게임 세션의 여러 BattleScene·Field·Formation·Shop 이동 사이에서 유지한다. 전투 사망과 Bench 상태는 부대 원본을 삭제하지 않으며, recall과 UI 인원수는 현재 생존·편성 유닛만 조회한다. Bench 유닛이 배치된 일반 용병 슬롯을 직접 대체하면 Apply 시 기존 부대 지정을 새 유닛이 승계한다.
 
-자동 검사와 순수 로직 검사는 실행했고, 브라우저에서는 첫 전투의 Group 1이 다음 전투에 유지되는 것과 Swordsman의 Merc 4 슬롯 대체 후 Group 2 승계를 확인했다. 전체 사용자 통합 테스트는 아직 공식 실행하지 않았으므로 `not_tested`로 남긴다. ChatGPT 코드 검수도 아직 `not_reviewed`다.
+Auto Hunt OFF의 지역 방어는 각 유닛의 고정 `guardPosition`을 탐색 기준점으로 사용한다. 최초 감지는 140px, LOCAL_ENGAGE 재탐색과 추적 제한은 180px이며, 전투가 끝나도 유닛을 guardPosition으로 자동 귀환시키지 않는다. 적이 없으면 현재 위치에서 멈춘다.
+
+자동 검사와 코드 조사를 실행했다. M8/M9 지역 방어 재현을 포함한 전체 사용자 통합 테스트는 아직 공식 완료로 기록하지 않았으므로 `not_tested`로 남긴다. ChatGPT 코드 검수도 아직 `not_reviewed`다.
 
 ## Stage 11 final approval history
 
@@ -51,7 +53,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 현재 단계 이름: 부대 지정과 단축키 설정
 - 현재 상태: 검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
-- 검수 태그: `review-stage-12-v3`
+- 검수 태그: `review-stage-12-v4`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 

@@ -1,13 +1,13 @@
 # 현재 개발 상태
 
-## Stage 12 부대 지정과 단축키 설정 — v3 검수 대기
+## Stage 12 부대 지정과 단축키 설정 — v4 검수 대기
 
-- 현재 검수 태그: `review-stage-12-v3`
+- 현재 검수 태그: `review-stage-12-v4`
 - 작업 브랜치: `stage-12-control-groups-keybinds`
 - 전체 단계: 17단계
 - 현재 단계: 12단계 — 부대 지정과 단축키 설정
 - 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업: 12단계 전투 간 부대 구성 지속 수정 완료 — `review-stage-12-v3` 검수 대기 중
+- 현재 작업: 12단계 지역 방어 자동 귀환 제거와 제한된 재탐색 수정 완료 — `review-stage-12-v4` 검수 대기 중
 - 완료된 단계: 1단계~11단계
 - 검수 통과된 단계: 1단계~11단계
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
@@ -27,6 +27,9 @@
 - `CONTROL_GROUPS_REGISTRY_KEY`에 `rosterUnitId` 기반 10개 부대를 저장하고 BattleScene마다 깊은 복사해 로드한다.
 - 사망·Bench 유닛은 persistent group에서 삭제하지 않으며, recall/UI는 현재 생존·편성 유닛만 조회한다.
 - Formation에서 Bench 유닛이 일반 용병 슬롯을 직접 대체하고 Apply하면 기존 부대 지정을 승계한다.
+- Auto Hunt OFF 지역 방어는 고정 `guardPosition`을 기준으로 최초 140px, LOCAL_ENGAGE 재탐색 180px를 사용한다.
+- 지역 교전이 끝나도 `guardPosition`으로 자동 귀환하지 않고 현재 위치에서 IDLE로 멈춘다.
+- `guardPosition`은 전투 시작, 사용자 MOVE 성공 완료, Auto Hunt OFF 전환 때만 갱신한다.
 
 ### 12단계 검증 기록
 
@@ -35,9 +38,10 @@
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
 - `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
-- 브라우저 자동 확인: 전투장 밖 부대 UI, Group 10 설정·저장 로그, 전투 간 Group 1 유지·호출, Swordsman의 Merc 4 슬롯 대체 후 Group 2 승계, error/warn 없음 확인
+- 브라우저 자동 확인: 기존 v3 확인 결과를 보존하며, v4 M8/M9 지역 방어 사용자 통합 시나리오는 아직 `not_tested`로 남김
 - v1 검수 결과: `changes_requested` — 중앙 부대 패널 겹침 및 Group 10 표기 오류
 - v2 검수 결과: `changes_requested` — 전투별 초기화와 사망/UI 조회에 의한 원본 삭제
+- v3 검수 결과: `changes_requested` / 사용자 테스트 `failed` — M8·M9가 지역 교전 후 기존 guardPosition으로 자동 귀환
 - 실제 부대 저장·호출, 사망 정리, 명령 보존과 사용자 통합 전투 시나리오는 사용자 실행 테스트 대기이며 통과로 기록하지 않음
 
 12단계 사용자 실행 테스트: 미실시 (`not_tested`)
@@ -112,11 +116,11 @@
 - 현재 단계 상태: 검수 대기 (`review_pending`)
 - 상태 코드: `review_pending`
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
-- 검수 태그: `review-stage-12-v3`
+- 검수 태그: `review-stage-12-v4`
 - 완료 태그: 없음 (검수 대기)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
-- 현재 작업: 12단계 전투 간 부대 구성 지속 수정 완료 — `review-stage-12-v3` 검수 대기 중
+- 현재 작업: 12단계 지역 방어 자동 귀환 제거와 제한된 재탐색 수정 완료 — `review-stage-12-v4` 검수 대기 중
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 - 사용자 실행 테스트: 미실시 (`not_tested`)
 - ChatGPT 코드 검수: 미실시 (`not_reviewed`)

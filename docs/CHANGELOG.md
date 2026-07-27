@@ -1,5 +1,18 @@
 # 변경 이력
 
+## 2026-07-28 — 12단계 v3 사용자 테스트 수정 및 v4 재제출 — 검수 대기
+
+- v3 사용자 실행 테스트에서 Auto Hunt OFF 아군, 특히 M8·M9가 지역 적에게 접근한 뒤 기존 guardPosition으로 자동 귀환하는 문제를 확인
+- `updateUnitReturningToGuard`와 동일 역할의 자동 귀환 흐름을 제거
+- guardPosition을 자동 복귀 목적지가 아닌 고정 defense anchor로 사용
+- NONE 최초 감지는 guardPosition 기준 140px, LOCAL_ENGAGE 재탐색·추적 제한은 180px로 분리
+- 타깃을 잃으면 180px 안의 다른 적을 재탐색하고, 없으면 현재 위치에서 IDLE로 정지
+- MOVE 성공 완료와 Auto Hunt OFF 전환에서만 guardPosition을 갱신
+- Auto Hunt ON, FOCUS_ATTACK, 반격, ATTACK_MOVE와 전투맵 크기는 기존 범위 유지
+- v3 `changes_requested` 및 `userRunTest: failed` 기록을 보존
+- 새 검수 태그는 `review-stage-12-v4`
+- v4 사용자 실행 테스트는 아직 미실시 (`not_tested`), main 미병합, 13단계 미구현
+
 ## 2026-07-28 — 12단계 v2 사용자 테스트 수정 및 v3 재제출 — 검수 대기
 
 - v2 사용자 통합 테스트에서 BattleScene마다 부대 구성이 초기화되는 치명적 설계 문제를 확인

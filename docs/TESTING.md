@@ -1,6 +1,40 @@
 # 실행 및 테스트 기록
 
-## Stage 12 부대 지정과 단축키 설정 — v3 검수 대기
+## Stage 12 지역 방어 AI — v4 검수 대기
+
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 검수 태그: `review-stage-12-v4`
+- 12단계 상태: 검수 대기 (`review_pending`)
+- v3 결과: `changes_requested` / 사용자 실행 테스트 `failed` — Auto Hunt OFF에서 M8·M9가 지역 교전 뒤 기존 guardPosition으로 자동 귀환함
+
+### v4 코드·자동 검사
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- `project-status.json` JSON 파싱: 통과 (`valid`)
+- 고정 guard anchor 140px·180px 경계와 NaN·음수 방어 순수 검사 10개: 통과
+- `updateUnitReturningToGuard` 참조 제거 확인
+- guardPosition 기반 140px 최초 감지와 180px LOCAL_ENGAGE 재탐색 코드 확인
+
+### v4 브라우저·사용자 검사
+
+아직 실행하지 못한 검사는 통과로 기록하지 않는다.
+
+- [ ] Auto Hunt OFF에서 M8/M9가 지역 적에게 접근한 뒤 원래 guardPosition으로 귀환하지 않음
+- [ ] 현재 타깃 사망·이탈 후 guardPosition 180px 안의 다른 적으로 전환
+- [ ] 대체 적이 없을 때 현재 전투 위치에서 정지하고 목적지가 남지 않음
+- [ ] Auto Hunt OFF가 적 징검다리처럼 맵 전체를 추적하지 않음
+- [ ] MOVE 완료·Auto Hunt OFF 전환 시에만 guardPosition 갱신
+- [ ] Auto Hunt ON·FOCUS_ATTACK·반격·ATTACK_MOVE 회귀 확인
+- [ ] 부대 지속·편성 교체 승계·Group 10·키 설정·스킬 회귀 확인
+
+12단계 v4 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 v4 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 v4 `main` 반영: 미반영
+
+## Stage 12 부대 지정과 단축키 설정 — v3 검수 기록 (historical)
 
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
 - 현재 검수 태그: `review-stage-12-v3`

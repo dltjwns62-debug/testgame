@@ -38,6 +38,9 @@ export class FormationScene extends Phaser.Scene {
   }
 
   public create(): void {
+    this.selectedRosterUnitId = null;
+    this.slotVisuals.clear();
+    this.ownedVisuals.clear();
     this.draft = getOrCreateFormationState(this.game.registry);
     this.drawBackground();
     this.addHeader();
@@ -213,6 +216,14 @@ export class FormationScene extends Phaser.Scene {
     if (!this.draft.ownedUnits.some((unit) => unit.rosterUnitId === rosterUnitId)) {
       return;
     }
+
+    if (this.selectedRosterUnitId === rosterUnitId) {
+      this.selectedRosterUnitId = null;
+      this.setStatus("Selection cleared.", "#c4e4d0");
+      this.refreshUi();
+      return;
+    }
+
     this.selectedRosterUnitId = rosterUnitId;
     this.setStatus("Select a formation slot to place or swap this unit.", "#c4e4d0");
     this.refreshUi();
@@ -233,7 +244,9 @@ export class FormationScene extends Phaser.Scene {
     const currentSlot = this.findSlotForUnit(selectedId);
     const occupant = this.getUnitInSlot(slotIndex);
     if (currentSlot === slotIndex) {
-      this.setStatus("This unit is already in that slot.", "#c4e4d0");
+      this.selectedRosterUnitId = null;
+      this.setStatus("Selection cleared.", "#c4e4d0");
+      this.refreshUi();
       return;
     }
     if (currentSlot === null && occupant?.unitRole === "MAIN_CHARACTER") {
@@ -248,6 +261,7 @@ export class FormationScene extends Phaser.Scene {
       this.setSlotUnit(slotIndex, selectedId);
     }
 
+    this.selectedRosterUnitId = null;
     this.setStatus(occupant ? "Units swapped." : "Unit placed.", "#9ce4b0");
     this.refreshUi();
   }
@@ -267,8 +281,10 @@ export class FormationScene extends Phaser.Scene {
       this.setStatus("This unit is not deployed.", "#c4e4d0");
       return;
     }
+    const removedName = selected.displayName;
     this.setSlotUnit(slot, null);
-    this.setStatus(`${selected.displayName} removed from the formation.`, "#c4e4d0");
+    this.selectedRosterUnitId = null;
+    this.setStatus(`${removedName} removed from the formation.`, "#c4e4d0");
     this.refreshUi();
   }
 

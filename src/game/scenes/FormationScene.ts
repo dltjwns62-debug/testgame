@@ -1,9 +1,16 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH, RTS_ALLY_COUNT } from "../constants";
 import {
+  getOrCreatePersistentControlGroupState,
+  replaceControlGroupMember,
+  setPersistentControlGroupState,
+  type PersistentControlGroupState,
+} from "../controlGroups";
+import {
   getFormationSlotLabel,
   getOrCreateFormationState,
   isValidFormationState,
+  cloneFormationState,
   resetFormationSlotsToDefault,
   setFormationState,
 } from "../formationState";
@@ -25,6 +32,8 @@ type OwnedUnitVisual = {
 
 export class FormationScene extends Phaser.Scene {
   private draft!: FormationState;
+  private initialFormationState!: FormationState;
+  private controlGroupState!: PersistentControlGroupState;
   private selectedRosterUnitId: string | null = null;
   private readonly slotVisuals = new Map<number, FormationSlotVisual>();
   private readonly ownedVisuals = new Map<string, OwnedUnitVisual>();
@@ -42,6 +51,11 @@ export class FormationScene extends Phaser.Scene {
     this.slotVisuals.clear();
     this.ownedVisuals.clear();
     this.draft = getOrCreateFormationState(this.game.registry);
+    this.initialFormationState = cloneFormationState(this.draft);
+    this.controlGroupState = getOrCreatePersistentControlGroupState(
+      this.game.registry,
+      new Set(this.draft.ownedUnits.map((unit) => unit.rosterUnitId)),
+    );
     this.drawBackground();
     this.addHeader();
     this.addFormationSlots();
@@ -293,7 +307,16 @@ export class FormationScene extends Phaser.Scene {
       this.setStatus("Hero must remain deployed and every slot must be valid.");
       return;
     }
+    let nextControlGroupState = this.controlGroupState;
+    for (const replacement of this.getDirectBenchReplacements()) {
+      nextControlGroupState = replaceControlGroupMember(
+        nextControlGroupState,
+        replacement.previousRosterUnitId,
+        replacement.nextRosterUnitId,
+      );
+    }
     setFormationState(this.game.registry, this.draft);
+    setPersistentControlGroupState(this.game.registry, nextControlGroupState);
     this.returnToField("Formation saved.");
   }
 
@@ -306,6 +329,32 @@ export class FormationScene extends Phaser.Scene {
     this.selectedRosterUnitId = null;
     this.setStatus("Default formation restored. Apply to save.", "#c4e4d0");
     this.refreshUi();
+  }
+
+  private getDirectBenchReplacements(): Array<{ previousRosterUnitId: string; nextRosterUnitId: string }> {
+    const originallyDeployedIds = new Set(
+      this.initialFormationState.slots.flatMap((slot) => slot.rosterUnitId ? [slot.rosterUnitId] : []),
+    );
+    const finallyDeployedIds = new Set(
+      this.draft.slots.flatMap((slot) => slot.rosterUnitId ? [slot.rosterUnitId] : []),
+    );
+    const replacements: Array<{ previousRosterUnitId: string; nextRosterUnitId: string }> = [];
+
+    for (const slot of this.draft.slots) {
+      const originalId = this.initialFormationState.slots.find((entry) => entry.slotIndex === slot.slotIndex)?.rosterUnitId;
+      const nextId = slot.rosterUnitId;
+      if (!originalId || !nextId || originalId === nextId ||
+        originallyDeployedIds.has(nextId) || finallyDeployedIds.has(originalId)) {
+        continue;
+      }
+      const previous = this.initialFormationState.ownedUnits.find((unit) => unit.rosterUnitId === originalId);
+      const next = this.draft.ownedUnits.find((unit) => unit.rosterUnitId === nextId);
+      if (previous?.unitRole === "MERCENARY" && next?.unitRole === "MERCENARY") {
+        replacements.push({ previousRosterUnitId: originalId, nextRosterUnitId: nextId });
+      }
+    }
+
+    return replacements;
   }
 
   private returnToField(savedMessage?: string): void {

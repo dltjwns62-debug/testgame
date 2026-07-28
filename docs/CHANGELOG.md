@@ -1,5 +1,65 @@
 # 변경 이력
 
+## 2026-07-28 — 12단계 v4 문서 불일치 수정 및 v5 재제출 — 검수 대기
+
+- v4 소스 코드의 지역 방어 수정은 정적 검수 승인 가능 상태였으나 `docs/STATUS.md`에 부대가 전투마다 초기화되고 사망 ID가 제거된다는 오래된 설명이 남아 있음을 확인
+- 현재 구현 요약을 `CONTROL_GROUPS_REGISTRY_KEY`와 `rosterUnitId` 기반 세션 지속 부대 설계에 맞게 정정
+- v3 부대 지속·키 바인딩 순수 검사 25개와 v4 guard anchor 거리·유효성 순수 검사 10개의 실제 결과를 문서에 반영
+- v4 제출 결과는 `changes_requested`로 보존하고 v4 사용자 실행 테스트는 `not_tested`로 유지
+- 새 검수 태그는 `review-stage-12-v5`
+- 이번 수정은 문서만 변경했으며 `main`에 병합하지 않았고 13단계는 구현하지 않음
+
+## 2026-07-28 — 12단계 v3 사용자 테스트 수정 및 v4 재제출 — 검수 대기
+
+- v3 사용자 실행 테스트에서 Auto Hunt OFF 아군, 특히 M8·M9가 지역 적에게 접근한 뒤 기존 guardPosition으로 자동 귀환하는 문제를 확인
+- `updateUnitReturningToGuard`와 동일 역할의 자동 귀환 흐름을 제거
+- guardPosition을 자동 복귀 목적지가 아닌 고정 defense anchor로 사용
+- NONE 최초 감지는 guardPosition 기준 140px, LOCAL_ENGAGE 재탐색·추적 제한은 180px로 분리
+- 타깃을 잃으면 180px 안의 다른 적을 재탐색하고, 없으면 현재 위치에서 IDLE로 정지
+- MOVE 성공 완료와 Auto Hunt OFF 전환에서만 guardPosition을 갱신
+- Auto Hunt ON, FOCUS_ATTACK, 반격, ATTACK_MOVE와 전투맵 크기는 기존 범위 유지
+- v3 `changes_requested` 및 `userRunTest: failed` 기록을 보존
+- 새 검수 태그는 `review-stage-12-v4`
+- v4 사용자 실행 테스트는 아직 미실시 (`not_tested`), main 미병합, 13단계 미구현
+
+## 2026-07-28 — 12단계 v2 사용자 테스트 수정 및 v3 재제출 — 검수 대기
+
+- v2 사용자 통합 테스트에서 BattleScene마다 부대 구성이 초기화되는 치명적 설계 문제를 확인
+- `CONTROL_GROUPS_REGISTRY_KEY` 기반 세션 지속 `PersistentControlGroupState`를 추가
+- 부대 저장 ID를 `rosterUnitId`로 유지하고 FormationState의 전체 ownedUnits를 기준으로 검증
+- 전투 사망·Bench·UI 조회에서 persistent 원본을 삭제하지 않도록 수정
+- recall은 현재 생존·편성 유닛만 반환하고 UI는 현재/저장 총원으로 표시
+- Bench 유닛이 일반 용병 슬롯을 직접 대체하면 Apply 시 기존 부대 지정을 승계
+- 첫 전투 Group 1 유지·호출 및 Swordsman의 Merc 4 슬롯 대체 후 Group 2 승계를 브라우저에서 확인
+- `review-stage-12-v2`는 `changes_requested`, 사용자 통합 테스트 실패 이력으로 보존
+- 새 검수 태그 `review-stage-12-v3`로 작업 브랜치에 재제출
+- 사용자 실행 테스트 상태는 `not_tested`, 13단계는 구현하지 않음
+- 12단계는 아직 `main`에 병합하지 않음
+
+## 2026-07-28 — 12단계 v1 UI 수정 및 v2 재제출 — 검수 대기
+
+- v1 정적 코드 검수에서 중앙 부대 상태 패널이 적군 초기 대형과 겹치는 문제를 수정 요청받음
+- 238×132 중앙 패널을 제거하고 `RTS_ARENA_BOUNDS` 아래 좌측의 소형 5×2 부대 UI로 이동
+- 부대 UI가 전투 유닛·선택 영역·적 우클릭·하단 슬롯·Skill 패널을 가리지 않도록 조정
+- Group 10의 정식 이름과 실제 호출키를 분리하고 `G10 [0]` 및 `Group 10` 로그를 적용
+- KeySettingsScene에 `Group 10`, `Recall: 0 · Save: Ctrl + 0` 표시를 적용
+- `review-stage-12-v1`은 `changes_requested` 이력으로 보존
+- 새 검수 태그 `review-stage-12-v2`로 작업 브랜치에 재제출
+- 사용자 실행 테스트는 미실시 (`not_tested`), 13단계는 구현하지 않음
+- 12단계는 아직 `main`에 병합하지 않음
+
+## 2026-07-28 — 12단계 부대 지정과 단축키 설정 — 검수 대기
+
+- BattleScene에 10개 임시 부대의 Ctrl+숫자 저장과 숫자 호출을 추가
+- 저장·호출 시 생존 ALLY, 중복 제거, 결정적 정렬과 사망 유닛 정리를 적용
+- registry 기반 숫자 그룹 키와 Whirlwind·First Aid 사용자 지정 키를 추가
+- KeySettingsScene, FieldScene Keys 진입, BattleScene 동적 키 도움말·그룹 UI를 추가
+- 순수 로직 24개와 자동 검사, 제한된 브라우저 자동 확인을 실행
+- 사용자 실행 테스트는 아직 미실시 (`not_tested`), ChatGPT 코드 검수는 미실시 (`not_reviewed`)
+- 검수 태그 `review-stage-12-v1`로 작업 브랜치에 제출
+- 12단계는 아직 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않음
+- 13단계 경험치·레벨·능력치 성장 기능은 구현하지 않음
+
 ## 2026-07-28 — 11단계 검수 승인 및 main 반영 — 완료
 
 - 검수 태그 `review-stage-11-v1`과 승인 커밋 `c63369ce05e19b23d43eff5d753b8f9159736bdc` 확인

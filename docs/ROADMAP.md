@@ -1,5 +1,23 @@
 # Test Game 개발 로드맵
 
+## Stage 12 v5 current submission
+
+- 전체 단계: 17단계
+- 현재 단계: 12단계 — 부대 지정과 단축키 설정
+- 단계 상태: `review_pending`
+- 작업 브랜치: `stage-12-control-groups-keybinds`
+- 검수 태그: `review-stage-12-v5`
+- 완료된 단계: 1단계~11단계
+- 다음 단계: 13단계 — 경험치·레벨·능력치 성장
+- `main` 반영 여부: 미반영
+- 사용자 실행 테스트: `not_tested`
+- ChatGPT 코드 검수: `not_reviewed`
+- v1 결과 (historical): `changes_requested` — 중앙 부대 패널이 전투 유닛을 가리고 Group 10이 Group 0으로 표시됨
+- v2 결과 (historical): `changes_requested` — 부대가 BattleScene마다 초기화되고 사망·UI 조회가 부대 원본을 삭제함
+- v3 결과 (historical): `changes_requested` / 사용자 실행 테스트 `failed` — Auto Hunt OFF에서 M8·M9가 전투 후 guardPosition으로 자동 귀환함
+- v4 제출: 고정 guardPosition 기준 지역 방어와 자동 귀환 제거, 소스 검수 승인 가능
+- v5 제출: 현재 구현 요약의 문서 불일치 정정, 검수 대기
+
 ## Stage 9 v3 resubmission scope
 
 - Each ally stores an independent `guardPosition` initialized from its spawn position.
@@ -22,10 +40,10 @@
 ## 로드맵 기준
 
 - 전체 단계: 17단계
-- 현재 단계: 11단계
-- 현재 단계 이름: 상점·용병 구매 기능
-- 현재 단계 상태: 완료 (`completed`)
-- 현재 작업 브랜치: `main`
+- 현재 단계: 12단계
+- 현재 단계 이름: 부대 지정과 단축키 설정
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -47,14 +65,18 @@
 - 10단계 2차 검수 태그: `review-stage-10-v2` — 사용자 테스트 수정 요청
 - 10단계 현재 검수 태그: `review-stage-10-v3` (승인)
 - 10단계 완료 태그: `stage-10-completed`
-- 11단계 검수 태그: `review-stage-11-v1` (승인)
+- 11단계 검수 태그: `review-stage-11-v1` (승인, 과거 이력)
 - 11단계 완료 태그: `stage-11-completed`
-- 다음 단계: 12단계 — 부대 지정과 단축키 설정
+- 12단계 최초 검수 태그: `review-stage-12-v1` — UI 수정 요청
+- 12단계 2차 검수 태그: `review-stage-12-v2` — 사용자 통합 테스트 수정 요청
+- 12단계 v3 검수 태그: `review-stage-12-v3` — 사용자 테스트 수정 요청
+- 12단계 현재 검수 태그: `review-stage-12-v5`
+- 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - `main` 반영 여부: 1단계부터 11단계까지 반영 완료
 
-현재 단계 번호는 11이며, 11단계 `review-stage-11-v1` 검수 승인 작업을 `main`에 no-ff 병합하고 `stage-11-completed`로 완료 확정했다. 다음 12단계는 별도의 시작 명령 전까지 시작하지 않는다.
+현재 단계 번호는 12이며, 12단계 `review-stage-12-v5` 문서 정정본을 작업 브랜치에 제출하고 검수를 기다리는 중이다. 13단계는 별도의 승인·시작 명령 전까지 시작하지 않는다.
 
 각 단계의 상태는 다음 값으로 관리한다.
 
@@ -65,7 +87,7 @@
 - `approved`: 검수 통과, 병합 대기
 - `completed`: `main` 반영까지 완료
 
-각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 11이며, 1단계부터 11단계까지 `main` 반영이 완료됐다. 12단계는 별도의 시작 명령 전까지 시작하지 않는다.
+각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 12이며, 1단계부터 11단계까지 `main` 반영이 완료됐다. 12단계는 검수 승인 전까지 `review_pending`으로 유지한다.
 
 검수 대상 버전은 tracked 파일 안의 현재 커밋 해시가 아니라 변경되지 않는 Git 태그로 관리한다. 검수 태그는 `review-stage-XX-vN` 형식을 사용하고, 기존 원격 태그는 이동하거나 덮어쓰지 않는다. 1단계 승인 태그는 `review-stage-01-v1`이며, 2단계 최초 검수 태그 `review-stage-02-v1`은 수정 요청 기록으로 보존하고 현재 재검수 태그는 `review-stage-02-v2`다.
 
@@ -540,7 +562,7 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 
 ### 단계 상태
 
-`not_started`
+`review_pending` — `review-stage-12-v5` 제출, `main` 미반영
 
 ### 목표
 
@@ -548,17 +570,46 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 
 ### 주요 구현 항목
 
-- Ctrl+1~0 부대 저장
-- 1~0 부대 호출
-- 키 설정과 충돌 처리
+- Ctrl+1~0으로 생존한 선택 아군을 10개 부대에 저장하고 기존 그룹을 교체
+- 1~0으로 현재 전투의 생존 아군만 호출하고 선택 UI를 갱신
+- 부대 멤버를 `slotIndex`와 `battleUnitId`로 결정적으로 정렬하고 조회 결과에서 중복·사망·오래된 ID를 제외
+- 전투 시작 시 Registry의 그룹을 로드하고 유닛 사망 시 persistent 원본에서 제거하지 않음
+- 숫자 그룹 키와 Whirlwind·First Aid 키를 registry에 저장하는 KeySettingsScene 추가
+- 동일 종류 키 충돌 교환, 잘못된 키·반복 입력·Escape 취소와 draft 저장/취소/기본값 복원
+- FieldScene Keys 진입, BattleScene 동적 도움말·그룹 목록·동적 스킬 키 표시
+- Auto Hunt OFF는 고정 guardPosition 기준 140px 최초 감지와 180px LOCAL_ENGAGE 재탐색을 사용
+- 지역 교전 종료 시 guardPosition으로 자동 귀환하지 않고 현재 위치에서 정지
+- 사용자 MOVE 완료와 Auto Hunt OFF 전환에서만 guardPosition을 갱신
 
 ### 완료 조건
 
-- 죽은 유닛 제외와 선택 상태가 부대 호출 규칙에 맞게 동작한다.
+- [x] v3 부대 지속·키 바인딩 순수 로직 검사 25개가 통과한다.
+- [x] v4 guard anchor 거리·유효성 순수 검사 10개가 통과한다.
+- [x] Ctrl 저장과 숫자 호출은 RUNNING·수식어·반복 입력 규칙을 지킨다.
+- [x] recall/UI는 생존·편성 ALLY만 사용하고, 사망·오래된 ID는 persistent 원본에서 삭제하지 않는다.
+- [x] 부대 데이터는 session Registry에 유지되며 새 전투에서도 10개 구성을 로드한다.
+- [x] 사용자 지정 키가 유효성·고유성 검증을 통과하고 충돌 시 같은 종류 설정을 교환한다.
+- [x] KeySettingsScene draft와 Apply·Cancel·Reset Defaults 동작을 구현한다.
+- [x] FieldScene과 BattleScene UI에 실제 키가 표시되고 기존 하단 슬롯·스킬 패널과 겹치지 않는다.
+- [x] 부대 상태 UI는 `RTS_ARENA_BOUNDS` 밖의 좌측 하단 소형 5×2 표시이며 선택 정보·하단 슬롯·Skill 패널과 겹치지 않는다.
+- [x] 정식 부대 이름은 Group 1~Group 10이고, 실제 호출키는 1~9·0이며 Group 10의 기본키는 0이다.
+- [x] `CONTROL_GROUPS_REGISTRY_KEY`에 10개 부대를 `rosterUnitId` 기준으로 깊은 복사 저장·로드한다.
+- [x] BattleScene마다 부대 구성을 초기화하지 않고, 현재 편성된 생존 유닛만 호출한다.
+- [x] 사망·Bench 유닛은 부대 원본에 유지하고, UI는 생존/저장 총원으로 표시한다.
+- [x] Bench 유닛의 일반 용병 슬롯 직접 대체 시 기존 부대 지정을 새 유닛에게 승계한다.
+- [x] 승리·패배·Field·Formation·Shop 이동 후 부대 구성을 유지한다.
+- [x] Auto Hunt OFF 최초 감지는 guardPosition 기준 140px, LOCAL_ENGAGE 재탐색은 guardPosition 기준 180px이다.
+- [x] 지역 교전 종료 후 guardPosition으로 자동 이동하지 않고 현재 위치에서 IDLE 상태로 멈춘다.
+- [x] MOVE 성공 완료와 Auto Hunt OFF 전환에서만 guardPosition을 갱신한다.
+- [x] 새로고침 이후 영구 저장은 구현하지 않는다.
+- [x] `npm ci`, typecheck, build, dev 및 제한된 브라우저 자동 확인을 완료한다.
+- [ ] 사용자 수동 통합 테스트를 실행한다.
+- [ ] ChatGPT 코드 검수를 승인받고 `main`에 반영한다.
 
 ### 해당 단계에서 구현하지 않을 항목
 
-- 경험치·아이템·오프라인 진행
+- 경험치·레벨·능력치 성장과 13단계 기능
+- 반복 구매·판매·환불, 인벤토리·저장·온라인 기능
 
 ## 13단계: 경험치, 레벨, 능력치 성장
 

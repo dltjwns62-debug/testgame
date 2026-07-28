@@ -1,5 +1,180 @@
 # 실행 및 테스트 기록
 
+## Stage 12 지역 방어 AI — v5 문서 정정 검수 대기
+
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 검수 태그: `review-stage-12-v5`
+- 12단계 상태: 검수 대기 (`review_pending`)
+- v4 소스 검수: 승인 가능. 다만 `docs/STATUS.md`의 현재 구현 요약에 과거 초기화 설명이 남아 전체 제출은 `changes_requested`로 기록하고 v5에서 문서만 정정한다.
+- v4 사용자 실행 테스트: 미실시 (`not_tested`)
+
+### v4 코드·자동 검사 기록
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- `project-status.json` JSON 파싱: 통과 (`valid`)
+- 고정 guard anchor 140px·180px 경계와 NaN·음수 방어 순수 검사 10개: 통과
+- `updateUnitReturningToGuard` 소스 참조 제거 확인
+- guardPosition 기반 140px 최초 감지와 180px LOCAL_ENGAGE 재탐색 코드 확인
+- v3 부대 지속·키 바인딩 순수 로직 검사 25개: 통과
+- v4 guard anchor 거리·유효성 순수 검사 10개: 통과
+
+### v4 브라우저·사용자 검사
+
+아직 실행하지 못한 검사는 통과로 기록하지 않는다.
+
+- [ ] Auto Hunt OFF에서 M8/M9가 지역 적에게 접근한 뒤 원래 guardPosition으로 귀환하지 않음
+- [ ] 현재 타깃 사망·이탈 후 guardPosition 180px 안의 다른 적으로 전환
+- [ ] 대체 적이 없을 때 현재 전투 위치에서 정지하고 목적지가 남지 않음
+- [ ] Auto Hunt OFF가 적 징검다리처럼 맵 전체를 추적하지 않음
+- [ ] MOVE 완료·Auto Hunt OFF 전환 시에만 guardPosition 갱신
+- [ ] Auto Hunt ON·FOCUS_ATTACK·반격·ATTACK_MOVE 회귀 확인
+- [ ] 부대 지속·편성 교체 승계·Group 10·키 설정·스킬 회귀 확인
+
+12단계 v4 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 v4 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 v4 `main` 반영: 미반영
+
+## Stage 12 부대 지정과 단축키 설정 — v3 검수 기록 (historical)
+
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 검수 태그: `review-stage-12-v3`
+- 12단계 상태: 검수 대기 (`review_pending`)
+- v1 결과: `changes_requested` — 중앙 부대 UI 겹침과 Group 10 표기 오류
+- v2 결과: `changes_requested` / 사용자 통합 테스트 실패 — BattleScene마다 부대가 초기화되고 사망·UI 조회가 원본을 삭제함
+
+### v3 순수 로직 검사
+
+- [x] PersistentControlGroupState의 빈 상태·10개 그룹·손상 길이 검증
+- [x] 그룹 내부 중복·알 수 없는 ID 제거와 정상 그룹 보존
+- [x] 서로 다른 그룹의 같은 rosterUnitId 허용
+- [x] Bench 유닛 ID 유지와 깊은 복사
+- [x] Map↔persistent 변환과 왕복 구성 보존
+- [x] recall/UI 조회가 원본 그룹을 변경하지 않음
+- [x] 사망·미배치 유닛은 조회에서 제외되지만 persistent 그룹에 유지
+- [x] 다음 전투에서 다시 살아난 유닛이 조회에 복귀
+- [x] 빈 저장·특정 그룹 교체·다른 그룹 보존
+- [x] 직접 Bench 교체 시 부대 구성 승계 및 중복 제거
+- 결과: 25개 통과
+
+### v3 자동 검사
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- `project-status.json` JSON 파싱: 통과
+
+### v3 브라우저 자동 확인
+
+- [x] 첫 전투에서 저장한 Group 1이 Field 복귀 후 다음 BattleScene에 `1/1`로 유지된다.
+- [x] 다음 전투에서 `1` 호출 시 Group 1의 저장 유닛이 선택되고 `Group 1 recalled: 1 living units.` 로그가 표시된다.
+- [x] 전투 중 일부 유닛이 사망해도 Group 원본 삭제 없이 UI가 `0/1`처럼 현재/저장 총원으로 표시된다.
+- [x] Bench Swordsman을 Merc 4 슬롯에 직접 배치하고 Apply한 뒤 다음 전투 Group 2가 `1/1`로 유지된다.
+- [x] 다음 전투에서 `2` 호출 시 Swordsman이 선택되고 `Group 2 recalled: 1 living units.` 로그가 표시된다.
+- [x] 전투장 밖 부대 UI·Group 10 표기·기존 슬롯·스킬 패널 UI가 유지된다.
+- [x] 브라우저 console error/warn 로그가 없다.
+
+실행하지 못한 항목은 통과로 기록하지 않는다.
+
+- [ ] 패배 후 복귀와 세 번째 연속 전투까지 모든 그룹 유지
+- [ ] 여러 유닛·여러 그룹·Skill Merc 스킬 UI의 전체 사용자 통합 시나리오
+- [ ] Bench 이동 후 재편성, 빈 슬롯 배치, 단순 배치 유닛 슬롯 교환의 전체 회귀 시나리오
+- [ ] 새로고침 이후 저장 — 15단계 범위
+
+12단계 v3 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 v3 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 v3 `main` 반영: 미반영
+
+## Stage 12 부대 지정과 단축키 설정 — v2 검수 기록 (historical; superseded by v3)
+
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 검수 태그: `review-stage-12-v2`
+- 12단계 상태: 검수 대기 (`review_pending`)
+- v1 결과: `changes_requested` — 중앙 부대 상태 패널이 적군 초기 대형을 가리고 Group 10이 Group 0으로 표시됨
+
+### v2 자동 검사
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- 기존 순수 부대·키 바인딩 로직 검사 24개: 통과
+- `project-status.json` JSON 파싱: 통과
+
+### v2 브라우저 자동 확인
+
+- [x] 전투 시작 직후 초기 적 대형이 부대 UI에 가려지지 않는다.
+- [x] 부대 UI 배경과 텍스트가 `RTS_ARENA_BOUNDS` 아래의 좌측 하단에 표시된다.
+- [x] 부대 UI가 아군 초기 대형·전투 이동 영역·선택 드래그 영역·적 우클릭 영역을 덮지 않는다.
+- [x] 하단 10개 슬롯 및 Skill Merc 스킬 패널과 겹치지 않는다.
+- [x] KeySettingsScene에 `Group 10`, `Recall: 0 · Save: Ctrl + 0`이 표시된다.
+- [x] `Ctrl+0` 빈 선택 저장 로그가 `Group 10 cleared.`로 표시된다.
+- [x] 브라우저 console error/warn 로그가 없다.
+
+실행하지 못한 항목은 통과로 기록하지 않는다.
+
+- [ ] 살아 있는 유닛을 Ctrl+0으로 저장한 뒤 성공 로그를 확인
+- [ ] 0 호출 로그가 `Group 10 recalled: N living units.`로 표시되는지 확인
+- [ ] Group 10 호출 후 선택 상태·동적 Skill UI·기존 MOVE/FOCUS/Auto Hunt/guard 동작 확인
+
+12단계 v2 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 v2 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 v2 `main` 반영: 미반영
+
+## Stage 12 부대 지정과 단축키 설정 — v1 검수 기록 (historical; superseded by v3)
+
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 검수 태그: `review-stage-12-v1`
+- 12단계 상태: 검수 대기 (`review_pending`)
+
+### 순수 로직 검사
+
+- [x] 기본 키 설정이 숫자 10개와 서로 다른 Q/W 기본 스킬 키를 사용한다.
+- [x] 잘못된 키·중복 키·손상된 registry는 전체 기본값으로 복구된다.
+- [x] registry 읽기·쓰기에서 deep clone을 사용한다.
+- [x] 그룹·스킬 키 충돌은 같은 종류 설정을 교환한다.
+- [x] 그룹 저장은 생존 ALLY만 slotIndex와 battleUnitId 기준으로 정렬하고 중복을 제거한다.
+- [x] 그룹 교체·복수 그룹·빈 그룹 저장을 확인한다.
+- [x] 그룹 호출은 생존 유닛만 남기고 오래된 ID·사망 유닛을 제거한다.
+- [x] 모든 그룹에서 사망 유닛을 제거하고 결정적 정렬을 확인한다.
+- 결과: 24개 통과
+
+### 자동 검사
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- `project-status.json` JSON 파싱: 통과
+
+### 브라우저 자동 확인
+
+- [x] Field에 Stage 12 제목, Formation·Shop·Keys 버튼, Gold·Owned·Formation 정보가 겹치지 않게 표시된다.
+- [x] KeySettingsScene에 그룹 1~9·0과 Whirlwind·First Aid가 표시된다.
+- [x] Group 1 키를 2로 변경하면 Group 2와 교환되고 상태 메시지가 표시된다.
+- [x] Whirlwind 키를 W로 변경하면 First Aid와 교환되고 상태 메시지가 표시된다.
+- [x] Cancel은 draft 변경을 버리고, Apply는 사용자 지정 키를 저장한다.
+- [x] Reset Defaults는 draft만 기본값으로 되돌리고 Cancel 시 저장된 설정을 보존한다.
+- [x] BattleScene에 Stage 12 제목, 실제 그룹·스킬 키 도움말, 10개 그룹 UI가 표시되고 하단 슬롯·스킬 패널과 겹치지 않는다.
+- [x] 브라우저 error/warn 로그가 없다.
+
+다음 항목은 브라우저 자동 확인에서 실행하지 않았으며 통과로 기록하지 않는다.
+
+- [ ] 실제 전투에서 Ctrl+1~0 저장과 1~0 호출
+- [ ] 부대 호출 시 선택 상태·스킬 패널·동적 스킬 키 갱신
+- [ ] 유닛 사망·전투 종료·다음 전투 시작 시 그룹 정리와 초기화
+- [ ] MOVE·FOCUS_ATTACK·AUTO_HUNT·Guard·스킬 쿨다운이 부대 호출로 변경되지 않는지
+- [ ] 반복 keydown·Shift/Alt/Meta·Escape·Scene 재진입에서 중복 리스너가 없는지
+- [ ] 전투 중 KeySettings 진입 차단과 이동 중 안내
+- [ ] 모든 구매 용병과 10명 roster의 실제 통합 동작
+
+12단계 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 `main` 반영: 미반영
+
 ## Stage 11 상점·용병 구매 기능 — v1 최종 승인
 
 - 현재 작업 브랜치: `main`

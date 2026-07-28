@@ -13,6 +13,7 @@ import {
 } from "../constants";
 import { buildBattleRosterFromFormation, getOrCreateFormationState, isValidFormationState } from "../formationState";
 import { addPlayerGold, getOrCreatePlayerGold } from "../playerEconomy";
+import { getOrCreateKeyBindingState } from "../keyBindings";
 import type { RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
@@ -37,6 +38,8 @@ export class FieldScene extends Phaser.Scene {
   private formationButtonLabel!: Phaser.GameObjects.Text;
   private shopButton!: Phaser.GameObjects.Rectangle;
   private shopButtonLabel!: Phaser.GameObjects.Text;
+  private keySettingsButton!: Phaser.GameObjects.Rectangle;
+  private keySettingsButtonLabel!: Phaser.GameObjects.Text;
   private formationMessage: string | null = null;
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
@@ -50,11 +53,13 @@ export class FieldScene extends Phaser.Scene {
   public create(): void {
     getOrCreateFormationState(this.game.registry);
     getOrCreatePlayerGold(this.game.registry);
+    getOrCreateKeyBindingState(this.game.registry);
     this.drawField();
     this.addStageNotice();
     this.addStatusText();
     this.addFormationButton();
     this.addShopButton();
+    this.addKeySettingsButton();
     this.player = this.addPlayer();
 
     MONSTERS.forEach((monster) => this.addMonster(monster));
@@ -88,14 +93,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 11: Shop & Recruitment", {
+    this.add.text(48, 36, "Stage 12: Control Groups", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Earn Gold and recruit mercenaries for your roster.", {
+    this.add.text(50, 66, "Save and recall living units during battle.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -146,6 +151,24 @@ export class FieldScene extends Phaser.Scene {
       pointer.event?.stopPropagation();
       if (pointer.button === 0) {
         this.openShop();
+      }
+    });
+  }
+
+  private addKeySettingsButton(): void {
+    this.keySettingsButton = this.add.rectangle(750, 66, 96, 28, 0x4b8b6d, 1)
+      .setStrokeStyle(1, 0x9ce4b0, 1)
+      .setInteractive({ useHandCursor: true });
+    this.keySettingsButtonLabel = this.add.text(750, 66, "Keys", {
+      color: "#f3f8e9",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "11px",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+    this.keySettingsButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      if (pointer.button === 0) {
+        this.openKeySettings();
       }
     });
   }
@@ -383,6 +406,29 @@ export class FieldScene extends Phaser.Scene {
     this.updateStatusText();
   }
 
+  public openKeySettings(): void {
+    if (this.battleTransitionStarted || this.state === "BATTLE") {
+      return;
+    }
+    if (this.state === "MOVING") {
+      this.formationMessage = "Key settings are unavailable while the player is moving.";
+      this.updateStatusText();
+      return;
+    }
+
+    this.formationMessage = null;
+    this.scene.pause();
+    this.scene.launch("KeySettingsScene");
+  }
+
+  public returnFromKeySettings(savedMessage?: string): void {
+    this.scene.stop("KeySettingsScene");
+    this.scene.resume();
+    this.state = "IDLE";
+    this.formationMessage = savedMessage ?? null;
+    this.updateStatusText();
+  }
+
   public applyBattleResult(result: RTSBattleResult): void {
     if (
       !result ||
@@ -491,6 +537,8 @@ export class FieldScene extends Phaser.Scene {
     this.formationButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.shopButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
     this.shopButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
+    this.keySettingsButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
+    this.keySettingsButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.stateText.setText([
       `State: ${this.state}`,
       `Target: ${this.targetMonster?.definition.name ?? "None"}`,

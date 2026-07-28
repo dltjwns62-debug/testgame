@@ -1,5 +1,66 @@
 # 프로젝트 결정 사항
 
+## 12단계 v5 문서 일치성 결정 (검수 재제출)
+
+- 결정: 현재 구현 설명은 `CONTROL_GROUPS_REGISTRY_KEY`와 `rosterUnitId`를 기준으로 같은 세션에서 유지되는 persistent 부대 설계를 설명해야 한다.
+- 결정: 사망·Bench 유닛은 persistent 부대 원본에서 삭제하지 않으며, recall/UI에서 현재 생존·편성 유닛만 필터링한다.
+- 결정: `docs/STATUS.md`에 남아 있던 BattleScene별 초기화·사망 ID 즉시 삭제 설명은 과거 구현 기록과 현재 구현을 혼동하므로 현재 요약에서 제거한다.
+- 결정: `review-stage-12-v4`와 v4의 `changes_requested` 기록은 보존하고, 문서 정정본을 `review-stage-12-v5`로 `review_pending` 제출한다.
+- 결정: v4 사용자 실행 테스트는 실행하지 않았으므로 `not_tested`로 유지한다.
+- 결정: 13단계 경험치·레벨·능력치 기능은 별도 승인·시작 명령 전까지 구현하지 않는다.
+- 상태: 확정
+
+## 12단계 v4 지역 방어 기준점 결정 (검수 재제출)
+
+- 결정: Auto Hunt OFF 아군은 고정 `guardPosition` 기준으로 지역 방어를 수행한다.
+- 결정: `guardPosition`은 자동 복귀 목적지가 아니라 지역 적 탐색과 교전 leash의 defense anchor다.
+- 결정: NONE 상태의 최초 적 탐색은 guardPosition 기준 `RTS_GUARD_AGGRO_RANGE = 140`px다.
+- 결정: LOCAL_ENGAGE 재탐색과 최대 추적 범위는 guardPosition 기준 `RTS_GUARD_LEASH_RANGE = 180`px다.
+- 결정: 타깃을 잃으면 180px 안의 다른 적을 먼저 찾고, 다른 적이 없으면 현재 위치에서 IDLE로 멈춘다.
+- 결정: 지역 전투 종료 후 유닛은 이전 생성 위치나 guardPosition으로 자동 귀환하지 않는다.
+- 결정: guardPosition은 전투 시작, 사용자의 MOVE 정상 완료, Auto Hunt ON→OFF 전환 때만 갱신한다.
+- 결정: 자동 전투 이동·타깃 손실·타깃 전환·분리 충돌은 guardPosition을 갱신하지 않는다.
+- 결정: Auto Hunt ON은 전장 전체 탐색을 유지하고, FOCUS_ATTACK은 guard leash 예외를 유지한다.
+- 결정: 전투맵 크기, 카메라 이동·확대는 이번 수정 범위가 아니다.
+- 결정: `review-stage-12-v3`는 사용자 테스트 실패와 `changes_requested`로 보존하고, 수정본은 `review-stage-12-v4`로 `review_pending` 제출한다.
+- 상태: 확정
+
+## 12단계 v3 전투 간 부대 지속 결정 (검수 재제출)
+
+- 결정: 부대 구성은 BattleScene별 임시 상태가 아니라 같은 게임 세션에서 유지되는 registry 상태다.
+- 결정: `CONTROL_GROUPS_REGISTRY_KEY`에 10개 부대를 `rosterUnitId` 배열로 저장하고 registry 읽기·쓰기에 깊은 복사를 사용한다.
+- 결정: FormationState의 전체 `ownedUnits`를 부대 ID 유효성 기준으로 사용하며 Bench 유닛도 부대 정의에 유지한다.
+- 결정: 전투 사망은 현재 선택과 조회 결과에만 영향을 주고 persistent 부대 정의는 삭제하지 않는다.
+- 결정: recall과 UI 인원수 조회는 원본 그룹을 수정하지 않으며, 현재 생존·편성 유닛만 선택 가능하게 한다.
+- 결정: Bench 유닛이 점유된 일반 용병 슬롯을 직접 대체하고 Apply하면 기존 유닛의 모든 부대 지정을 새 `rosterUnitId`로 승계한다.
+- 결정: 구매만 한 경우, 빈 슬롯 배치, 배치 유닛 간 슬롯 교환, 단순 Bench 이동에는 부대 승계를 적용하지 않는다.
+- 결정: 승리·패배·Field·Formation·Shop 이동 후에도 부대 구성과 KeyBindingState를 유지한다.
+- 결정: 브라우저 새로고침 이후 영구 저장은 15단계에서 처리하며 이번 단계에서 localStorage는 사용하지 않는다.
+- 결정: `review-stage-12-v2`는 사용자 통합 테스트 실패와 changes_requested로 보존하고 수정본은 `review-stage-12-v3`로 `review_pending` 제출한다.
+- 상태: 확정
+
+## 12단계 v2 UI 수정 결정 (historical; superseded by v3)
+
+- 결정: 부대 상태 UI는 `RTS_ARENA_BOUNDS` 밖의 좌측 하단 소형 5×2 영역에 배치하고 전투장 중앙에 큰 패널을 두지 않는다.
+- 결정: UI 배경과 텍스트는 적·아군·선택 드래그·적 우클릭·하단 슬롯·Skill 패널을 가리지 않도록 한다.
+- 결정: 내부 groupIndex 0~9는 유지하되 정식 이름은 Group 1~Group 10으로 표시한다.
+- 결정: 실제 호출키는 사용자 설정값을 표시하고, 기본 설정에서 Group 10의 키는 0이다.
+- 결정: `review-stage-12-v1`은 중앙 UI 겹침과 Group 10 표기 문제로 `changes_requested`로 보존하고, 수정본은 `review-stage-12-v2`로 `review_pending` 제출한다.
+- 결정: 사용자 실행 테스트는 아직 `not_tested`이며 12단계 승인 전 `main`을 변경하지 않는다.
+- 상태: 확정
+
+## 12단계 부대 지정과 단축키 설정 결정 (historical; superseded by v3)
+
+- 결정: 부대는 BattleScene 인스턴스의 임시 상태로만 유지하고 새 전투마다 10개 그룹을 초기화한다.
+- 결정: Ctrl+1…Ctrl+9·Ctrl+0은 생존한 선택 ALLY를 저장하고, 1…9·0은 현재 살아 있는 그룹 멤버만 호출한다.
+- 결정: 그룹 멤버는 현재 `battleUnitId`를 사용하고 `slotIndex` 오름차순, `battleUnitId` 순으로 결정적으로 정렬한다.
+- 결정: 사망·오래된 ID는 선택과 모든 그룹에서 제거하며, 부대 호출은 명령·목표·목적지·Guard·Auto Hunt·스킬 쿨다운을 변경하지 않는다.
+- 결정: 숫자 그룹 키와 Whirlwind·First Aid 키는 `testgame.keyBindings` registry에 저장하고, 손상된 값은 전체 기본값으로 복구한다.
+- 결정: 같은 종류의 키 충돌은 두 설정을 교환하고, KeySettingsScene의 Cancel은 draft를 폐기하며 Apply 때만 registry에 저장한다.
+- 결정: 12단계는 `review-stage-12-v1`로 `review_pending` 제출하며 사용자 실행 테스트는 `not_tested`, ChatGPT 코드 검수는 `not_reviewed`로 기록한다.
+- 결정: 12단계 승인 전에는 `main`을 변경하지 않고, 13단계 경험치·레벨·능력치 기능을 구현하지 않는다.
+- 상태: 확정
+
 ## 11단계 최종 승인 및 main 반영 결정
 
 - 결정: `review-stage-11-v1`의 정적 코드 검수를 승인한다.

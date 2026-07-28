@@ -14,6 +14,27 @@ import {
   RTS_RETALIATION_MEMORY_MS,
   RTS_SELECTION_DRAG_THRESHOLD_PX,
 } from "../constants";
+import {
+  createEmptyControlGroups,
+  controlGroupMapToPersistentState,
+  getAvailableControlGroupMemberIds,
+  getControlGroupOrdinalLabel,
+  getOrCreatePersistentControlGroupState,
+  persistentStateToControlGroupMap,
+  recallControlGroup,
+  saveControlGroup,
+  setPersistentControlGroupState,
+  type ControlGroupMap,
+} from "../controlGroups";
+import { getOrCreateFormationState } from "../formationState";
+import {
+  createDefaultKeyBindingState,
+  findControlGroupIndexByCode,
+  getKeyCodeLabel,
+  getOrCreateKeyBindingState,
+  type ControlGroupIndex,
+  type KeyBindingState,
+} from "../keyBindings";
 import { createEnemyIds, getAllyUnitDefinition, getEnemyDefinition } from "../rtsBattleDefinitions";
 import type {
   BattleOutcome,
@@ -31,6 +52,7 @@ import {
   createFormationDestinations,
   distanceBetween,
   findNearestAliveUnit,
+  isWithinDistanceFromAnchor,
   isPointInRectangle,
   moveToward,
   requiredAttackDistance,
@@ -93,6 +115,8 @@ export class BattleScene extends Phaser.Scene {
   private readonly unitVisuals = new Map<string, UnitVisual>();
   private readonly slotVisuals = new Map<number, SlotVisual>();
   private readonly selectedUnitIds = new Set<string>();
+  private keyBindingState: KeyBindingState = createDefaultKeyBindingState();
+  private controlGroups: ControlGroupMap = createEmptyControlGroups();
   private readonly attackLogs: string[] = [];
   private arena!: Phaser.GameObjects.Rectangle;
   private selectionGraphics!: Phaser.GameObjects.Graphics;
@@ -102,22 +126,47 @@ export class BattleScene extends Phaser.Scene {
   private outcomeText!: Phaser.GameObjects.Text;
   private attackLogText!: Phaser.GameObjects.Text;
   private autoHuntButton!: AutoHuntButtonVisual;
+  private readonly controlGroupTexts = new Map<ControlGroupIndex, Phaser.GameObjects.Text>();
   private dragStart: PointerPosition | null = null;
   private dragEnd: PointerPosition | null = null;
   private isDragging = false;
   private suppressArenaPointer = false;
 
-  private readonly handleSkillKeyDown = (event: KeyboardEvent): void => {
-    if (event.repeat || event.ctrlKey || event.altKey || event.metaKey) {
+  private readonly handleBattleKeyDown = (event: KeyboardEvent): void => {
+    if (event.repeat || event.shiftKey) {
       return;
     }
 
-    const skillId = event.key.toUpperCase() === "Q"
+    if (event.ctrlKey && !event.altKey && !event.metaKey) {
+      const groupIndex = findControlGroupIndexByCode(this.keyBindingState, event.code);
+      if (groupIndex !== null) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.saveCurrentSelectionToGroup(groupIndex);
+      }
+      return;
+    }
+
+    if (event.ctrlKey || event.altKey || event.metaKey) {
+      return;
+    }
+
+    const groupIndex = findControlGroupIndexByCode(this.keyBindingState, event.code);
+    if (groupIndex !== null) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.recallGroup(groupIndex);
+      return;
+    }
+
+    const skillId = event.code === this.keyBindingState.whirlwindCode
       ? "whirlwind"
-      : event.key.toUpperCase() === "W"
+      : event.code === this.keyBindingState.firstAidCode
       ? "first-aid"
       : null;
     if (skillId) {
+      event.preventDefault();
+      event.stopPropagation();
       this.useSelectedSkill(skillId);
     }
   };
@@ -153,7 +202,7 @@ export class BattleScene extends Phaser.Scene {
       this.commitResult("VICTORY");
     }
 
-    this.input.keyboard?.on("keydown", this.handleSkillKeyDown, this);
+    this.input.keyboard?.on("keydown", this.handleBattleKeyDown, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanupInput, this);
   }
 
@@ -193,6 +242,12 @@ export class BattleScene extends Phaser.Scene {
     this.resultCommitted = false;
     this.dataError = null;
     this.combatTimeMs = 0;
+    this.keyBindingState = getOrCreateKeyBindingState(this.game.registry);
+    const formation = getOrCreateFormationState(this.game.registry);
+    const ownedRosterUnitIds = new Set(formation.ownedUnits.map((unit) => unit.rosterUnitId));
+    const persistentControlGroups = getOrCreatePersistentControlGroupState(this.game.registry, ownedRosterUnitIds);
+    this.controlGroups = persistentStateToControlGroupMap(persistentControlGroups);
+    this.controlGroupTexts.clear();
     const storedAutoHunt = this.game.registry.get(AUTO_HUNT_REGISTRY_KEY);
     this.autoHuntEnabled = storedAutoHunt === true;
     if (storedAutoHunt === undefined) {
@@ -349,7 +404,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 12, "Stage 10: Formation Battle", {
+    this.add.text(32, 12, "Stage 12: Control Groups", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
@@ -360,10 +415,22 @@ export class BattleScene extends Phaser.Scene {
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "12px",
     });
-    this.add.text(34, 57, "Formation slots and fixed unit identities persist into battle.", {
+    this.add.text(34, 57, "Save and recall living units without changing their orders.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "11px",
+    });
+    this.add.text(280, 43, `Ctrl+${getKeyCodeLabel(this.keyBindingState.controlGroupCodes[0])} save · ${getKeyCodeLabel(this.keyBindingState.controlGroupCodes[0])} recall`, {
+      color: "#f6e8ad",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "10px",
+      fontStyle: "bold",
+    });
+    this.add.text(280, 57, `Whirlwind: ${getKeyCodeLabel(this.keyBindingState.whirlwindCode)} · First Aid: ${getKeyCodeLabel(this.keyBindingState.firstAidCode)}`, {
+      color: "#e9ddff",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "10px",
+      fontStyle: "bold",
     });
     const autoHuntBackground = this.add.rectangle(500, 28, 150, 28, 0x26394b, 1)
       .setStrokeStyle(1, 0x54748a, 1);
@@ -486,7 +553,10 @@ export class BattleScene extends Phaser.Scene {
         .setFillStyle(enabled ? 0x4b3670 : 0x293044, 1)
         .setStrokeStyle(1, enabled ? 0xa78bfa : 0x536078, 1)
         .setVisible(true);
-      button.label.setText(`${definition.hotkey} ${definition.name} · ${status}`).setVisible(true);
+      const keyLabel = skillId === "whirlwind"
+        ? getKeyCodeLabel(this.keyBindingState.whirlwindCode)
+        : getKeyCodeLabel(this.keyBindingState.firstAidCode);
+      button.label.setText(`[${keyLabel}] ${definition.name} · ${status}`).setVisible(true);
       if (enabled) {
         button.background.setInteractive({ useHandCursor: true });
       } else {
@@ -656,7 +726,7 @@ export class BattleScene extends Phaser.Scene {
 
   private addSelectionUi(): void {
     this.selectionGraphics = this.add.graphics();
-    this.selectedInfoText = this.add.text(260, 426, "", {
+    this.selectedInfoText = this.add.text(260, 407, "", {
       color: "#f6e8ad",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "13px",
@@ -671,6 +741,26 @@ export class BattleScene extends Phaser.Scene {
       lineSpacing: 6,
     }).setOrigin(0.5).setDepth(10);
     this.addSkillPanelUi();
+    this.addControlGroupUi();
+  }
+
+  private addControlGroupUi(): void {
+    this.add.rectangle(265, 441, 474, 38, 0x172033, 0.72)
+      .setStrokeStyle(1, 0x54748a, 1)
+      .setDepth(4);
+
+    for (let index = 0; index < RTS_ALLY_COUNT; index += 1) {
+      const groupIndex = index as ControlGroupIndex;
+      const column = index % 5;
+      const row = Math.floor(index / 5);
+      const text = this.add.text(40 + column * 92, 432 + row * 16, "", {
+        color: "#b9cad7",
+        fontFamily: "Segoe UI, sans-serif",
+        fontSize: "9px",
+        fontStyle: "bold",
+      }).setDepth(5);
+      this.controlGroupTexts.set(groupIndex, text);
+    }
   }
 
   private addSkillPanelUi(): void {
@@ -787,9 +877,10 @@ export class BattleScene extends Phaser.Scene {
       let currentTarget = this.getAliveEnemy(unit.currentTargetId);
       let targetLost = false;
       if (currentTarget && unit.commandMode === "LOCAL_ENGAGE" && !this.isTargetWithinGuardLeash(unit, currentTarget)) {
+        targetLost = true;
         unit.currentTargetId = null;
         unit.attackElapsedMs = 0;
-        unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "NONE";
+        unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "LOCAL_ENGAGE";
         unit.state = "IDLE";
         currentTarget = null;
       }
@@ -826,19 +917,13 @@ export class BattleScene extends Phaser.Scene {
       if (unit.commandMode === "ATTACK_MOVE" && unit.commandDestination) {
         unit.state = "MOVING";
         if (moveToward(unit, unit.commandDestination, deltaMs)) {
-          unit.moveDestination = null;
-          unit.commandDestination = null;
-          unit.guardPosition = { x: unit.position.x, y: unit.position.y };
-          unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "NONE";
-          unit.state = "IDLE";
+          this.finishMoveCommand(unit, false);
         }
       } else {
         unit.moveDestination = null;
+        unit.commandDestination = null;
         if (unit.commandMode === "LOCAL_ENGAGE") {
           unit.commandMode = this.autoHuntEnabled ? "AUTO_HUNT" : "NONE";
-        }
-        if (!this.autoHuntEnabled && unit.commandMode === "NONE" && this.updateUnitReturningToGuard(unit, deltaMs)) {
-          continue;
         }
         unit.state = "IDLE";
       }
@@ -937,8 +1022,12 @@ export class BattleScene extends Phaser.Scene {
       return this.findPreferredEnemyTarget(unit, RTS_GUARD_LEASH_RANGE);
     }
 
-    if (targetLost || unit.commandMode === "LOCAL_ENGAGE" || unit.commandMode === "NONE") {
-      return this.findGuardAggroTarget(unit);
+    if (targetLost || unit.commandMode === "LOCAL_ENGAGE") {
+      return this.findGuardAggroTarget(unit, RTS_GUARD_LEASH_RANGE);
+    }
+
+    if (unit.commandMode === "NONE") {
+      return this.findGuardAggroTarget(unit, RTS_GUARD_AGGRO_RANGE);
     }
 
     return null;
@@ -985,10 +1074,15 @@ export class BattleScene extends Phaser.Scene {
     return candidates[0]?.candidate ?? null;
   }
 
-  private findGuardAggroTarget(unit: RTSBattleUnit): RTSBattleUnit | null {
+  private findGuardAggroTarget(
+    unit: RTSBattleUnit,
+    maxGuardDistance: number = RTS_GUARD_AGGRO_RANGE,
+  ): RTSBattleUnit | null {
     if (
       !unit.isAlive ||
       unit.team !== "ALLY" ||
+      !Number.isFinite(maxGuardDistance) ||
+      maxGuardDistance < 0 ||
       !Number.isFinite(unit.guardPosition.x) ||
       !Number.isFinite(unit.guardPosition.y)
     ) {
@@ -1005,16 +1099,12 @@ export class BattleScene extends Phaser.Scene {
     return this.getAliveUnits("ENEMY")
       .map((enemy) => ({
         enemy,
-        guardDistance: distanceBetween(unit.guardPosition, enemy.position),
         currentDistance: distanceBetween(unit.position, enemy.position),
         assignedCount: targetCounts.get(enemy.battleUnitId) ?? 0,
       }))
-      .filter(({ enemy, guardDistance, currentDistance }) => (
+      .filter(({ enemy, currentDistance }) => (
         this.units.get(enemy.battleUnitId) === enemy &&
-        Number.isFinite(enemy.position.x) &&
-        Number.isFinite(enemy.position.y) &&
-        Number.isFinite(guardDistance) &&
-        guardDistance <= RTS_GUARD_AGGRO_RANGE &&
+        isWithinDistanceFromAnchor(unit.guardPosition, enemy.position, maxGuardDistance) &&
         Number.isFinite(currentDistance)
       ))
       .sort((first, second) => (
@@ -1025,36 +1115,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private isTargetWithinGuardLeash(unit: RTSBattleUnit, target: RTSBattleUnit): boolean {
-    const distance = distanceBetween(unit.guardPosition, target.position);
-    return Number.isFinite(distance) && distance <= RTS_GUARD_LEASH_RANGE;
-  }
-
-  private updateUnitReturningToGuard(unit: RTSBattleUnit, deltaMs: number): boolean {
-    if (
-      !Number.isFinite(unit.guardPosition.x) ||
-      !Number.isFinite(unit.guardPosition.y) ||
-      !Number.isFinite(unit.position.x) ||
-      !Number.isFinite(unit.position.y)
-    ) {
-      return false;
-    }
-
-    const guardPosition = constrainToArena(unit.guardPosition, unit.collisionRadius);
-    if (distanceBetween(unit.position, guardPosition) <= RTS_MOVE_ARRIVAL_EPSILON) {
-      unit.position = { x: guardPosition.x, y: guardPosition.y };
-      unit.moveDestination = null;
-      unit.state = "IDLE";
-      return false;
-    }
-
-    unit.moveDestination = { x: guardPosition.x, y: guardPosition.y };
-    unit.state = "MOVING";
-    if (moveToward(unit, guardPosition, deltaMs)) {
-      unit.position = { x: guardPosition.x, y: guardPosition.y };
-      unit.moveDestination = null;
-      unit.state = "IDLE";
-    }
-    return true;
+    return isWithinDistanceFromAnchor(unit.guardPosition, target.position, RTS_GUARD_LEASH_RANGE);
   }
 
   private assignAllyTarget(unit: RTSBattleUnit, target: RTSBattleUnit): void {
@@ -1159,7 +1220,8 @@ export class BattleScene extends Phaser.Scene {
       this.normalizeCompletedMoveCommand(target);
       const isMoving = this.isActiveMoveCommand(target);
       const activeTarget = this.getAliveEnemy(target.currentTargetId);
-      if (!isMoving && !activeTarget) {
+      const canRetaliate = this.autoHuntEnabled || this.isTargetWithinGuardLeash(target, attacker);
+      if (!isMoving && !activeTarget && canRetaliate) {
         target.currentTargetId = attacker.battleUnitId;
         if (target.commandMode === "ATTACK_MOVE") {
           target.moveDestination = null;
@@ -1211,6 +1273,36 @@ export class BattleScene extends Phaser.Scene {
     this.outcomeText.setText(outcome === "VICTORY"
       ? ["VICTORY", `${this.enemyDisplayName} squad defeated.`, `Reward: +${this.goldReward} Gold`]
       : ["DEFEAT", "All allied units are defeated.", "Reward: 0 Gold"]);
+  }
+
+  private saveCurrentSelectionToGroup(groupIndex: ControlGroupIndex): void {
+    if (this.dataError || this.combatState !== "RUNNING") {
+      return;
+    }
+
+    const ids = saveControlGroup(this.controlGroups, groupIndex, this.selectedUnitIds, this.units.values());
+    setPersistentControlGroupState(this.game.registry, controlGroupMapToPersistentState(this.controlGroups));
+    const groupLabel = getControlGroupOrdinalLabel(groupIndex);
+    this.addAttackLog(ids.length > 0
+      ? `Group ${groupLabel} saved: ${ids.length} units.`
+      : `Group ${groupLabel} cleared.`);
+    this.updateUi();
+  }
+
+  private recallGroup(groupIndex: ControlGroupIndex): void {
+    if (this.dataError || this.combatState !== "RUNNING") {
+      return;
+    }
+
+    const ids = recallControlGroup(this.controlGroups, groupIndex, this.units);
+    this.selectedUnitIds.clear();
+    ids.forEach((unitId) => this.selectedUnitIds.add(unitId));
+    this.refreshAllVisuals();
+    const groupLabel = getControlGroupOrdinalLabel(groupIndex);
+    this.addAttackLog(ids.length > 0
+      ? `Group ${groupLabel} recalled: ${ids.length} living units.`
+      : `Group ${groupLabel} has no living units.`);
+    this.updateUi();
   }
 
   private selectSingleUnit(unitId: string): void {
@@ -1407,7 +1499,23 @@ export class BattleScene extends Phaser.Scene {
     this.attackLogText?.setText(["Recent orders", ...(this.attackLogs.length > 0 ? this.attackLogs.slice(-3) : ["No orders yet."])]);
     this.updateAutoHuntUi();
     this.updateSkillUi();
+    this.refreshControlGroupUi();
     this.refreshSlotUi();
+  }
+
+  private refreshControlGroupUi(): void {
+    for (let index = 0; index < RTS_ALLY_COUNT; index += 1) {
+      const groupIndex = index as ControlGroupIndex;
+      const visual = this.controlGroupTexts.get(groupIndex);
+      if (!visual) {
+        continue;
+      }
+      const key = getKeyCodeLabel(this.keyBindingState.controlGroupCodes[groupIndex]);
+      const totalCount = this.controlGroups.get(groupIndex)?.length ?? 0;
+      const livingCount = getAvailableControlGroupMemberIds(this.controlGroups, groupIndex, this.units).length;
+      const ordinal = getControlGroupOrdinalLabel(groupIndex);
+      visual.setText(`G${ordinal} [${key}]: ${totalCount > 0 ? `${livingCount}/${totalCount}` : "--"}`);
+    }
   }
 
   private refreshSlotUi(): void {
@@ -1470,7 +1578,7 @@ export class BattleScene extends Phaser.Scene {
     this.arena?.off("pointerdown", this.handleArenaPointerDown, this);
     this.input.off("pointermove", this.handlePointerMove, this);
     this.input.off("pointerup", this.handlePointerUp, this);
-    this.input.keyboard?.off("keydown", this.handleSkillKeyDown, this);
+    this.input.keyboard?.off("keydown", this.handleBattleKeyDown, this);
   }
 
   private sanitizeGold(value: number): number {

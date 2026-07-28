@@ -1,5 +1,58 @@
 # 현재 개발 상태
 
+## Stage 12 부대 지정과 단축키 설정 — v5 검수 대기
+
+- 현재 검수 태그: `review-stage-12-v5`
+- 작업 브랜치: `stage-12-control-groups-keybinds`
+- 전체 단계: 17단계
+- 현재 단계: 12단계 — 부대 지정과 단축키 설정
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업: 12단계 v4 문서 불일치 수정 완료 — `review-stage-12-v5` 검수 대기 중
+- 완료된 단계: 1단계~11단계
+- 검수 통과된 단계: 1단계~11단계
+- 다음 단계: 13단계 — 경험치·레벨·능력치 성장
+- `main` 정식 반영 여부: 미반영
+- 사용자 실행 테스트: 미실시 (`not_tested`)
+- ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+- 현재 알려진 문제: 기존 `favicon.ico` 404 비차단 경고
+
+### 12단계 구현 요약
+
+- BattleScene에서 Ctrl+1…Ctrl+9·Ctrl+0으로 선택 아군을 저장하고 1…9·0으로 생존 아군을 호출한다.
+- 부대 구성은 `CONTROL_GROUPS_REGISTRY_KEY`에 `rosterUnitId` 기준으로 저장되며 같은 세션의 여러 BattleScene 사이에서 유지된다.
+- 승리·패배와 Field·Formation·Shop 이동 후에도 persistent 부대 원본은 유지된다. recall/UI는 현재 생존·편성 유닛만 필터링하며, 사망·Bench 유닛을 원본에서 삭제하지 않는다.
+- 부대 정의는 사용자가 다시 저장하거나 초기화할 때만 변경되며, 브라우저 새로고침 이후 영구 저장은 아직 구현하지 않는다.
+- KeySettingsScene에서 숫자 부대 키와 Whirlwind·First Aid 키를 registry에 저장하고, 충돌 시 같은 종류의 바인딩을 교환한다.
+- FieldScene Keys 진입과 BattleScene 동적 도움말·부대 UI를 추가했으며 기존 명령·스킬 우선순위를 유지한다.
+- v1에서 중앙 전투장을 덮던 238×132 패널을 제거하고 `RTS_ARENA_BOUNDS` 아래 좌측의 소형 5×2 UI로 이동했다.
+- 정식 이름 Group 1~Group 10과 실제 호출키 1~9·0을 분리해 Group 10을 `Recall: 0 · Save: Ctrl + 0`으로 표시한다.
+- `CONTROL_GROUPS_REGISTRY_KEY`에 `rosterUnitId` 기반 10개 부대를 저장하고 BattleScene마다 깊은 복사해 로드한다.
+- 사망·Bench 유닛은 persistent group에서 삭제하지 않으며, recall/UI는 현재 생존·편성 유닛만 조회한다.
+- Formation에서 Bench 유닛이 일반 용병 슬롯을 직접 대체하고 Apply하면 기존 부대 지정을 승계한다.
+- Auto Hunt OFF 지역 방어는 고정 `guardPosition`을 기준으로 최초 140px, LOCAL_ENGAGE 재탐색 180px를 사용한다.
+- 지역 교전이 끝나도 `guardPosition`으로 자동 귀환하지 않고 현재 위치에서 IDLE로 멈춘다.
+- `guardPosition`은 전투 시작, 사용자 MOVE 성공 완료, Auto Hunt OFF 전환 때만 갱신한다.
+
+### 12단계 검증 기록
+
+- v3 부대 지속·키 바인딩 순수 로직 검사 25개: 통과
+- v4 guard anchor 거리·유효성 순수 검사 10개: 통과
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- 브라우저 자동 확인: 기존 v3 확인 결과를 보존하며, v4 M8/M9 지역 방어 사용자 통합 시나리오는 아직 `not_tested`로 남김
+- v1 검수 결과 (historical): `changes_requested` — 중앙 부대 패널 겹침 및 Group 10 표기 오류
+- v2 검수 결과 (historical): `changes_requested` — 전투별 초기화와 사망/UI 조회에 의한 원본 삭제
+- v3 검수 결과 (historical): `changes_requested` / 사용자 테스트 `failed` — M8·M9가 지역 교전 후 기존 guardPosition으로 자동 귀환
+- 실제 부대 저장·호출, 사망 정리, 명령 보존과 사용자 통합 전투 시나리오는 사용자 실행 테스트 대기이며 통과로 기록하지 않음
+
+12단계 사용자 실행 테스트: 미실시 (`not_tested`)
+12단계 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+12단계 `main` 반영: 미반영
+
+마지막 갱신: 2026-07-28 (Asia/Seoul)
+
 ## Stage 11 shop and recruitment final approval
 
 - 제출 태그: `review-stage-11-v1`
@@ -61,22 +114,22 @@
 ## 단계 정보
 
 - 전체 단계: 17단계
-- 현재 단계: 11단계
-- 현재 단계 이름: 상점·용병 구매 기능
-- 현재 단계 상태: 완료 (`completed`)
-- 상태 코드: `completed`
-- 현재 작업 브랜치: `main`
-- 검수 태그: `review-stage-11-v1` (승인)
-- 완료 태그: `stage-11-completed`
+- 현재 단계: 12단계
+- 현재 단계 이름: 부대 지정과 단축키 설정
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 상태 코드: `review_pending`
+- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 검수 태그: `review-stage-12-v5`
+- 완료 태그: 없음 (검수 대기)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
-- 현재 작업: 11단계 완료 — 12단계 시작 명령 대기 중
-- 다음 단계: 12단계 — 부대 지정과 단축키 설정
-- 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 승인 (`approved`)
-- `main` 정식 반영 여부: 반영 완료
+- 현재 작업: 12단계 v4 문서 불일치 수정 완료 — `review-stage-12-v5` 검수 대기 중
+- 다음 단계: 13단계 — 경험치·레벨·능력치 성장
+- 사용자 실행 테스트: 미실시 (`not_tested`)
+- ChatGPT 코드 검수: 미실시 (`not_reviewed`)
+- `main` 정식 반영 여부: 미반영
 
-현재 단계 번호는 11로 유지한다. 1단계부터 11단계까지 `main`에 반영되어 완료됐고, 12단계는 별도 시작 명령 전까지 시작하지 않는다.
+현재 단계 번호는 12로 유지한다. 1단계부터 11단계까지 `main`에 반영되어 완료됐고, 12단계는 검수 승인 전까지 `review_pending`으로 유지한다. 13단계는 시작하지 않는다.
 
 ## 마지막 작업 요약
 

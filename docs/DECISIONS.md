@@ -1,11 +1,21 @@
 # 프로젝트 결정 사항
 
-## 12단계 v5 문서 일치성 결정 (검수 재제출)
+## 12단계 최종 승인 및 main 반영 결정
+
+- 결정: `review-stage-12-v5`의 ChatGPT 정적 코드 검수를 승인한다.
+- 결정: 사용자가 M8·M9 비귀환, 타깃 상실 후 재탐색, 주변 적 부재 시 현재 위치 정지, 다음 전투 부대 지속을 직접 확인했으므로 사용자 실행 테스트를 `passed`로 기록한다.
+- 결정: 승인 커밋 `2a5a41a1122226e79b503c310269b821756f4b9a`를 `main`에 no-ff 병합한다.
+- 결정: persistent control groups, configurable key bindings, direct replacement inheritance, fixed guard anchor와 자동 귀환 제거를 12단계 완료 범위로 확정한다.
+- 결정: 12단계를 `completed`로 확정하고 최종 완료 문서 커밋에 `stage-12-completed` 태그를 생성한다.
+- 결정: 13단계 경험치·레벨·능력치 기능은 별도 작업 브랜치와 시작 명령 전까지 구현하지 않는다.
+- 상태: 확정
+
+## 12단계 v5 문서 일치성 결정 (historical; superseded by final approval)
 
 - 결정: 현재 구현 설명은 `CONTROL_GROUPS_REGISTRY_KEY`와 `rosterUnitId`를 기준으로 같은 세션에서 유지되는 persistent 부대 설계를 설명해야 한다.
 - 결정: 사망·Bench 유닛은 persistent 부대 원본에서 삭제하지 않으며, recall/UI에서 현재 생존·편성 유닛만 필터링한다.
 - 결정: `docs/STATUS.md`에 남아 있던 BattleScene별 초기화·사망 ID 즉시 삭제 설명은 과거 구현 기록과 현재 구현을 혼동하므로 현재 요약에서 제거한다.
-- 결정: `review-stage-12-v4`와 v4의 `changes_requested` 기록은 보존하고, 문서 정정본을 `review-stage-12-v5`로 `review_pending` 제출한다.
+- 결정: `review-stage-12-v4`와 v4의 `changes_requested` 기록은 보존하고, 문서 정정본을 `review-stage-12-v5`로 제출했다. 이후 최종 승인을 거쳐 `main`에 반영했다.
 - 결정: v4 사용자 실행 테스트는 실행하지 않았으므로 `not_tested`로 유지한다.
 - 결정: 13단계 경험치·레벨·능력치 기능은 별도 승인·시작 명령 전까지 구현하지 않는다.
 - 상태: 확정

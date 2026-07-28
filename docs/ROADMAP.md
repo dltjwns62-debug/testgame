@@ -1,22 +1,23 @@
 # Test Game 개발 로드맵
 
-## Stage 12 v5 current submission
+## Stage 12 final approval
 
 - 전체 단계: 17단계
 - 현재 단계: 12단계 — 부대 지정과 단축키 설정
-- 단계 상태: `review_pending`
-- 작업 브랜치: `stage-12-control-groups-keybinds`
-- 검수 태그: `review-stage-12-v5`
-- 완료된 단계: 1단계~11단계
+- 단계 상태: `completed`
+- 작업 브랜치: `main`
+- 승인 검수 태그: `review-stage-12-v5`
+- 완료 태그: `stage-12-completed`
+- 완료된 단계: 1단계~12단계
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
-- `main` 반영 여부: 미반영
-- 사용자 실행 테스트: `not_tested`
-- ChatGPT 코드 검수: `not_reviewed`
+- `main` 반영 여부: 반영 완료
+- 사용자 실행 테스트: `passed`
+- ChatGPT 코드 검수: `approved`
 - v1 결과 (historical): `changes_requested` — 중앙 부대 패널이 전투 유닛을 가리고 Group 10이 Group 0으로 표시됨
 - v2 결과 (historical): `changes_requested` — 부대가 BattleScene마다 초기화되고 사망·UI 조회가 부대 원본을 삭제함
 - v3 결과 (historical): `changes_requested` / 사용자 실행 테스트 `failed` — Auto Hunt OFF에서 M8·M9가 전투 후 guardPosition으로 자동 귀환함
 - v4 제출: 고정 guardPosition 기준 지역 방어와 자동 귀환 제거, 소스 검수 승인 가능
-- v5 제출: 현재 구현 요약의 문서 불일치 정정, 검수 대기
+- v5 결과: `approved` — ChatGPT 정적 검수와 사용자 통합 실행 테스트 통과
 
 ## Stage 9 v3 resubmission scope
 
@@ -42,8 +43,8 @@
 - 전체 단계: 17단계
 - 현재 단계: 12단계
 - 현재 단계 이름: 부대 지정과 단축키 설정
-- 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
+- 현재 단계 상태: 완료 (`completed`)
+- 현재 작업 브랜치: `main`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -70,13 +71,14 @@
 - 12단계 최초 검수 태그: `review-stage-12-v1` — UI 수정 요청
 - 12단계 2차 검수 태그: `review-stage-12-v2` — 사용자 통합 테스트 수정 요청
 - 12단계 v3 검수 태그: `review-stage-12-v3` — 사용자 테스트 수정 요청
-- 12단계 현재 검수 태그: `review-stage-12-v5`
+- 12단계 승인 검수 태그: `review-stage-12-v5`
+- 12단계 완료 태그: `stage-12-completed`
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
-- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
-- 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
-- `main` 반영 여부: 1단계부터 11단계까지 반영 완료
+- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계
+- 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계
+- `main` 반영 여부: 1단계부터 12단계까지 반영 완료
 
-현재 단계 번호는 12이며, 12단계 `review-stage-12-v5` 문서 정정본을 작업 브랜치에 제출하고 검수를 기다리는 중이다. 13단계는 별도의 승인·시작 명령 전까지 시작하지 않는다.
+현재 단계 번호는 12이며, 12단계 `review-stage-12-v5`는 승인되어 `main`에 반영됐다. 13단계는 별도의 브랜치·시작 명령 전까지 시작하지 않는다.
 
 각 단계의 상태는 다음 값으로 관리한다.
 
@@ -87,7 +89,7 @@
 - `approved`: 검수 통과, 병합 대기
 - `completed`: `main` 반영까지 완료
 
-각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 12이며, 1단계부터 11단계까지 `main` 반영이 완료됐다. 12단계는 검수 승인 전까지 `review_pending`으로 유지한다.
+각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 12이며, 1단계부터 12단계까지 `main` 반영이 완료됐다. 12단계는 `completed` 상태이고, 13단계는 별도 브랜치·시작 명령 전까지 시작하지 않는다.
 
 검수 대상 버전은 tracked 파일 안의 현재 커밋 해시가 아니라 변경되지 않는 Git 태그로 관리한다. 검수 태그는 `review-stage-XX-vN` 형식을 사용하고, 기존 원격 태그는 이동하거나 덮어쓰지 않는다. 1단계 승인 태그는 `review-stage-01-v1`이며, 2단계 최초 검수 태그 `review-stage-02-v1`은 수정 요청 기록으로 보존하고 현재 재검수 태그는 `review-stage-02-v2`다.
 
@@ -562,7 +564,7 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 
 ### 단계 상태
 
-`review_pending` — `review-stage-12-v5` 제출, `main` 미반영
+`completed` — `review-stage-12-v5` 승인 및 `stage-12-completed` 생성, `main` 반영 완료
 
 ### 목표
 
@@ -603,8 +605,8 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 - [x] MOVE 성공 완료와 Auto Hunt OFF 전환에서만 guardPosition을 갱신한다.
 - [x] 새로고침 이후 영구 저장은 구현하지 않는다.
 - [x] `npm ci`, typecheck, build, dev 및 제한된 브라우저 자동 확인을 완료한다.
-- [ ] 사용자 수동 통합 테스트를 실행한다.
-- [ ] ChatGPT 코드 검수를 승인받고 `main`에 반영한다.
+- [x] 사용자 통합 테스트를 실행하고 통과한다.
+- [x] ChatGPT 코드 검수를 승인받고 `main`에 반영한다.
 
 ### 해당 단계에서 구현하지 않을 항목
 

@@ -1,19 +1,20 @@
 # 실행 및 테스트 기록
 
-## Stage 12 지역 방어 AI — v5 문서 정정 검수 대기
+## Stage 12 부대 지정과 단축키 설정 — v5 최종 승인
 
-- 현재 작업 브랜치: `stage-12-control-groups-keybinds`
-- 현재 검수 태그: `review-stage-12-v5`
-- 12단계 상태: 검수 대기 (`review_pending`)
-- v4 소스 검수: 승인 가능. 다만 `docs/STATUS.md`의 현재 구현 요약에 과거 초기화 설명이 남아 전체 제출은 `changes_requested`로 기록하고 v5에서 문서만 정정한다.
-- v4 사용자 실행 테스트: 미실시 (`not_tested`)
+- 현재 작업 브랜치: `main`
+- 승인 검수 태그: `review-stage-12-v5`
+- 완료 태그: `stage-12-completed`
+- 12단계 상태: 완료 (`completed`)
+- ChatGPT 정적 코드 검수: 승인 (`approved`)
+- 사용자 통합 실행 테스트: 통과 (`passed`)
 
-### v4 코드·자동 검사 기록
+### 병합 후 자동 검사 기록
 
-- `npm ci`: 통과 (`passed`)
-- `npm run typecheck`: 통과 (`passed`)
-- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
-- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- 병합 후 `npm ci`: 통과 (`passed`)
+- 병합 후 `npm run typecheck`: 통과 (`passed`)
+- 병합 후 `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- 병합 후 `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
 - `project-status.json` JSON 파싱: 통과 (`valid`)
 - 고정 guard anchor 140px·180px 경계와 NaN·음수 방어 순수 검사 10개: 통과
 - `updateUnitReturningToGuard` 소스 참조 제거 확인
@@ -21,7 +22,7 @@
 - v3 부대 지속·키 바인딩 순수 로직 검사 25개: 통과
 - v4 guard anchor 거리·유효성 순수 검사 10개: 통과
 
-### v4 브라우저·사용자 검사
+### v4 브라우저·사용자 검사 (historical; superseded by v5)
 
 아직 실행하지 못한 검사는 통과로 기록하지 않는다.
 
@@ -33,9 +34,17 @@
 - [ ] Auto Hunt ON·FOCUS_ATTACK·반격·ATTACK_MOVE 회귀 확인
 - [ ] 부대 지속·편성 교체 승계·Group 10·키 설정·스킬 회귀 확인
 
-12단계 v4 사용자 실행 테스트: 미실시 (`not_tested`)
-12단계 v4 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
-12단계 v4 `main` 반영: 미반영
+### v5 사용자 통합 테스트
+
+- [x] Auto Hunt OFF에서 M8·M9가 적에게 접근한 뒤 원래 위치로 돌아가지 않음
+- [x] 첫 타깃 사망 후 근처 다른 적을 탐색함
+- [x] 근처 적이 없으면 싸우던 현재 위치에서 멈춤
+- [x] 전투 종료 후 다음 전투에서도 기존 부대 구성이 유지됨
+- 브라우저 자동화: 이번 병합 과정에서는 실행하지 않음 (`not_tested`)
+
+12단계 v5 사용자 실행 테스트: 통과 (`passed`)
+12단계 v5 ChatGPT 코드 검수: 승인 (`approved`)
+12단계 v5 `main` 반영: 완료 (`stage-12-completed`)
 
 ## Stage 12 부대 지정과 단축키 설정 — v3 검수 기록 (historical)
 

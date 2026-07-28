@@ -46,5 +46,7 @@ export function createOwnedUnitFromOffer(offer: ShopOffer): OwnedRosterUnit {
     unitDefinitionId: offer.unitDefinitionId,
     unitRole: "MERCENARY",
     displayName: offer.displayName,
+    level: 1,
+    experience: 0,
   };
 }

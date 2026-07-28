@@ -74,6 +74,7 @@ export type MonsterDefinition = {
   attackDamage: number;
   attackIntervalMs: number;
   goldReward: number;
+  experienceReward: number;
 };
 
 export const PLAYER_POSITION = {
@@ -92,6 +93,7 @@ export const MONSTERS: readonly MonsterDefinition[] = [
     attackDamage: MONSTER_ATTACK_DAMAGE,
     attackIntervalMs: MONSTER_ATTACK_INTERVAL_MS,
     goldReward: 10,
+    experienceReward: 100,
   },
   {
     id: "slime-2",
@@ -103,6 +105,7 @@ export const MONSTERS: readonly MonsterDefinition[] = [
     attackDamage: MONSTER_ATTACK_DAMAGE,
     attackIntervalMs: MONSTER_ATTACK_INTERVAL_MS,
     goldReward: 10,
+    experienceReward: 120,
   },
   {
     id: "slime-3",
@@ -114,6 +117,7 @@ export const MONSTERS: readonly MonsterDefinition[] = [
     attackDamage: MONSTER_ATTACK_DAMAGE,
     attackIntervalMs: MONSTER_ATTACK_INTERVAL_MS,
     goldReward: 10,
+    experienceReward: 150,
   },
   {
     id: "slime-4",
@@ -125,5 +129,6 @@ export const MONSTERS: readonly MonsterDefinition[] = [
     attackDamage: 12,
     attackIntervalMs: 1000,
     goldReward: 25,
+    experienceReward: 200,
   },
 ];

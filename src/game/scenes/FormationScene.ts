@@ -15,6 +15,7 @@ import {
   setFormationState,
 } from "../formationState";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
+import { formatProgression } from "../progression";
 import type { FormationState, OwnedRosterUnit } from "../rtsBattleTypes";
 import type { FieldScene } from "./FieldScene";
 
@@ -71,7 +72,7 @@ export class FormationScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 18, "Stage 11: Formation & Roster", {
+    this.add.text(32, 18, "Stage 13: Formation & Growth", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
@@ -430,7 +431,7 @@ export class FormationScene extends Phaser.Scene {
     const required = unit.unitRole === "MAIN_CHARACTER" ? " · Required" : "";
     const skills = this.hasSkills(unit) ? " · Skills Q/W" : "";
     const placement = slotIndex === null ? "Bench" : `Slot ${getFormationSlotLabel(slotIndex)}`;
-    return `${unit.displayName} · ${role}${required}${skills} · ${placement}`;
+    return `${unit.displayName} · ${formatProgression(unit)} · ${role}${required}${skills} · ${placement}`;
   }
 
   private getOwnedUnitDetails(unit: OwnedRosterUnit, slotIndex: number | null): string {
@@ -438,14 +439,14 @@ export class FormationScene extends Phaser.Scene {
     const required = unit.unitRole === "MAIN_CHARACTER" ? " · Required" : "";
     const skills = this.hasSkills(unit) ? " · Skills Q/W" : "";
     const placement = slotIndex === null ? "Bench" : `Slot ${getFormationSlotLabel(slotIndex)}`;
-    return `${role}${required}${skills}\n${placement}`;
+    return `${formatProgression(unit)}\n${role}${required}${skills} · ${placement}`;
   }
 
   private getSlotStatus(unit: OwnedRosterUnit): string {
     if (unit.unitRole === "MAIN_CHARACTER") {
-      return "Required";
+      return `${formatProgression(unit)}\nRequired`;
     }
-    return this.hasSkills(unit) ? "Skills Q/W" : "Mercenary";
+    return `${formatProgression(unit)}\n${this.hasSkills(unit) ? "Skills Q/W" : "Mercenary"}`;
   }
 
   private hasSkills(unit: OwnedRosterUnit): boolean {

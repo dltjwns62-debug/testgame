@@ -1,8 +1,8 @@
 # Test Game
 
-## Stage 12 v4 review submission
+## Stage 12 v5 documentation correction submission
 
-12단계 **부대 지정과 단축키 설정**의 v3 사용자 실행 테스트에서 발견된 지역 방어 자동 귀환 문제를 수정했다. 현재 상태는 `review_pending`이며 검수 태그는 `review-stage-12-v4`이다. 이 제출은 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않았다.
+12단계 **부대 지정과 단축키 설정**의 v4 소스 수정본에 남아 있던 문서 불일치를 정정해 v5로 재제출했다. 현재 상태는 `review_pending`이며 검수 태그는 `review-stage-12-v5`이다. 이 제출은 `main`에 병합하지 않았고 `stage-12-completed` 태그도 생성하지 않았다.
 
 부대 구성은 `CONTROL_GROUPS_REGISTRY_KEY` registry에 `rosterUnitId` 기준으로 저장해 같은 게임 세션의 여러 BattleScene·Field·Formation·Shop 이동 사이에서 유지한다. 전투 사망과 Bench 상태는 부대 원본을 삭제하지 않으며, recall과 UI 인원수는 현재 생존·편성 유닛만 조회한다. Bench 유닛이 배치된 일반 용병 슬롯을 직접 대체하면 Apply 시 기존 부대 지정을 새 유닛이 승계한다.
 
@@ -53,7 +53,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 현재 단계 이름: 부대 지정과 단축키 설정
 - 현재 상태: 검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
-- 검수 태그: `review-stage-12-v4`
+- 검수 태그: `review-stage-12-v5`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계
 - 다음 단계: 13단계 — 경험치·레벨·능력치 성장
 
@@ -109,4 +109,4 @@ npm run typecheck
 npm run build
 ```
 
-1단계부터 11단계까지는 `main`에 반영됐다. 12단계는 `stage-12-control-groups-keybinds`에서 검수 대기 중이며, 다음 예정 단계는 13단계다. 13단계 기능은 별도 승인·시작 명령 전까지 구현하지 않는다.
+1단계부터 11단계까지는 `main`에 반영됐다. 12단계 v5 문서 정정본은 `stage-12-control-groups-keybinds`에서 검수 대기 중이며, 다음 예정 단계는 13단계다. 13단계 기능은 별도 승인·시작 명령 전까지 구현하지 않는다.

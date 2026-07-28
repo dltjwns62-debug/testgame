@@ -1,5 +1,15 @@
 # 프로젝트 결정 사항
 
+## 12단계 v5 문서 일치성 결정 (검수 재제출)
+
+- 결정: 현재 구현 설명은 `CONTROL_GROUPS_REGISTRY_KEY`와 `rosterUnitId`를 기준으로 같은 세션에서 유지되는 persistent 부대 설계를 설명해야 한다.
+- 결정: 사망·Bench 유닛은 persistent 부대 원본에서 삭제하지 않으며, recall/UI에서 현재 생존·편성 유닛만 필터링한다.
+- 결정: `docs/STATUS.md`에 남아 있던 BattleScene별 초기화·사망 ID 즉시 삭제 설명은 과거 구현 기록과 현재 구현을 혼동하므로 현재 요약에서 제거한다.
+- 결정: `review-stage-12-v4`와 v4의 `changes_requested` 기록은 보존하고, 문서 정정본을 `review-stage-12-v5`로 `review_pending` 제출한다.
+- 결정: v4 사용자 실행 테스트는 실행하지 않았으므로 `not_tested`로 유지한다.
+- 결정: 13단계 경험치·레벨·능력치 기능은 별도 승인·시작 명령 전까지 구현하지 않는다.
+- 상태: 확정
+
 ## 12단계 v4 지역 방어 기준점 결정 (검수 재제출)
 
 - 결정: Auto Hunt OFF 아군은 고정 `guardPosition` 기준으로 지역 방어를 수행한다.
@@ -29,7 +39,7 @@
 - 결정: `review-stage-12-v2`는 사용자 통합 테스트 실패와 changes_requested로 보존하고 수정본은 `review-stage-12-v3`로 `review_pending` 제출한다.
 - 상태: 확정
 
-## 12단계 v2 UI 수정 결정 (검수 재제출)
+## 12단계 v2 UI 수정 결정 (historical; superseded by v3)
 
 - 결정: 부대 상태 UI는 `RTS_ARENA_BOUNDS` 밖의 좌측 하단 소형 5×2 영역에 배치하고 전투장 중앙에 큰 패널을 두지 않는다.
 - 결정: UI 배경과 텍스트는 적·아군·선택 드래그·적 우클릭·하단 슬롯·Skill 패널을 가리지 않도록 한다.
@@ -39,7 +49,7 @@
 - 결정: 사용자 실행 테스트는 아직 `not_tested`이며 12단계 승인 전 `main`을 변경하지 않는다.
 - 상태: 확정
 
-## 12단계 부대 지정과 단축키 설정 결정 (검수 제출)
+## 12단계 부대 지정과 단축키 설정 결정 (historical; superseded by v3)
 
 - 결정: 부대는 BattleScene 인스턴스의 임시 상태로만 유지하고 새 전투마다 10개 그룹을 초기화한다.
 - 결정: Ctrl+1…Ctrl+9·Ctrl+0은 생존한 선택 ALLY를 저장하고, 1…9·0은 현재 살아 있는 그룹 멤버만 호출한다.

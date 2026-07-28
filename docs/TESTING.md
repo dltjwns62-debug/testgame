@@ -1,13 +1,14 @@
 # 실행 및 테스트 기록
 
-## Stage 12 지역 방어 AI — v4 검수 대기
+## Stage 12 지역 방어 AI — v5 문서 정정 검수 대기
 
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
-- 현재 검수 태그: `review-stage-12-v4`
+- 현재 검수 태그: `review-stage-12-v5`
 - 12단계 상태: 검수 대기 (`review_pending`)
-- v3 결과: `changes_requested` / 사용자 실행 테스트 `failed` — Auto Hunt OFF에서 M8·M9가 지역 교전 뒤 기존 guardPosition으로 자동 귀환함
+- v4 소스 검수: 승인 가능. 다만 `docs/STATUS.md`의 현재 구현 요약에 과거 초기화 설명이 남아 전체 제출은 `changes_requested`로 기록하고 v5에서 문서만 정정한다.
+- v4 사용자 실행 테스트: 미실시 (`not_tested`)
 
-### v4 코드·자동 검사
+### v4 코드·자동 검사 기록
 
 - `npm ci`: 통과 (`passed`)
 - `npm run typecheck`: 통과 (`passed`)
@@ -15,8 +16,10 @@
 - `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
 - `project-status.json` JSON 파싱: 통과 (`valid`)
 - 고정 guard anchor 140px·180px 경계와 NaN·음수 방어 순수 검사 10개: 통과
-- `updateUnitReturningToGuard` 참조 제거 확인
+- `updateUnitReturningToGuard` 소스 참조 제거 확인
 - guardPosition 기반 140px 최초 감지와 180px LOCAL_ENGAGE 재탐색 코드 확인
+- v3 부대 지속·키 바인딩 순수 로직 검사 25개: 통과
+- v4 guard anchor 거리·유효성 순수 검사 10개: 통과
 
 ### v4 브라우저·사용자 검사
 
@@ -85,7 +88,7 @@
 12단계 v3 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 12단계 v3 `main` 반영: 미반영
 
-## Stage 12 부대 지정과 단축키 설정 — v2 검수 기록
+## Stage 12 부대 지정과 단축키 설정 — v2 검수 기록 (historical; superseded by v3)
 
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
 - 현재 검수 태그: `review-stage-12-v2`
@@ -121,7 +124,7 @@
 12단계 v2 ChatGPT 코드 검수: 미실시 (`not_reviewed`)
 12단계 v2 `main` 반영: 미반영
 
-## Stage 12 부대 지정과 단축키 설정 — v1 검수 기록
+## Stage 12 부대 지정과 단축키 설정 — v1 검수 기록 (historical; superseded by v3)
 
 - 현재 작업 브랜치: `stage-12-control-groups-keybinds`
 - 현재 검수 태그: `review-stage-12-v1`

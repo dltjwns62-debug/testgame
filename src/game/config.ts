@@ -3,6 +3,7 @@ import { BattleScene } from "./scenes/BattleScene";
 import { FieldScene } from "./scenes/FieldScene";
 import { FormationScene } from "./scenes/FormationScene";
 import { KeySettingsScene } from "./scenes/KeySettingsScene";
+import { InventoryScene } from "./scenes/InventoryScene";
 import { ShopScene } from "./scenes/ShopScene";
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
@@ -17,5 +18,5 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 960,
     height: 540,
   },
-  scene: [FieldScene, FormationScene, ShopScene, KeySettingsScene, BattleScene],
+  scene: [FieldScene, FormationScene, ShopScene, KeySettingsScene, InventoryScene, BattleScene],
 };

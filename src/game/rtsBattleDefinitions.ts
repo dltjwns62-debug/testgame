@@ -6,7 +6,9 @@ import {
   RTS_TRIAL_MAIN_CHARACTER,
   RTS_TRIAL_MERCENARY,
 } from "./constants";
+import { getMonsterDropTable } from "./items";
 import type { EnemyDefinition, OwnedRosterUnit, RosterEntry, UnitRole, UnitSkillId } from "./rtsBattleTypes";
+import type { WeaponCategory } from "./items";
 
 export type AllyUnitDefinition = {
   id: string;
@@ -15,11 +17,13 @@ export type AllyUnitDefinition = {
   color: number;
   maxHp: number;
   attackDamage: number;
+  defense: number;
   attackIntervalMs: number;
   moveSpeed: number;
   attackRange: number;
   collisionRadius: number;
   skills: readonly UnitSkillId[];
+  allowedWeaponCategories: readonly WeaponCategory[];
 };
 
 const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
@@ -30,6 +34,7 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     color: 0xf4d35e,
     ...RTS_TRIAL_MAIN_CHARACTER,
     skills: [],
+    allowedWeaponCategories: ["melee"],
   },
   {
     id: "trial-mercenary",
@@ -38,6 +43,7 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     color: 0x63b3ed,
     ...RTS_TRIAL_MERCENARY,
     skills: [],
+    allowedWeaponCategories: ["melee"],
   },
   {
     id: "trial-skill-mercenary",
@@ -46,6 +52,7 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     color: 0xa78bfa,
     ...RTS_TRIAL_MERCENARY,
     skills: ["whirlwind", "first-aid"],
+    allowedWeaponCategories: ["magic"],
   },
   {
     id: "mercenary-swordsman",
@@ -54,11 +61,13 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     color: 0xf97316,
     maxHp: 85,
     attackDamage: 10,
+    defense: 3,
     attackIntervalMs: 1000,
     moveSpeed: 105,
     attackRange: 8,
     collisionRadius: 12,
     skills: [],
+    allowedWeaponCategories: ["melee"],
   },
   {
     id: "mercenary-guardian",
@@ -67,11 +76,13 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     color: 0x34d399,
     maxHp: 115,
     attackDamage: 7,
+    defense: 8,
     attackIntervalMs: 1200,
     moveSpeed: 85,
     attackRange: 8,
     collisionRadius: 13,
     skills: [],
+    allowedWeaponCategories: ["melee"],
   },
   {
     id: "mercenary-scout",
@@ -80,11 +91,13 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     color: 0xf472b6,
     maxHp: 65,
     attackDamage: 11,
+    defense: 1,
     attackIntervalMs: 900,
     moveSpeed: 125,
     attackRange: 8,
     collisionRadius: 11,
     skills: [],
+    allowedWeaponCategories: ["ranged"],
   },
 ];
 
@@ -108,6 +121,7 @@ export function getEnemyDefinition(monsterId: string): EnemyDefinition | null {
     color: monster.color,
     goldReward: monster.goldReward,
     experienceReward: monster.experienceReward,
+    dropTable: getMonsterDropTable(monster.id),
     ...stats,
   };
 }

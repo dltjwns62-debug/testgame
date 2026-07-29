@@ -15,6 +15,7 @@ import {
   setFormationState,
 } from "../formationState";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
+import { calculateFinalUnitStats, getEquippedModifierTotals, getOrCreateInventoryState } from "../items";
 import { formatProgression } from "../progression";
 import type { FormationState, OwnedRosterUnit } from "../rtsBattleTypes";
 import type { FieldScene } from "./FieldScene";
@@ -72,13 +73,13 @@ export class FormationScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 18, "Stage 13: Formation & Growth", {
+    this.add.text(32, 18, "Stage 14: Formation & Equipment", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
-    this.add.text(34, 52, "Arrange up to 13 owned units. Hero must remain deployed.", {
+    this.add.text(34, 52, "Arrange units and review their current equipment-ready stats.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "13px",
@@ -431,7 +432,7 @@ export class FormationScene extends Phaser.Scene {
     const required = unit.unitRole === "MAIN_CHARACTER" ? " · Required" : "";
     const skills = this.hasSkills(unit) ? " · Skills Q/W" : "";
     const placement = slotIndex === null ? "Bench" : `Slot ${getFormationSlotLabel(slotIndex)}`;
-    return `${unit.displayName} · ${formatProgression(unit)} · ${role}${required}${skills} · ${placement}`;
+    return `${unit.displayName} · ${formatProgression(unit)} · ${this.getFinalStatsSummary(unit)} · ${role}${required}${skills} · ${placement}`;
   }
 
   private getOwnedUnitDetails(unit: OwnedRosterUnit, slotIndex: number | null): string {
@@ -451,5 +452,17 @@ export class FormationScene extends Phaser.Scene {
 
   private hasSkills(unit: OwnedRosterUnit): boolean {
     return (getAllyUnitDefinition(unit.unitDefinitionId)?.skills.length ?? 0) > 0;
+  }
+
+  private getFinalStatsSummary(unit: OwnedRosterUnit): string {
+    const definition = getAllyUnitDefinition(unit.unitDefinitionId);
+    const stats = calculateFinalUnitStats(
+      definition?.maxHp ?? 1,
+      definition?.attackDamage ?? 1,
+      definition?.defense ?? 0,
+      unit.level,
+      getEquippedModifierTotals(getOrCreateInventoryState(this.game.registry), unit.rosterUnitId),
+    );
+    return "HP " + stats.maxHp + " · ATK " + stats.attackDamage + " · DEF " + stats.defense;
   }
 }

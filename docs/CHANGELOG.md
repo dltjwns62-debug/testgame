@@ -1,5 +1,17 @@
 # 변경 이력
 
+## 2026-07-30 — 15단계 저장과 오프라인 진행 구현 및 검수 제출
+
+- `stage-15-save-offline-progress` 브랜치에서 저장·복구·Repeat Hunt·방치 보상을 구현함
+- SaveEnvelope schemaVersion 1, FNV-1a checksum, primary/backup/temp/recovery 안전 저장과 미래 버전 차단 추가
+- BootstrapScene에서 저장을 먼저 복원하고 FieldScene을 시작하도록 연결함
+- Formation, Gold, KeyBinding, Control Group, Inventory, Battle Auto Hunt와 AutoProgress 저장 추가
+- Repeat Hunt 대상 선택·승리 해금·전투 자동 복귀·Defeat 중단·메뉴 일시정지 추가
+- 방치 Gold·출전 유닛 EXP·결정적 아이템 드롭과 8시간·100개 cap 추가
+- SaveDataScene, Save Now, Reset Save 이중 확인, 저장 상태 UI 추가
+- `review-stage-15-v1`로 검수 제출하며 `main`에는 병합하지 않음
+- 사용자 수동 테스트는 `skipped_by_user`로 기록하고 통과로 간주하지 않음
+
 ## 2026-07-30 — 14단계 검수 승인 및 main 반영 — 완료
 
 - 승인 검수 태그 `review-stage-14-v2`와 승인 커밋 `c61bcf0c14b1520733b707a7acd62b3ed90eeccd`을 확인했다.

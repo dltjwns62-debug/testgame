@@ -2,22 +2,37 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 14,
-  "currentStageName": "아이템·인벤토리·장비",
-  "stageStatus": "completed",
-  "activeTask": "14단계 완료 — 15단계 저장과 오프라인 진행 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 15,
+  "currentStageName": "저장과 오프라인 진행",
+  "stageStatus": "review_pending",
+  "activeTask": "15단계 구현 완료 및 ChatGPT 검수 대기",
+  "workingBranch": "stage-15-save-offline-progress",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-  "nextStage": 15,
-  "nextStageName": "저장과 오프라인 진행",
+  "nextStage": 16,
+  "nextStageName": "성능 및 안정화",
   "reviewSubmission": {
-    "branch": "stage-14-items-inventory-equipment",
-    "tag": "review-stage-14-v2",
-    "version": 2,
+    "branch": "stage-15-save-offline-progress",
+    "tag": "review-stage-15-v1",
+    "version": 1,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 15,
+      "branch": "stage-15-save-offline-progress",
+      "tag": "review-stage-15-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자 요청에 따라 수동 테스트를 요구하지 않음",
+      "mainBranchMerged": false
+    },
     {
       "stage": 14,
       "branch": "stage-14-items-inventory-equipment",
@@ -498,9 +513,9 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-30T00:40:00+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
@@ -509,12 +524,12 @@
     "devServer": "passed",
     "browserAutomation": "partial_passed",
     "userRunTest": "skipped_by_user",
-    "userRunTestReason": "사용자 요청에 따라 14단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "approved"
+    "userRunTestReason": "사용자 요청에 따라 15단계 수동 테스트를 요구하지 않음",
+    "chatGptCodeReview": "pending"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-30T00:40:00+09:00"
+  "lastUpdated": "2026-07-30T01:40:18+09:00"
 }

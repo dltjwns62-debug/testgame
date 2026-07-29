@@ -219,10 +219,10 @@ export class InventoryScene extends Phaser.Scene {
         fontSize: "9px",
         wordWrap: { width: 150 },
       });
-      const button = this.add.rectangle(697, y, 62, 24, 0x536078, 1)
+      const button = this.add.rectangle(580, y, 62, 24, 0x536078, 1)
         .setStrokeStyle(1, 0x9ce4b0, 0.8)
         .setInteractive({ useHandCursor: true });
-      const buttonLabel = this.add.text(697, y, "Unequip", {
+      const buttonLabel = this.add.text(580, y, "Unequip", {
         color: "#f3f8e9",
         fontFamily: "Segoe UI, sans-serif",
         fontSize: "8px",
@@ -483,7 +483,7 @@ export class InventoryScene extends Phaser.Scene {
     if (!unit) {
       return;
     }
-    const result = tryUnequipItem(this.game.registry, unit.rosterUnitId, slotType);
+    const result = tryUnequipItem(this.game.registry, unit.rosterUnitId, unit, slotType);
     if (result.ok) {
       this.setStatus("Equipment removed.", "#c4e4d0");
       this.refreshUi();

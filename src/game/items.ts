@@ -1,5 +1,5 @@
 import type Phaser from "phaser";
-import { INVENTORY_REGISTRY_KEY } from "./constants";
+import { FORMATION_REGISTRY_KEY, INVENTORY_REGISTRY_KEY } from "./constants";
 import { calculateProgressionStats } from "./progression";
 import type { OwnedRosterUnit } from "./rtsBattleTypes";
 
@@ -486,6 +486,11 @@ export function tryEquipItem(
   itemInstanceId: string,
 ): EquipmentMutationResult {
   const current = getOrCreateInventoryState(registry);
+  const ownedUnit = getOwnedUnitFromRegistry(registry, rosterUnitId);
+  if (!ownedUnit || unit.rosterUnitId !== rosterUnitId ||
+    ownedUnit.unitDefinitionId !== unit.unitDefinitionId || ownedUnit.unitRole !== unit.unitRole) {
+    return { ok: false, state: cloneInventoryState(current), reason: "UNIT_NOT_FOUND" };
+  }
   const result = equipItem(
     current,
     rosterUnitId,
@@ -520,14 +525,40 @@ export function unequipItem(
 export function tryUnequipItem(
   registry: Phaser.Data.DataManager,
   rosterUnitId: string,
+  unit: OwnedRosterUnit,
   slotType: EquipmentSlotId,
 ): UnequipResult {
   const current = getOrCreateInventoryState(registry);
+  const ownedUnit = getOwnedUnitFromRegistry(registry, rosterUnitId);
+  if (!ownedUnit || unit.rosterUnitId !== rosterUnitId ||
+    ownedUnit.unitDefinitionId !== unit.unitDefinitionId || ownedUnit.unitRole !== unit.unitRole) {
+    return { ok: false, state: cloneInventoryState(current), reason: "UNIT_NOT_FOUND" };
+  }
   const result = unequipItem(current, rosterUnitId, slotType);
   if (result.ok) {
     setInventoryState(registry, result.state);
   }
   return result;
+}
+
+function getOwnedUnitFromRegistry(
+  registry: Phaser.Data.DataManager,
+  rosterUnitId: string,
+): OwnedRosterUnit | null {
+  const stored = registry.get(FORMATION_REGISTRY_KEY) as { ownedUnits?: unknown } | undefined;
+  if (!stored || !Array.isArray(stored.ownedUnits)) {
+    return null;
+  }
+  const unit = stored.ownedUnits.find((candidate): candidate is OwnedRosterUnit => {
+    if (!candidate || typeof candidate !== "object") {
+      return false;
+    }
+    const record = candidate as Partial<OwnedRosterUnit>;
+    return record.rosterUnitId === rosterUnitId &&
+      typeof record.unitDefinitionId === "string" &&
+      (record.unitRole === "MAIN_CHARACTER" || record.unitRole === "MERCENARY");
+  });
+  return unit ?? null;
 }
 
 export function getItemDescription(itemInstance: ItemInstance): string {

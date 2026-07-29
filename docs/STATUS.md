@@ -37,7 +37,7 @@
 - InventoryScene 브라우저 확인: Field 버튼, 보유 유닛·장비 슬롯·빈 인벤토리·Back to Field 표시 확인
 - v1 수정 사항: Unequip 버튼을 각 중앙 장비 슬롯 카드 내부로 이동하고 실제 FormationState 보유 유닛 검증을 추가했다.
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- ChatGPT 코드 검수: 승인 (`approved`)
 - `main` 반영: no-ff 병합 완료
 
 마지막 갱신: 2026-07-30 00:40 (Asia/Seoul)

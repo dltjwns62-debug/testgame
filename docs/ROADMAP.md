@@ -1,12 +1,12 @@
 # Test Game 개발 로드맵
 
-## Stage 14 current submission
+## Stage 14 current submission — v2
 
 - 전체 단계: 17단계
 - 현재 단계: 14단계 — 아이템·인벤토리·장비
 - 단계 상태: `review_pending`
 - 작업 브랜치: `stage-14-items-inventory-equipment`
-- 검수 태그: `review-stage-14-v1`
+- 검수 태그: `review-stage-14-v2`
 - 완료된 단계: 1단계~13단계
 - 다음 단계: 15단계 — 저장과 오프라인 진행
 - `main` 반영 여부: 1단계부터 13단계까지 반영 완료, 14단계 미반영
@@ -18,7 +18,8 @@
 - v4 제출: 고정 guardPosition 기준 지역 방어와 자동 귀환 제거, 소스 검수 승인 가능
 - 12단계 v5 결과 (historical): `approved` — ChatGPT 정적 검수와 사용자 통합 실행 테스트 통과
 - 13단계 v1 결과: `approved` — 승인 커밋을 `main`에 no-ff 병합하고 완료 태그 생성
-- 14단계 v1 제출: 인벤토리·장비·드롭·방어력 구현, 검수 대기
+- 14단계 v1 제출: 인벤토리·장비·드롭·방어력 구현, `changes_requested` — Unequip UI 겹침 가능성과 실제 보유 유닛 검증 보완 필요
+- 14단계 v2 제출: Unequip 버튼을 중앙 슬롯 카드 안으로 이동하고 registry FormationState 기반 rosterUnitId·unitDefinitionId·unitRole 소유 검증 추가
 
 ## Stage 9 v3 resubmission scope
 
@@ -76,7 +77,8 @@
 - 12단계 완료 태그: `stage-12-completed`
 - 13단계 검수 태그: `review-stage-13-v1` (승인)
 - 13단계 완료 태그: `stage-13-completed`
-- 14단계 검수 태그: `review-stage-14-v1`
+- 14단계 최초 검수 태그: `review-stage-14-v1` — 수정 요청
+- 14단계 현재 검수 태그: `review-stage-14-v2`
 - 다음 단계: 15단계 — 저장과 오프라인 진행
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
@@ -662,7 +664,7 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 
 ### 단계 상태
 
-`review_pending` — `review-stage-14-v1` 제출, `main` 미반영
+`review_pending` — `review-stage-14-v2` 제출, `review-stage-14-v1`은 수정 요청 이력으로 보존, `main` 미반영
 
 ### 목표
 

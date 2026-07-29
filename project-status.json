@@ -13,11 +13,26 @@
   "nextStageName": "저장과 오프라인 진행",
   "reviewSubmission": {
     "branch": "stage-14-items-inventory-equipment",
-    "tag": "review-stage-14-v1",
-    "version": 1,
+    "tag": "review-stage-14-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 14,
+      "branch": "stage-14-items-inventory-equipment",
+      "tag": "review-stage-14-v2",
+      "version": 2,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자 요청에 따라 수동 테스트를 요구하지 않음",
+      "mainBranchMerged": false
+    },
     {
       "stage": 14,
       "branch": "stage-14-items-inventory-equipment",
@@ -25,10 +40,11 @@
       "version": 1,
       "submitted": true,
       "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
-      "commit": null,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-29T18:00:00+09:00",
+      "commit": "97968057202745cb07eea1982578557c06751697",
+      "reason": "InventoryScene의 Unequip 버튼이 Available Items 영역과 겹칠 수 있고, registry 장비 진입점이 실제 FormationState 보유 유닛을 직접 검증하지 않음",
       "userRunTest": "skipped_by_user",
       "userRunTestReason": "사용자 요청에 따라 수동 테스트를 요구하지 않음",
       "mainBranchMerged": false

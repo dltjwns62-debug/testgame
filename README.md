@@ -2,7 +2,7 @@
 
 ## Stage 14 review submission
 
-14단계 **아이템·인벤토리·장비**를 `stage-14-items-inventory-equipment`에서 구현하고 `review-stage-14-v1`로 검수 제출한다. 현재 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 사용자 수동 테스트는 요청하지 않아 `skipped_by_user`로 기록하며 통과로 간주하지 않는다.
+14단계 **아이템·인벤토리·장비**의 v1 검수 지적을 반영해 `stage-14-items-inventory-equipment`에서 수정하고 `review-stage-14-v2`로 재제출한다. 현재 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 사용자 수동 테스트는 요청하지 않아 `skipped_by_user`로 기록하며 통과로 간주하지 않는다.
 
 장비는 weapon·armor·accessory 중앙 슬롯 정의와 개별 ItemInstance로 관리한다. 몬스터 사망 즉시 독립 드롭 판정을 수행하고, 공용 인벤토리·유닛별 장착 상태·무기 호환·고유 장비 제한·최종 공격력/방어력/최대 HP·방어력 피해 감소를 구현했다. 15단계 저장·오프라인 진행과 브라우저 새로고침 영구 저장은 구현하지 않는다.
 
@@ -65,7 +65,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 현재 단계 이름: 아이템·인벤토리·장비
 - 현재 상태: 검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-14-items-inventory-equipment`
-- 검수 태그: `review-stage-14-v1`
+- 검수 태그: `review-stage-14-v2`
 - 완료 태그: 없음 (검수 대기)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
 - 다음 단계: 15단계 — 저장과 오프라인 진행

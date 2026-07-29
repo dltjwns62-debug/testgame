@@ -1,5 +1,14 @@
 # 프로젝트 결정 사항
 
+## 14단계 v1 검수 수정 결정
+
+- 결정: Unequip 버튼은 중앙 장비 슬롯 카드 내부에 배치해 Available Items 패널과 겹치지 않게 한다.
+- 결정: registry 진입 함수는 전달된 유닛과 현재 FormationState.ownedUnits의 rosterUnitId·unitDefinitionId·unitRole을 모두 대조한다.
+- 결정: 실제 보유 유닛 검증에 실패하면 `UNIT_NOT_FOUND`를 반환하고 InventoryState를 변경하지 않는다.
+- 결정: 실제 Bench 유닛과 출전 유닛 모두 같은 소유 검증을 통과하면 장착·해제가 가능하다.
+- 결정: `review-stage-14-v1`은 수정 요청 이력으로 보존하고 v2 재검수 태그를 생성한다.
+- 상태: 확정
+
 ## 14단계 아이템·인벤토리·장비 결정 (검수 제출)
 
 - 결정: 인벤토리는 현재 Phaser registry 세션에서 용량 제한 없이 관리한다.

@@ -1,5 +1,15 @@
 # 변경 이력
 
+## 2026-07-29 — 14단계 v1 검수 수정 및 v2 재제출
+
+- 14단계 최초 코드 검수에서 수정 요청됨
+- Unequip 버튼을 중앙 장비 슬롯 카드 내부로 이동해 Available Items 영역과의 겹침 가능성을 제거함
+- registry 기반 장비 진입 시 실제 FormationState.ownedUnits의 rosterUnitId·unitDefinitionId·unitRole을 검증함
+- 검증 실패 시 `UNIT_NOT_FOUND`를 반환하고 기존 InventoryState를 변경하지 않음
+- `review-stage-14-v1`은 보존하고 새 검수 태그는 `review-stage-14-v2`로 사용함
+- 사용자 수동 테스트는 아직 실시하지 않아 `skipped_by_user`로 유지함
+- 14단계는 아직 완료되지 않음
+
 ## 2026-07-29 — 14단계 아이템·인벤토리·장비 구현 및 검수 제출
 
 - ItemDefinition과 개별 ItemInstance, weapon·armor·accessory 중앙 슬롯 정의, 무제한 세션 인벤토리 추가

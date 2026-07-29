@@ -1,9 +1,9 @@
 # 실행 및 테스트 기록
 
-## Stage 14 아이템·인벤토리·장비 — v1 검수 대기
+## Stage 14 아이템·인벤토리·장비 — v2 검수 대기
 
 - 현재 작업 브랜치: `stage-14-items-inventory-equipment`
-- 현재 검수 태그: `review-stage-14-v1`
+- 현재 검수 태그: `review-stage-14-v2`
 - 14단계 상태: 검수 대기 (`review_pending`)
 - 완료된 단계: 1단계~13단계
 - 다음 단계: 15단계 — 저장과 오프라인 진행
@@ -17,6 +17,8 @@
 - `npm run typecheck`: 통과
 - `npm run build`: 통과 (비차단 chunk 크기 경고 있음)
 - 브라우저 UI 확인: Field Inventory 버튼과 InventoryScene 960×540 레이아웃 확인
+- v1 UI 수정 확인: 세 Unequip 버튼이 각 장비 슬롯 카드 내부에 있고 Available Items와 겹치지 않음
+- 장비 진입 검증: registry의 실제 FormationState 보유 유닛과 rosterUnitId·unitDefinitionId·unitRole 대조
 - Node 직접 순수 실행: 확장자 없는 TypeScript import를 Node가 해석하지 못해 미실시; 통과로 기록하지 않음
 
 ### 14단계 검증 항목

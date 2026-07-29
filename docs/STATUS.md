@@ -1,8 +1,8 @@
 # 현재 개발 상태
 
-## Stage 14 아이템·인벤토리·장비 — 검수 대기
+## Stage 14 아이템·인벤토리·장비 — v2 검수 대기
 
-- 현재 검수 태그: `review-stage-14-v1`
+- 현재 검수 태그: `review-stage-14-v2`
 - 작업 브랜치: `stage-14-items-inventory-equipment`
 - 전체 단계: 17단계
 - 현재 단계: 14단계 — 아이템·인벤토리·장비
@@ -35,11 +35,12 @@
 - `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
 - `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
 - InventoryScene 브라우저 확인: Field 버튼, 보유 유닛·장비 슬롯·빈 인벤토리·Back to Field 표시 확인
+- v1 수정 사항: Unequip 버튼을 각 중앙 장비 슬롯 카드 내부로 이동하고 실제 FormationState 보유 유닛 검증을 추가했다.
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
 - ChatGPT 코드 검수: 검수 대기 (`pending`)
 - `main` 반영: 미반영
 
-마지막 갱신: 2026-07-29 17:50 (Asia/Seoul)
+마지막 갱신: 2026-07-29 (Asia/Seoul)
 
 ## Stage 12 부대 지정과 단축키 설정 — 완료 (historical)
 

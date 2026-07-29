@@ -4,11 +4,11 @@
   "totalStages": 17,
   "currentStage": 14,
   "currentStageName": "아이템·인벤토리·장비",
-  "stageStatus": "review_pending",
-  "activeTask": "14단계 구현 완료 및 ChatGPT 검수 대기",
-  "workingBranch": "stage-14-items-inventory-equipment",
-  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+  "stageStatus": "completed",
+  "activeTask": "14단계 완료 — 15단계 저장과 오프라인 진행 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
   "nextStage": 15,
   "nextStageName": "저장과 오프라인 진행",
   "reviewSubmission": {
@@ -24,14 +24,15 @@
       "tag": "review-stage-14-v2",
       "version": 2,
       "submitted": true,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
-      "commit": null,
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-30T00:40:00+09:00",
+      "commit": "c61bcf0c14b1520733b707a7acd62b3ed90eeccd",
+      "reason": "v1에서 지적된 InventoryScene Unequip 버튼 겹침과 registry 장비 진입점의 실제 보유 유닛 검증 문제가 수정됐고, 아이템 인스턴스·드롭·장착 제한·확장 능력치·방어력 계산·인벤토리 보존 구조가 정적 코드 검수를 통과함",
       "userRunTest": "skipped_by_user",
       "userRunTestReason": "사용자 요청에 따라 수동 테스트를 요구하지 않음",
-      "mainBranchMerged": false
+      "mainBranchMerged": true
     },
     {
       "stage": 14,
@@ -497,9 +498,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-30T00:40:00+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -509,11 +510,11 @@
     "browserAutomation": "partial_passed",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "사용자 요청에 따라 14단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "pending"
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-29T17:50:47+09:00"
+  "lastUpdated": "2026-07-30T00:40:00+09:00"
 }

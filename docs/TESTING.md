@@ -1,15 +1,16 @@
 # 실행 및 테스트 기록
 
-## Stage 14 아이템·인벤토리·장비 — v2 검수 대기
+## Stage 14 아이템·인벤토리·장비 — 최종 승인 및 main 반영
 
-- 현재 작업 브랜치: `stage-14-items-inventory-equipment`
+- 현재 작업 브랜치: `main`
 - 현재 검수 태그: `review-stage-14-v2`
-- 14단계 상태: 검수 대기 (`review_pending`)
-- 완료된 단계: 1단계~13단계
+- 완료 태그: `stage-14-completed`
+- 14단계 상태: 완료 (`completed`)
+- 완료된 단계: 1단계~14단계
 - 다음 단계: 15단계 — 저장과 오프라인 진행
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
-- `main` 반영: 미반영
+- ChatGPT 코드 검수: 승인 (`approved`)
+- `main` 반영: no-ff 병합 완료
 
 ### 14단계 자동 검사
 
@@ -30,7 +31,7 @@
 - [x] 적 사망 시 독립 드롭 판정과 패배 후 인벤토리 보존 구조를 구현한다.
 - [x] InventoryScene의 보유 유닛·장비 슬롯·아이템 페이지·Back to Field UI를 확인한다.
 - [ ] 실제 드롭·장착·전투 회귀 전체 시나리오 — 사용자 수동 테스트 생략
-- [ ] ChatGPT 코드 검수 및 main 반영
+- [x] ChatGPT 코드 검수 승인 및 main 반영
 
 ## Stage 13 경험치·레벨·능력치 성장 — 최종 승인 및 main 반영
 

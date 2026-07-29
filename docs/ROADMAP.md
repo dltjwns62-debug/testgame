@@ -1,17 +1,18 @@
 # Test Game 개발 로드맵
 
-## Stage 14 current submission — v2
+## Stage 14 final approval and main integration
 
 - 전체 단계: 17단계
 - 현재 단계: 14단계 — 아이템·인벤토리·장비
-- 단계 상태: `review_pending`
-- 작업 브랜치: `stage-14-items-inventory-equipment`
+- 단계 상태: `completed`
+- 작업 브랜치: `main`
 - 검수 태그: `review-stage-14-v2`
-- 완료된 단계: 1단계~13단계
+- 완료 태그: `stage-14-completed`
+- 완료된 단계: 1단계~14단계
 - 다음 단계: 15단계 — 저장과 오프라인 진행
-- `main` 반영 여부: 1단계부터 13단계까지 반영 완료, 14단계 미반영
+- `main` 반영 여부: 1단계부터 14단계까지 반영 완료
 - 사용자 실행 테스트: `skipped_by_user`
-- ChatGPT 코드 검수: `pending`
+- ChatGPT 코드 검수: `approved`
 - v1 결과 (historical): `changes_requested` — 중앙 부대 패널이 전투 유닛을 가리고 Group 10이 Group 0으로 표시됨
 - v2 결과 (historical): `changes_requested` — 부대가 BattleScene마다 초기화되고 사망·UI 조회가 부대 원본을 삭제함
 - v3 결과 (historical): `changes_requested` / 사용자 실행 테스트 `failed` — Auto Hunt OFF에서 M8·M9가 전투 후 guardPosition으로 자동 귀환함
@@ -19,7 +20,7 @@
 - 12단계 v5 결과 (historical): `approved` — ChatGPT 정적 검수와 사용자 통합 실행 테스트 통과
 - 13단계 v1 결과: `approved` — 승인 커밋을 `main`에 no-ff 병합하고 완료 태그 생성
 - 14단계 v1 제출: 인벤토리·장비·드롭·방어력 구현, `changes_requested` — Unequip UI 겹침 가능성과 실제 보유 유닛 검증 보완 필요
-- 14단계 v2 제출: Unequip 버튼을 중앙 슬롯 카드 안으로 이동하고 registry FormationState 기반 rosterUnitId·unitDefinitionId·unitRole 소유 검증 추가
+- 14단계 v2 결과: `approved` — Unequip 버튼 위치와 registry 기반 실제 보유 유닛 검증을 보완한 뒤 정적 코드 검수를 통과했고 `main`에 no-ff 병합함
 
 ## Stage 9 v3 resubmission scope
 
@@ -45,8 +46,8 @@
 - 전체 단계: 17단계
 - 현재 단계: 14단계
 - 현재 단계 이름: 아이템·인벤토리·장비
-- 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-14-items-inventory-equipment`
+- 현재 단계 상태: 완료 (`completed`)
+- 현재 작업 브랜치: `main`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -78,13 +79,14 @@
 - 13단계 검수 태그: `review-stage-13-v1` (승인)
 - 13단계 완료 태그: `stage-13-completed`
 - 14단계 최초 검수 태그: `review-stage-14-v1` — 수정 요청
-- 14단계 현재 검수 태그: `review-stage-14-v2`
+- 14단계 승인 검수 태그: `review-stage-14-v2`
+- 14단계 완료 태그: `stage-14-completed`
 - 다음 단계: 15단계 — 저장과 오프라인 진행
-- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
-- 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
-- `main` 반영 여부: 1단계부터 13단계까지 반영 완료
+- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계
+- 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계
+- `main` 반영 여부: 1단계부터 14단계까지 반영 완료
 
-현재 단계 번호는 14이며, 1단계부터 13단계까지 `main`에 반영되어 완료됐다. 14단계는 `stage-14-items-inventory-equipment`에서 검수 대기 중이며, 15단계는 시작하지 않는다.
+현재 단계 번호는 14이며, 1단계부터 14단계까지 `main`에 반영되어 완료됐다. 14단계는 `stage-14-completed` 태그로 완료 상태를 기록하며, 15단계는 시작하지 않는다.
 
 각 단계의 상태는 다음 값으로 관리한다.
 
@@ -95,7 +97,7 @@
 - `approved`: 검수 통과, 병합 대기
 - `completed`: `main` 반영까지 완료
 
-각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 14이며, 1단계부터 13단계까지 `main` 반영이 완료됐다. 14단계는 `review_pending` 상태이고, 15단계는 시작하지 않는다.
+각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 14이며, 1단계부터 14단계까지 `main` 반영이 완료됐다. 14단계는 `completed` 상태이고, 15단계는 시작하지 않는다.
 
 검수 대상 버전은 tracked 파일 안의 현재 커밋 해시가 아니라 변경되지 않는 Git 태그로 관리한다. 검수 태그는 `review-stage-XX-vN` 형식을 사용하고, 기존 원격 태그는 이동하거나 덮어쓰지 않는다. 1단계 승인 태그는 `review-stage-01-v1`이며, 2단계 최초 검수 태그 `review-stage-02-v1`은 수정 요청 기록으로 보존하고 현재 재검수 태그는 `review-stage-02-v2`다.
 
@@ -664,7 +666,7 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 
 ### 단계 상태
 
-`review_pending` — `review-stage-14-v2` 제출, `review-stage-14-v1`은 수정 요청 이력으로 보존, `main` 미반영
+`completed` — `review-stage-14-v2` 승인 및 `main` no-ff 반영 완료, `review-stage-14-v1`은 수정 요청 이력으로 보존
 
 ### 목표
 

@@ -1,8 +1,8 @@
 # Test Game
 
-## Stage 14 review submission
+## Stage 14 final approval and main integration
 
-14단계 **아이템·인벤토리·장비**의 v1 검수 지적을 반영해 `stage-14-items-inventory-equipment`에서 수정하고 `review-stage-14-v2`로 재제출한다. 현재 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 사용자 수동 테스트는 요청하지 않아 `skipped_by_user`로 기록하며 통과로 간주하지 않는다.
+14단계 **아이템·인벤토리·장비**는 승인 검수 태그 `review-stage-14-v2`와 승인 커밋 `c61bcf0c14b1520733b707a7acd62b3ed90eeccd`을 확인한 뒤 `main`에 no-ff 병합됐다. 현재 상태는 `completed`이며 완료 태그는 `stage-14-completed`다. 사용자 수동 테스트는 요청하지 않아 `skipped_by_user`로 유지하며 통과로 간주하지 않는다.
 
 장비는 weapon·armor·accessory 중앙 슬롯 정의와 개별 ItemInstance로 관리한다. 몬스터 사망 즉시 독립 드롭 판정을 수행하고, 공용 인벤토리·유닛별 장착 상태·무기 호환·고유 장비 제한·최종 공격력/방어력/최대 HP·방어력 피해 감소를 구현했다. 15단계 저장·오프라인 진행과 브라우저 새로고침 영구 저장은 구현하지 않는다.
 
@@ -63,11 +63,11 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 전체 개발 단계: 17단계
 - 현재 단계: 14단계
 - 현재 단계 이름: 아이템·인벤토리·장비
-- 현재 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-14-items-inventory-equipment`
+- 현재 상태: 완료 (`completed`)
+- 현재 작업 브랜치: `main`
 - 검수 태그: `review-stage-14-v2`
-- 완료 태그: 없음 (검수 대기)
-- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
+- 완료 태그: `stage-14-completed`
+- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계
 - 다음 단계: 15단계 — 저장과 오프라인 진행
 
 7단계 10대10 RTS 핵심 전투와 8단계 Auto Hunt·지역 동료 지원 기능은 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다.
@@ -89,7 +89,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - HP 감소·사망·선택 해제·전멸 승패
 - 기존 Gold 1회 지급·월드맵 몬스터 제거·3초 재생성 연결
 
-12단계에서는 부대 지정과 단축키 설정을 완료했고, 13단계에서는 경험치·레벨·능력치 성장을 완료했다. 14단계에서는 아이템·인벤토리·장비를 검수 제출했으며, 브라우저 새로고침 이후 영구 저장은 15단계에서 다룬다.
+12단계에서는 부대 지정과 단축키 설정을 완료했고, 13단계에서는 경험치·레벨·능력치 성장을 완료했다. 14단계에서는 아이템·인벤토리·장비를 완료했으며, 브라우저 새로고침 이후 영구 저장은 15단계에서 다룬다.
 
 ## 알려진 문제
 
@@ -122,4 +122,4 @@ npm run typecheck
 npm run build
 ```
 
-1단계부터 13단계까지는 `main`에 반영되어 완료됐다. 14단계는 작업 브랜치에서 검수 대기 중이며, 다음 예정 단계는 15단계다.
+1단계부터 14단계까지는 `main`에 반영되어 완료됐다. 다음 예정 단계는 15단계이며, 별도 시작 명령 전까지 구현하지 않는다.

@@ -1,5 +1,17 @@
 # 변경 이력
 
+## 2026-07-29 — 13단계 경험치·레벨·능력치 성장 구현 및 검수 제출
+
+- `rosterUnitId` 기준 세션 성장 상태와 기존 데이터의 Lv.1·EXP 0 보정 추가
+- Slime 1~4에 100/120/150/200 EXP 보상 추가
+- 마지막 유효 아군 처치자 직접 경험치와 적 사망 중복 지급 방지 추가
+- 전투 전체 직접 EXP 합계 기반 생존 출전 유닛 종료 보너스 추가
+- 레벨별 최대 HP·공격력 성장과 레벨업 HP 증가분 반영 추가
+- Formation·Battle·Field 성장 정보와 전투 결과 Direct EXP·Bonus EXP 표시 추가
+- `review-stage-13-v1`로 `stage-13-experience-level-stats`에 검수 제출
+- 사용자 수동 테스트는 요청에 따라 `skipped_by_user`, ChatGPT 코드 검수는 `pending`
+- 13단계는 아직 `main`에 병합하지 않았으며 14단계 아이템·인벤토리·장비는 구현하지 않음
+
 ## 2026-07-28 — 12단계 검수 승인 및 main 반영 — 완료
 
 - `review-stage-12-v5` 정적 코드 검수 승인

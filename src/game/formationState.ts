@@ -6,6 +6,7 @@ import {
   RTS_ALLY_COUNT,
 } from "./constants";
 import { createTrialOwnedUnits, getAllyUnitDefinition } from "./rtsBattleDefinitions";
+import { addExperience, normalizeProgressionState, type ExperienceGainResult } from "./progression";
 import { SHOP_OFFERS } from "./shopCatalog";
 import type { FormationSlot, FormationState, OwnedRosterUnit, RosterEntry } from "./rtsBattleTypes";
 
@@ -30,7 +31,10 @@ export function getFormationSlotLabel(slotIndex: number): string {
 
 export function cloneFormationState(state: FormationState): FormationState {
   return {
-    ownedUnits: state.ownedUnits.map((unit) => ({ ...unit })),
+    ownedUnits: state.ownedUnits.map((unit) => ({
+      ...unit,
+      ...normalizeProgressionState(unit),
+    })),
     slots: state.slots.map((slot) => ({ ...slot })),
   };
 }
@@ -152,7 +156,35 @@ export function buildBattleRosterFromFormation(state: FormationState): RosterEnt
         unitRole: owned.unitRole,
         displayName: owned.displayName,
         slotIndex: slot.slotIndex,
+        level: owned.level,
+        experience: owned.experience,
       };
     })
     .filter((entry): entry is RosterEntry => Boolean(entry));
+}
+
+export function grantRosterUnitExperience(
+  registry: Phaser.Data.DataManager,
+  rosterUnitId: string,
+  amount: number,
+): ExperienceGainResult | null {
+  if (typeof rosterUnitId !== "string" || rosterUnitId.length === 0) {
+    return null;
+  }
+
+  const formation = getOrCreateFormationState(registry);
+  const unitIndex = formation.ownedUnits.findIndex((unit) => unit.rosterUnitId === rosterUnitId);
+  if (unitIndex < 0) {
+    return null;
+  }
+
+  const unit = formation.ownedUnits[unitIndex];
+  const result = addExperience(unit, amount);
+  const nextFormation = cloneFormationState(formation);
+  nextFormation.ownedUnits[unitIndex] = {
+    ...nextFormation.ownedUnits[unitIndex],
+    ...result.next,
+  };
+  setFormationState(registry, nextFormation);
+  return result;
 }

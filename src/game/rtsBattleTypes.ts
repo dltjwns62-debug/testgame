@@ -18,6 +18,8 @@ export type RosterEntry = {
   unitRole: UnitRole;
   displayName: string;
   slotIndex: number;
+  level: number;
+  experience: number;
 };
 
 export type OwnedRosterUnit = {
@@ -25,6 +27,8 @@ export type OwnedRosterUnit = {
   unitDefinitionId: string;
   unitRole: UnitRole;
   displayName: string;
+  level: number;
+  experience: number;
 };
 
 export type FormationSlot = {
@@ -48,7 +52,11 @@ export type RTSBattleUnit = {
   sourceWorldMonsterId: string | null;
   currentHp: number;
   maxHp: number;
+  baseMaxHp: number;
   attackDamage: number;
+  baseAttackDamage: number;
+  level: number;
+  experience: number;
   attackIntervalMs: number;
   attackElapsedMs: number;
   moveSpeed: number;
@@ -65,6 +73,7 @@ export type RTSBattleUnit = {
   lastAttackerId: string | null;
   lastAttackedAt: number;
   isAlive: boolean;
+  experienceRewardGranted: boolean;
   slotIndex: number | null;
   skills: UnitSkillId[];
   skillReadyAtMs: Partial<Record<UnitSkillId, number>>;
@@ -82,9 +91,16 @@ export type RTSBattleResult = {
   enemyDefinitionId: string;
   enemyDisplayName: string;
   goldReward: number;
+  directExperienceTotal: number;
+  bonusExperienceTotal: number;
+  experienceRewards: Array<{
+    rosterUnitId: string;
+    directExperience: number;
+    bonusExperience: number;
+  }>;
 };
 
-export type EnemyDefinition = Pick<MonsterDefinition, "id" | "name" | "color" | "goldReward"> & {
+export type EnemyDefinition = Pick<MonsterDefinition, "id" | "name" | "color" | "goldReward" | "experienceReward"> & {
   maxHp: number;
   attackDamage: number;
   attackIntervalMs: number;

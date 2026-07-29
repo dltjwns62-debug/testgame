@@ -2,22 +2,37 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 12,
-  "currentStageName": "부대 지정과 단축키 설정",
-  "stageStatus": "completed",
-  "activeTask": "12단계 완료 — 13단계 경험치·레벨·능력치 성장 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 13,
+  "currentStageName": "경험치·레벨·능력치 성장",
+  "stageStatus": "review_pending",
+  "activeTask": "13단계 경험치·레벨·능력치 성장 구현 완료 — review-stage-13-v1 검수 대기 중",
+  "workingBranch": "stage-13-experience-level-stats",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-  "nextStage": 13,
-  "nextStageName": "경험치·레벨·능력치 성장",
+  "nextStage": 14,
+  "nextStageName": "아이템·인벤토리·장비",
   "reviewSubmission": {
-    "branch": "stage-12-control-groups-keybinds",
-    "tag": "review-stage-12-v5",
-    "version": 5,
+    "branch": "stage-13-experience-level-stats",
+    "tag": "review-stage-13-v1",
+    "version": 1,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 13,
+      "branch": "stage-13-experience-level-stats",
+      "tag": "review-stage-13-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "이번 단계에서는 사용자가 수동 테스트를 요청하지 않았으며 주요 마일스톤 통합 테스트에서 진행 예정",
+      "mainBranchMerged": false
+    },
     {
       "stage": 12,
       "branch": "stage-12-control-groups-keybinds",
@@ -450,9 +465,9 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-28T17:49:05+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
@@ -460,13 +475,13 @@
     "build": "passed",
     "devServer": "passed",
     "browserAutomation": "not_tested",
-    "userRunTest": "passed",
-    "userRunTestReason": "사용자가 Auto Hunt OFF 상태의 M8·M9 비귀환, 타깃 상실 후 다른 적 재탐색, 주변 적 부재 시 현재 위치 정지, 다음 전투 부대 지속 시나리오를 직접 실행하고 통과를 확인함",
-    "chatGptCodeReview": "approved"
+    "userRunTest": "skipped_by_user",
+    "userRunTestReason": "이번 단계에서는 사용자가 수동 테스트를 요청하지 않았으며 주요 마일스톤 통합 테스트에서 진행 예정",
+    "chatGptCodeReview": "pending"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-28T18:01:57+09:00"
+  "lastUpdated": "2026-07-29T01:31:58+09:00"
 }

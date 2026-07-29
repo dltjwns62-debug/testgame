@@ -26,7 +26,7 @@ import {
   setPersistentControlGroupState,
   type ControlGroupMap,
 } from "../controlGroups";
-import { getOrCreateFormationState } from "../formationState";
+import { getOrCreateFormationState, grantRosterUnitExperience } from "../formationState";
 import {
   createDefaultKeyBindingState,
   findControlGroupIndexByCode,
@@ -47,6 +47,13 @@ import type {
   UnitSkillId,
 } from "../rtsBattleTypes";
 import { getUnitSkillDefinition } from "../unitSkills";
+import {
+  calculateBattleEndBonusExperience,
+  calculateProgressionStats,
+  formatProgression,
+  normalizeProgressionState,
+  type ExperienceGainResult,
+} from "../progression";
 import {
   constrainToArena,
   createFormationDestinations,
@@ -111,6 +118,12 @@ export class BattleScene extends Phaser.Scene {
   private enemyDisplayName = "Slime 1";
   private enemyColor = 0xe67e91;
   private goldReward = 0;
+  private experienceReward = 0;
+  private battleEndExperienceGranted = false;
+  private directExperienceTotal = 0;
+  private bonusExperienceTotal = 0;
+  private readonly directExperienceByRosterUnitId = new Map<string, number>();
+  private readonly bonusExperienceByRosterUnitId = new Map<string, number>();
   private readonly units = new Map<string, RTSBattleUnit>();
   private readonly unitVisuals = new Map<string, UnitVisual>();
   private readonly slotVisuals = new Map<number, SlotVisual>();
@@ -258,6 +271,12 @@ export class BattleScene extends Phaser.Scene {
     this.enemyDisplayName = "Unknown enemy";
     this.enemyColor = 0x64748b;
     this.goldReward = 0;
+    this.experienceReward = 0;
+    this.battleEndExperienceGranted = false;
+    this.directExperienceTotal = 0;
+    this.bonusExperienceTotal = 0;
+    this.directExperienceByRosterUnitId.clear();
+    this.bonusExperienceByRosterUnitId.clear();
     this.units.clear();
     this.unitVisuals.clear();
     this.slotVisuals.clear();
@@ -284,6 +303,7 @@ export class BattleScene extends Phaser.Scene {
     this.enemyDisplayName = enemyDefinition.name;
     this.enemyColor = enemyDefinition.color;
     this.goldReward = this.sanitizeGold(enemyDefinition.goldReward);
+    this.experienceReward = this.sanitizeExperience(enemyDefinition.experienceReward);
 
     const roster = [...data.allyRoster].sort((first, second) => first.slotIndex - second.slotIndex);
     const invalidAlly = roster.find((entry) => {
@@ -325,6 +345,8 @@ export class BattleScene extends Phaser.Scene {
       return null;
     }
 
+    const progression = normalizeProgressionState(entry);
+    const stats = calculateProgressionStats(definition.maxHp, definition.attackDamage, progression.level);
     return {
       battleUnitId: entry.rosterUnitId,
       rosterUnitId: entry.rosterUnitId,
@@ -334,9 +356,13 @@ export class BattleScene extends Phaser.Scene {
       displayName: entry.displayName,
       color: definition.color,
       sourceWorldMonsterId: null,
-      currentHp: definition.maxHp,
-      maxHp: definition.maxHp,
-      attackDamage: definition.attackDamage,
+      currentHp: stats.maxHp,
+      maxHp: stats.maxHp,
+      baseMaxHp: definition.maxHp,
+      attackDamage: stats.attackDamage,
+      baseAttackDamage: definition.attackDamage,
+      level: progression.level,
+      experience: progression.experience,
       attackIntervalMs: definition.attackIntervalMs,
       attackElapsedMs: 0,
       moveSpeed: definition.moveSpeed,
@@ -352,6 +378,7 @@ export class BattleScene extends Phaser.Scene {
       lastAttackerId: null,
       lastAttackedAt: 0,
       isAlive: true,
+      experienceRewardGranted: false,
       slotIndex: entry.slotIndex,
       skills: [...definition.skills],
       skillReadyAtMs: {},
@@ -374,7 +401,11 @@ export class BattleScene extends Phaser.Scene {
       sourceWorldMonsterId: this.sourceWorldMonsterId,
       currentHp: enemyDefinition.maxHp,
       maxHp: enemyDefinition.maxHp,
+      baseMaxHp: enemyDefinition.maxHp,
       attackDamage: enemyDefinition.attackDamage,
+      baseAttackDamage: enemyDefinition.attackDamage,
+      level: 1,
+      experience: 0,
       attackIntervalMs: enemyDefinition.attackIntervalMs,
       attackElapsedMs: 0,
       moveSpeed: enemyDefinition.moveSpeed,
@@ -390,6 +421,7 @@ export class BattleScene extends Phaser.Scene {
       lastAttackerId: null,
       lastAttackedAt: 0,
       isAlive: true,
+      experienceRewardGranted: false,
       slotIndex: null,
       skills: [],
       skillReadyAtMs: {},
@@ -404,7 +436,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 12, "Stage 12: Control Groups", {
+    this.add.text(32, 12, "Stage 13: Experience & Growth", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
@@ -415,7 +447,7 @@ export class BattleScene extends Phaser.Scene {
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "12px",
     });
-    this.add.text(34, 57, "Save and recall living units without changing their orders.", {
+    this.add.text(34, 57, "Earn direct EXP and battle-end bonuses.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "11px",
@@ -652,7 +684,7 @@ export class BattleScene extends Phaser.Scene {
 
     target.currentHp = Math.max(0, target.currentHp - damage);
     if (target.currentHp === 0) {
-      this.markUnitDead(target);
+      this.markUnitDead(target, caster);
     }
     return true;
   }
@@ -1190,7 +1222,15 @@ export class BattleScene extends Phaser.Scene {
     }, attacker.collisionRadius);
   }
 
-  private markUnitDead(unit: RTSBattleUnit): void {
+  private markUnitDead(unit: RTSBattleUnit, killer: RTSBattleUnit | null = null): void {
+    if (!unit.isAlive) {
+      return;
+    }
+
+    if (unit.team === "ENEMY" && !unit.experienceRewardGranted) {
+      unit.experienceRewardGranted = true;
+      this.grantDirectExperience(killer);
+    }
     unit.currentHp = 0;
     unit.isAlive = false;
     unit.state = "DEAD";
@@ -1200,6 +1240,99 @@ export class BattleScene extends Phaser.Scene {
     unit.attackElapsedMs = 0;
     this.selectedUnitIds.delete(unit.battleUnitId);
     this.unitVisuals.get(unit.battleUnitId)?.interactionZone.disableInteractive();
+  }
+
+  private grantDirectExperience(killer: RTSBattleUnit | null): void {
+    if (!killer || killer.team !== "ALLY" || !killer.isAlive || !killer.rosterUnitId ||
+      this.units.get(killer.battleUnitId) !== killer || !Number.isSafeInteger(this.experienceReward) ||
+      this.experienceReward <= 0) {
+      return;
+    }
+
+    const result = this.grantExperienceToUnit(killer, this.experienceReward, "DIRECT");
+    if (!result) {
+      return;
+    }
+
+    this.directExperienceTotal += this.experienceReward;
+    this.directExperienceByRosterUnitId.set(
+      killer.rosterUnitId,
+      (this.directExperienceByRosterUnitId.get(killer.rosterUnitId) ?? 0) + this.experienceReward,
+    );
+    this.addAttackLog(`${killer.displayName} gained +${this.experienceReward} EXP.`);
+    if (result.levelsGained > 0) {
+      this.addAttackLog(`${killer.displayName} LEVEL UP! Lv.${result.next.level}`);
+    }
+  }
+
+  private grantExperienceToUnit(
+    unit: RTSBattleUnit,
+    amount: number,
+    _source: "DIRECT" | "BONUS",
+  ): ExperienceGainResult | null {
+    if (!unit.isAlive || unit.team !== "ALLY" || !unit.rosterUnitId ||
+      !Number.isSafeInteger(amount) || amount <= 0 || this.units.get(unit.battleUnitId) !== unit) {
+      return null;
+    }
+
+    const result = grantRosterUnitExperience(this.game.registry, unit.rosterUnitId, amount);
+    if (!result) {
+      return null;
+    }
+
+    const previousMaxHp = unit.maxHp;
+    const stats = calculateProgressionStats(unit.baseMaxHp, unit.baseAttackDamage, result.next.level);
+    unit.level = result.next.level;
+    unit.experience = result.next.experience;
+    unit.maxHp = stats.maxHp;
+    unit.attackDamage = stats.attackDamage;
+    if (unit.isAlive) {
+      unit.currentHp = Math.min(unit.maxHp, Math.max(0, unit.currentHp + (unit.maxHp - previousMaxHp)));
+    }
+
+    if (_source === "BONUS") {
+      this.bonusExperienceTotal += amount;
+      this.bonusExperienceByRosterUnitId.set(
+        unit.rosterUnitId,
+        (this.bonusExperienceByRosterUnitId.get(unit.rosterUnitId) ?? 0) + amount,
+      );
+    }
+    return result;
+  }
+
+  private grantBattleEndBonusExperience(outcome: BattleOutcome): void {
+    if (this.battleEndExperienceGranted) {
+      return;
+    }
+
+    this.battleEndExperienceGranted = true;
+    if (outcome !== "VICTORY") {
+      return;
+    }
+
+    const bonusExperience = calculateBattleEndBonusExperience(this.directExperienceTotal);
+    if (bonusExperience <= 0) {
+      return;
+    }
+
+    for (const ally of this.getAliveUnits("ALLY")) {
+      const result = this.grantExperienceToUnit(ally, bonusExperience, "BONUS");
+      if (result?.levelsGained) {
+        this.addAttackLog(`${ally.displayName} LEVEL UP! Lv.${result.next.level}`);
+      }
+    }
+  }
+
+  private getExperienceRewards(): RTSBattleResult["experienceRewards"] {
+    const rosterUnitIds = new Set([
+      ...this.directExperienceByRosterUnitId.keys(),
+      ...this.bonusExperienceByRosterUnitId.keys(),
+    ]);
+    return [...rosterUnitIds].sort().map((rosterUnitId) => ({
+      rosterUnitId,
+      directExperience: this.directExperienceByRosterUnitId.get(rosterUnitId) ?? 0,
+      bonusExperience: this.bonusExperienceByRosterUnitId.get(rosterUnitId) ?? 0,
+    }));
   }
 
   private applyDamage(attacker: RTSBattleUnit, target: RTSBattleUnit): void {
@@ -1235,7 +1368,7 @@ export class BattleScene extends Phaser.Scene {
     }
     this.addAttackLog(`${attacker.displayName} dealt ${attacker.attackDamage} to ${target.displayName}.`);
     if (target.currentHp === 0) {
-      this.markUnitDead(target);
+      this.markUnitDead(target, attacker);
     }
   }
 
@@ -1254,6 +1387,7 @@ export class BattleScene extends Phaser.Scene {
 
     this.resultCommitted = true;
     this.combatState = outcome;
+    this.grantBattleEndBonusExperience(outcome);
     for (const unit of this.units.values()) {
       unit.attackElapsedMs = 0;
       if (unit.isAlive && unit.state !== "DEAD") {
@@ -1267,12 +1401,15 @@ export class BattleScene extends Phaser.Scene {
       enemyDefinitionId: this.enemyDefinitionId,
       enemyDisplayName: this.enemyDisplayName,
       goldReward: outcome === "VICTORY" ? this.goldReward : 0,
+      directExperienceTotal: this.directExperienceTotal,
+      bonusExperienceTotal: this.bonusExperienceTotal,
+      experienceRewards: this.getExperienceRewards(),
     };
     const fieldScene = this.scene.get("FieldScene") as FieldScene;
     fieldScene.applyBattleResult(result);
     this.outcomeText.setText(outcome === "VICTORY"
-      ? ["VICTORY", `${this.enemyDisplayName} squad defeated.`, `Reward: +${this.goldReward} Gold`]
-      : ["DEFEAT", "All allied units are defeated.", "Reward: 0 Gold"]);
+      ? ["VICTORY", `${this.enemyDisplayName} squad defeated.`, `Reward: +${this.goldReward} Gold`, `Direct EXP: ${this.directExperienceTotal}`, `Bonus EXP: ${this.bonusExperienceTotal}`]
+      : ["DEFEAT", "All allied units are defeated.", "Reward: 0 Gold", `Direct EXP: ${this.directExperienceTotal}`, "Bonus EXP: 0"]);
   }
 
   private saveCurrentSelectionToGroup(groupIndex: ControlGroupIndex): void {
@@ -1561,7 +1698,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private getSelectionInfoLabel(unit: RTSBattleUnit): string {
-    return unit.displayName;
+    return `${unit.displayName} · ${formatProgression(unit)} · HP ${unit.currentHp}/${unit.maxHp} · ATK ${unit.attackDamage}`;
   }
 
   private getHealthRatio(currentHp: number, maxHp: number): number {
@@ -1582,6 +1719,10 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private sanitizeGold(value: number): number {
+    return Number.isSafeInteger(value) && value >= 0 ? value : 0;
+  }
+
+  private sanitizeExperience(value: number): number {
     return Number.isSafeInteger(value) && value >= 0 ? value : 0;
   }
 

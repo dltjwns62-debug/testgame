@@ -14,6 +14,7 @@ import {
 import { buildBattleRosterFromFormation, getOrCreateFormationState, isValidFormationState } from "../formationState";
 import { addPlayerGold, getOrCreatePlayerGold } from "../playerEconomy";
 import { getOrCreateKeyBindingState } from "../keyBindings";
+import { formatProgression } from "../progression";
 import type { RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
@@ -93,14 +94,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 12: Control Groups", {
+    this.add.text(48, 36, "Stage 13: Experience & Growth", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Save and recall living units during battle.", {
+    this.add.text(50, 66, "Track roster growth and formation progress.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -544,6 +545,7 @@ export class FieldScene extends Phaser.Scene {
       `Target: ${this.targetMonster?.definition.name ?? "None"}`,
       `Gold: ${playerGold}`,
       `Formation: ${deployedCount}/10 · Owned: ${formation.ownedUnits.length}/13 · Hero Slot: ${heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1}`,
+      `Hero: ${hero ? formatProgression(hero) : "Unavailable"}`,
       ...(this.formationMessage ? [this.formationMessage] : []),
     ]);
   }

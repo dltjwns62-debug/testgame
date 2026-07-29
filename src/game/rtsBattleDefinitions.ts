@@ -107,6 +107,7 @@ export function getEnemyDefinition(monsterId: string): EnemyDefinition | null {
     name: monster.name,
     color: monster.color,
     goldReward: monster.goldReward,
+    experienceReward: monster.experienceReward,
     ...stats,
   };
 }
@@ -120,6 +121,8 @@ export function createTrialRoster(): RosterEntry[] {
         unitRole: "MAIN_CHARACTER",
         displayName: "Hero",
         slotIndex: 0,
+        level: 1,
+        experience: 0,
       };
     }
 
@@ -130,6 +133,8 @@ export function createTrialRoster(): RosterEntry[] {
         unitRole: "MERCENARY",
         displayName: "Skill Merc",
         slotIndex: index,
+        level: 1,
+        experience: 0,
       };
     }
 
@@ -139,6 +144,8 @@ export function createTrialRoster(): RosterEntry[] {
       unitRole: "MERCENARY",
       displayName: `Merc ${index}`,
       slotIndex: index,
+      level: 1,
+      experience: 0,
     };
   });
 }
@@ -149,6 +156,8 @@ export function createTrialOwnedUnits(): OwnedRosterUnit[] {
     unitDefinitionId,
     unitRole,
     displayName,
+    level: 1,
+    experience: 0,
   }));
 }
 

@@ -1,48 +1,45 @@
 # 현재 개발 상태
 
-## Stage 13 경험치·레벨·능력치 성장 — 완료
+## Stage 14 아이템·인벤토리·장비 — 검수 대기
 
-- 현재 검수 태그: `review-stage-13-v1`
-- 승인 검수 커밋: `7add577d16d005087d16c23665804f6d3150c616`
-- 완료 태그: `stage-13-completed`
-- 작업 브랜치: `main`
+- 현재 검수 태그: `review-stage-14-v1`
+- 작업 브랜치: `stage-14-items-inventory-equipment`
 - 전체 단계: 17단계
-- 현재 단계: 13단계 — 경험치·레벨·능력치 성장
-- 현재 단계 상태: 완료 (`completed`)
-- 현재 작업: 13단계 완료 — 14단계 시작 명령 대기 중
+- 현재 단계: 14단계 — 아이템·인벤토리·장비
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업: 14단계 구현 완료 및 ChatGPT 검수 대기
 - 완료된 단계: 1단계~13단계
 - 검수 통과된 단계: 1단계~13단계
-- 다음 단계: 14단계 — 아이템·인벤토리·장비
-- `main` 정식 반영 여부: 반영 완료
+- 다음 단계: 15단계 — 저장과 오프라인 진행
+- `main` 정식 반영 여부: 미반영
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 승인 (`approved`)
-- 브라우저 자동화: 미실시 (`not_tested`)
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- 브라우저 자동화: 제한된 UI 확인 완료
 - 현재 알려진 문제: 기존 `favicon.ico` 404 비차단 경고
 
-### 13단계 구현 요약
+### 14단계 구현 요약
 
-- 성장 상태는 Formation registry의 `ownedUnits`에 `rosterUnitId`별 `level`·`experience`로 저장한다.
-- 기존 세션 데이터에 성장 필드가 없으면 Lv.1·EXP 0으로 보정하고, 구매 유닛도 동일한 초기값으로 시작한다.
-- 적 정의에 Slime 1~4의 `experienceReward`를 두고 마지막 유효 아군 처치자에게만 직접 경험치를 즉시 지급한다.
-- 전투 종료 시 전체 직접 처치 경험치의 `BATTLE_END_BONUS_RATE = 0.1` 보너스를 살아 있는 출전 아군마다 한 번 지급한다.
-- 레벨은 현재 레벨×1000의 누적 요구 경험치로 연속 상승하며, 최대 HP·공격력은 기본 능력치에서 현재 레벨로 다시 계산한다.
-- 레벨업 시 최대 HP 증가분만 현재 HP에 더하고, 이동 속도·공격 주기·사거리·스킬 쿨다운·범위는 성장시키지 않는다.
-- Formation은 Hero·출전 용병·Bench 용병의 성장 정보를 표시하고, Battle은 단일 선택 유닛의 레벨·EXP·HP·공격력을 표시한다.
-- Field는 Hero의 레벨·EXP를 표시하고 전투 결과는 Direct EXP·Bonus EXP를 표시한다.
-- 브라우저 새로고침 영구 저장과 14단계 아이템·인벤토리·장비는 구현하지 않는다.
+- ItemDefinition과 ItemInstance를 분리하고 같은 정의의 장비도 획득 순서가 다른 개별 인스턴스로 보관한다.
+- weapon·armor·accessory 중앙 슬롯 정의를 순회해 rosterUnitId별 장비 상태를 관리한다.
+- Slime별 독립 드롭표를 적 사망 전환 시점에 한 번만 판정해 즉시 세션 인벤토리에 넣고, 패배 후에도 유지한다.
+- melee/ranged/magic 무기 호환과 ALL_UNITS/SPECIFIC_UNITS 고유 장비 제한을 장착 시 검사한다.
+- 장비 modifier는 statId 기반으로 합산하며 현재 attack·defense·maxHp를 최종 능력치에 적용한다.
+- 기본 공격과 Whirlwind는 대상의 최종 방어력으로 물리 피해 감소 공식을 사용한다.
+- InventoryScene, Field Inventory 버튼, Formation·Battle·Field 방어력 표시와 전투 결과 Loot 요약을 추가했다.
+- 브라우저 새로고침 영구 저장과 15단계 저장·오프라인 진행은 구현하지 않는다.
 
-### 13단계 검증 기록
+### 14단계 검증 기록
 
 - `npm ci`: 통과 (`passed`)
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
 - `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
-- 경험치 순수 로직 검사: 임계값·다중 레벨업·능력치 공식·종료 보너스 통과
+- InventoryScene 브라우저 확인: Field 버튼, 보유 유닛·장비 슬롯·빈 인벤토리·Back to Field 표시 확인
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 승인 (`approved`)
-- `main` 반영: 완료
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- `main` 반영: 미반영
 
-마지막 갱신: 2026-07-29 15:23 (Asia/Seoul)
+마지막 갱신: 2026-07-29 17:50 (Asia/Seoul)
 
 ## Stage 12 부대 지정과 단축키 설정 — 완료 (historical)
 

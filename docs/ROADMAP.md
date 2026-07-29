@@ -1,24 +1,24 @@
 # Test Game 개발 로드맵
 
-## Stage 13 final approval and main integration
+## Stage 14 current submission
 
 - 전체 단계: 17단계
-- 현재 단계: 13단계 — 경험치·레벨·능력치 성장
-- 단계 상태: `completed`
-- 작업 브랜치: `main`
-- 검수 태그: `review-stage-13-v1`
-- 완료 태그: `stage-13-completed`
+- 현재 단계: 14단계 — 아이템·인벤토리·장비
+- 단계 상태: `review_pending`
+- 작업 브랜치: `stage-14-items-inventory-equipment`
+- 검수 태그: `review-stage-14-v1`
 - 완료된 단계: 1단계~13단계
-- 다음 단계: 14단계 — 아이템·인벤토리·장비
-- `main` 반영 여부: 1단계부터 13단계까지 반영 완료
+- 다음 단계: 15단계 — 저장과 오프라인 진행
+- `main` 반영 여부: 1단계부터 13단계까지 반영 완료, 14단계 미반영
 - 사용자 실행 테스트: `skipped_by_user`
-- ChatGPT 코드 검수: `approved`
+- ChatGPT 코드 검수: `pending`
 - v1 결과 (historical): `changes_requested` — 중앙 부대 패널이 전투 유닛을 가리고 Group 10이 Group 0으로 표시됨
 - v2 결과 (historical): `changes_requested` — 부대가 BattleScene마다 초기화되고 사망·UI 조회가 부대 원본을 삭제함
 - v3 결과 (historical): `changes_requested` / 사용자 실행 테스트 `failed` — Auto Hunt OFF에서 M8·M9가 전투 후 guardPosition으로 자동 귀환함
 - v4 제출: 고정 guardPosition 기준 지역 방어와 자동 귀환 제거, 소스 검수 승인 가능
 - 12단계 v5 결과 (historical): `approved` — ChatGPT 정적 검수와 사용자 통합 실행 테스트 통과
 - 13단계 v1 결과: `approved` — 승인 커밋을 `main`에 no-ff 병합하고 완료 태그 생성
+- 14단계 v1 제출: 인벤토리·장비·드롭·방어력 구현, 검수 대기
 
 ## Stage 9 v3 resubmission scope
 
@@ -42,10 +42,10 @@
 ## 로드맵 기준
 
 - 전체 단계: 17단계
-- 현재 단계: 13단계
-- 현재 단계 이름: 경험치·레벨·능력치 성장
+- 현재 단계: 14단계
+- 현재 단계 이름: 아이템·인벤토리·장비
 - 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-13-experience-level-stats`
+- 현재 작업 브랜치: `stage-14-items-inventory-equipment`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -76,12 +76,13 @@
 - 12단계 완료 태그: `stage-12-completed`
 - 13단계 검수 태그: `review-stage-13-v1` (승인)
 - 13단계 완료 태그: `stage-13-completed`
-- 다음 단계: 14단계 — 아이템·인벤토리·장비
+- 14단계 검수 태그: `review-stage-14-v1`
+- 다음 단계: 15단계 — 저장과 오프라인 진행
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
 - `main` 반영 여부: 1단계부터 13단계까지 반영 완료
 
-현재 단계 번호는 13이며, 1단계부터 13단계까지 `main`에 반영되어 완료됐다. 14단계는 별도의 브랜치·시작 명령 전까지 시작하지 않는다.
+현재 단계 번호는 14이며, 1단계부터 13단계까지 `main`에 반영되어 완료됐다. 14단계는 `stage-14-items-inventory-equipment`에서 검수 대기 중이며, 15단계는 시작하지 않는다.
 
 각 단계의 상태는 다음 값으로 관리한다.
 
@@ -92,7 +93,7 @@
 - `approved`: 검수 통과, 병합 대기
 - `completed`: `main` 반영까지 완료
 
-각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 13이며, 1단계부터 13단계까지 `main` 반영이 완료됐다. 14단계는 별도 브랜치·시작 명령 전까지 시작하지 않는다.
+각 단계는 목표와 완료 조건을 검수한 뒤 진행한다. 현재 단계 번호는 14이며, 1단계부터 13단계까지 `main` 반영이 완료됐다. 14단계는 `review_pending` 상태이고, 15단계는 시작하지 않는다.
 
 검수 대상 버전은 tracked 파일 안의 현재 커밋 해시가 아니라 변경되지 않는 Git 태그로 관리한다. 검수 태그는 `review-stage-XX-vN` 형식을 사용하고, 기존 원격 태그는 이동하거나 덮어쓰지 않는다. 1단계 승인 태그는 `review-stage-01-v1`이며, 2단계 최초 검수 태그 `review-stage-02-v1`은 수정 요청 기록으로 보존하고 현재 재검수 태그는 `review-stage-02-v2`다.
 
@@ -661,26 +662,29 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 
 ### 단계 상태
 
-`not_started`
+`review_pending` — `review-stage-14-v1` 제출, `main` 미반영
 
 ### 목표
 
-아이템을 획득하고 인벤토리에서 관리하며 장비를 장착해 플레이어 상태에 반영한다.
+아이템을 획득하고 인벤토리에서 관리하며 장비를 장착해 유닛 상태와 전투에 반영한다.
 
 ### 주요 구현 항목
 
-- 아이템 데이터 구조
-- 아이템 획득 및 드롭
-- 인벤토리 표시와 관리
-- 장비 장착·해제
-- 장비 효과 반영
+- ItemDefinition·개별 ItemInstance·무제한 세션 인벤토리
+- weapon·armor·accessory 슬롯 정의, melee/ranged/magic 호환, COMMON/UNIQUE 제한
+- Slime별 독립 드롭 판정과 패배 후 유지
+- InventoryScene 장착·해제와 Bench 포함 rosterUnitId 장비 유지
+- attack·defense·maxHp modifier와 방어력 물리 피해 감소
 
 ### 완료 조건
 
-- 아이템이 정의된 규칙에 따라 획득된다.
-- 인벤토리에서 아이템을 확인하고 관리할 수 있다.
-- 장비 장착·해제가 동작한다.
-- 장비 효과와 표시 능력치가 일치한다.
+- [x] 아이템이 정의된 규칙에 따라 적 사망 시 즉시 획득된다.
+- [x] 인벤토리에서 개별 아이템을 확인하고 장착·해제할 수 있다.
+- [x] 무기 호환·고유 장비 제한·인스턴스 이중 장착을 검사한다.
+- [x] 장비 효과와 표시 능력치·방어력 피해 감소가 연결된다.
+- [x] typecheck와 build가 통과한다.
+- [ ] 사용자 수동 테스트 — 사용자 요청으로 생략 (`skipped_by_user`)
+- [ ] ChatGPT 코드 검수 및 `main` 반영
 
 ### 해당 단계에서 구현하지 않을 항목
 

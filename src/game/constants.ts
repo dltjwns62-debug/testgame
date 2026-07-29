@@ -36,6 +36,7 @@ export const FORMATION_REGISTRY_KEY = "testgame.formationState";
 export const PLAYER_GOLD_REGISTRY_KEY = "testgame.playerGold";
 export const KEY_BINDINGS_REGISTRY_KEY = "testgame.keyBindings";
 export const CONTROL_GROUPS_REGISTRY_KEY = "testgame.controlGroups";
+export const INVENTORY_REGISTRY_KEY = "testgame.inventory";
 export const INITIAL_OWNED_UNIT_COUNT = 10;
 export const MAX_OWNED_UNIT_COUNT = 13;
 
@@ -44,6 +45,7 @@ export const MAX_OWNED_UNIT_COUNT = 13;
 export const RTS_TRIAL_MAIN_CHARACTER = {
   maxHp: 120,
   attackDamage: 15,
+  defense: 5,
   attackIntervalMs: 900,
   moveSpeed: 120,
   attackRange: 10,
@@ -52,16 +54,17 @@ export const RTS_TRIAL_MAIN_CHARACTER = {
 export const RTS_TRIAL_MERCENARY = {
   maxHp: 70,
   attackDamage: 8,
+  defense: 2,
   attackIntervalMs: 1100,
   moveSpeed: 100,
   attackRange: 8,
   collisionRadius: 12,
 };
 export const RTS_SLIME_STATS = {
-  slime1: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
-  slime2: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
-  slime3: { maxHp: 35, attackDamage: 5, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
-  slime4: { maxHp: 70, attackDamage: 10, attackIntervalMs: 1000, moveSpeed: 85, attackRange: 10, collisionRadius: 14 },
+  slime1: { maxHp: 35, attackDamage: 5, defense: 0, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
+  slime2: { maxHp: 35, attackDamage: 5, defense: 0, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
+  slime3: { maxHp: 35, attackDamage: 5, defense: 0, attackIntervalMs: 1300, moveSpeed: 70, attackRange: 8, collisionRadius: 12 },
+  slime4: { maxHp: 70, attackDamage: 10, defense: 0, attackIntervalMs: 1000, moveSpeed: 85, attackRange: 10, collisionRadius: 14 },
 } as const;
 
 export type MonsterDefinition = {

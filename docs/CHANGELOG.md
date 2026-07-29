@@ -1,5 +1,26 @@
 # 변경 이력
 
+## 2026-07-29 — 14단계 v1 검수 수정 및 v2 재제출
+
+- 14단계 최초 코드 검수에서 수정 요청됨
+- Unequip 버튼을 중앙 장비 슬롯 카드 내부로 이동해 Available Items 영역과의 겹침 가능성을 제거함
+- registry 기반 장비 진입 시 실제 FormationState.ownedUnits의 rosterUnitId·unitDefinitionId·unitRole을 검증함
+- 검증 실패 시 `UNIT_NOT_FOUND`를 반환하고 기존 InventoryState를 변경하지 않음
+- `review-stage-14-v1`은 보존하고 새 검수 태그는 `review-stage-14-v2`로 사용함
+- 사용자 수동 테스트는 아직 실시하지 않아 `skipped_by_user`로 유지함
+- 14단계는 아직 완료되지 않음
+
+## 2026-07-29 — 14단계 아이템·인벤토리·장비 구현 및 검수 제출
+
+- ItemDefinition과 개별 ItemInstance, weapon·armor·accessory 중앙 슬롯 정의, 무제한 세션 인벤토리 추가
+- Training Blade, Training Bow, Apprentice Staff, Leather Armor, Life Charm, Hero's Oathblade 정의 및 Slime별 독립 드롭표 추가
+- melee/ranged/magic 무기 호환, COMMON/UNIQUE, ALL_UNITS/SPECIFIC_UNITS 장착 제한과 인스턴스 이중 장착 방지 추가
+- attack·defense·maxHp modifier 기반 최종 능력치와 공통 방어력 물리 피해 감소 적용
+- 적 사망 시 즉시 드롭 획득, 패배 후 획득 보존, Victory/Defeat Loot 요약 추가
+- InventoryScene과 Field Inventory 버튼, Formation·Battle·Field 방어력 정보 추가
+- `review-stage-14-v1`로 `stage-14-items-inventory-equipment` 검수 제출
+- 사용자 수동 테스트는 `skipped_by_user`로 기록하며, 14단계는 `main`에 병합하지 않음
+
 ## 2026-07-29 — 13단계 검수 승인 및 main 반영 — 완료
 
 - 승인 검수 태그 `review-stage-13-v1`과 승인 커밋 `7add577d16d005087d16c23665804f6d3150c616`을 확인했다.

@@ -1,5 +1,28 @@
 # 프로젝트 결정 사항
 
+## 14단계 v1 검수 수정 결정
+
+- 결정: Unequip 버튼은 중앙 장비 슬롯 카드 내부에 배치해 Available Items 패널과 겹치지 않게 한다.
+- 결정: registry 진입 함수는 전달된 유닛과 현재 FormationState.ownedUnits의 rosterUnitId·unitDefinitionId·unitRole을 모두 대조한다.
+- 결정: 실제 보유 유닛 검증에 실패하면 `UNIT_NOT_FOUND`를 반환하고 InventoryState를 변경하지 않는다.
+- 결정: 실제 Bench 유닛과 출전 유닛 모두 같은 소유 검증을 통과하면 장착·해제가 가능하다.
+- 결정: `review-stage-14-v1`은 수정 요청 이력으로 보존하고 v2 재검수 태그를 생성한다.
+- 상태: 확정
+
+## 14단계 아이템·인벤토리·장비 결정 (검수 제출)
+
+- 결정: 인벤토리는 현재 Phaser registry 세션에서 용량 제한 없이 관리한다.
+- 결정: 동일 장비 정의도 각각 독립된 ItemInstance로 보관하고 하나의 인스턴스는 한 슬롯에만 장착한다.
+- 결정: 장비 슬롯은 weapon·armor·accessory 중앙 정의를 순회해 확장 가능하게 관리한다.
+- 결정: 장비는 COMMON/UNIQUE로 구분하고, 착용 제한은 ALL_UNITS/SPECIFIC_UNITS만 사용하며 계급 제한은 두지 않는다.
+- 결정: 편성·Bench·정의 변경으로 이미 장착한 장비를 자동 해제하지 않는다.
+- 결정: 무기 호환 분류는 melee/ranged/magic만 사용한다.
+- 결정: 장비 효과는 statId 기반 modifier 목록으로 보존하며 현재 attack·defense·maxHp만 실제 전투에 적용한다.
+- 결정: 미등록 statId는 데이터에 보존하되 현재 전투 계산에서는 무시할 수 있다.
+- 결정: 드롭 성공 아이템은 적 사망 시 즉시 획득해 Victory·Defeat와 무관하게 유지한다.
+- 결정: 영구 저장과 오프라인 진행은 15단계에서 처리하며 이번 단계는 `review_pending`으로 제출한다.
+- 상태: 확정
+
 ## 13단계 최종 승인 및 main 반영 결정
 
 - 결정: ChatGPT 독립 코드 검수를 통과한 `review-stage-13-v1`과 승인 커밋 `7add577d16d005087d16c23665804f6d3150c616`을 승인한다.

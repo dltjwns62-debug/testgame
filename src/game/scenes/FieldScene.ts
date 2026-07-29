@@ -14,8 +14,10 @@ import {
 import { buildBattleRosterFromFormation, getOrCreateFormationState, isValidFormationState } from "../formationState";
 import { addPlayerGold, getOrCreatePlayerGold } from "../playerEconomy";
 import { getOrCreateKeyBindingState } from "../keyBindings";
+import { calculateFinalUnitStats, getEquippedModifierTotals, getOrCreateInventoryState } from "../items";
+import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import { formatProgression } from "../progression";
-import type { RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
+import type { OwnedRosterUnit, RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
@@ -26,6 +28,21 @@ type MonsterView = {
   isAvailable: boolean;
   respawnEvent: Phaser.Time.TimerEvent | null;
 };
+
+function getHeroStatsLabel(
+  registry: Phaser.Data.DataManager,
+  hero: OwnedRosterUnit,
+): string {
+  const definition = getAllyUnitDefinition(hero.unitDefinitionId);
+  const stats = calculateFinalUnitStats(
+    definition?.maxHp ?? 1,
+    definition?.attackDamage ?? 1,
+    definition?.defense ?? 0,
+    hero.level,
+    getEquippedModifierTotals(getOrCreateInventoryState(registry), hero.rosterUnitId),
+  );
+  return formatProgression(hero) + " · ATK " + stats.attackDamage + " · DEF " + stats.defense + " · HP " + stats.maxHp;
+}
 
 export class FieldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Container;
@@ -41,6 +58,8 @@ export class FieldScene extends Phaser.Scene {
   private shopButtonLabel!: Phaser.GameObjects.Text;
   private keySettingsButton!: Phaser.GameObjects.Rectangle;
   private keySettingsButtonLabel!: Phaser.GameObjects.Text;
+  private inventoryButton!: Phaser.GameObjects.Rectangle;
+  private inventoryButtonLabel!: Phaser.GameObjects.Text;
   private formationMessage: string | null = null;
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
@@ -55,12 +74,14 @@ export class FieldScene extends Phaser.Scene {
     getOrCreateFormationState(this.game.registry);
     getOrCreatePlayerGold(this.game.registry);
     getOrCreateKeyBindingState(this.game.registry);
+    getOrCreateInventoryState(this.game.registry);
     this.drawField();
     this.addStageNotice();
     this.addStatusText();
     this.addFormationButton();
     this.addShopButton();
     this.addKeySettingsButton();
+    this.addInventoryButton();
     this.player = this.addPlayer();
 
     MONSTERS.forEach((monster) => this.addMonster(monster));
@@ -94,14 +115,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 13: Experience & Growth", {
+    this.add.text(48, 36, "Stage 14: Items & Equipment", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Track roster growth and formation progress.", {
+    this.add.text(50, 66, "Collect loot, manage inventory, and equip your roster.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -109,12 +130,12 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStatusText(): void {
-    this.stateText = this.add.text(928, 36, "", {
+    this.stateText = this.add.text(928, 98, "", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
-      fontSize: "18px",
+      fontSize: "12px",
       fontStyle: "bold",
-      lineSpacing: 8,
+      lineSpacing: 4,
       align: "right",
     }).setOrigin(1, 0);
     this.updateStatusText();
@@ -430,6 +451,46 @@ export class FieldScene extends Phaser.Scene {
     this.updateStatusText();
   }
 
+  private addInventoryButton(): void {
+    this.inventoryButton = this.add.rectangle(862, 66, 104, 28, 0x4b8b6d, 1)
+      .setStrokeStyle(1, 0x9ce4b0, 1)
+      .setInteractive({ useHandCursor: true });
+    this.inventoryButtonLabel = this.add.text(862, 66, "Inventory", {
+      color: "#f3f8e9",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "11px",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+    this.inventoryButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      if (pointer.button === 0) {
+        this.openInventory();
+      }
+    });
+  }
+
+  public openInventory(): void {
+    if (this.battleTransitionStarted || this.state === "BATTLE") {
+      return;
+    }
+    if (this.state === "MOVING") {
+      this.formationMessage = "Inventory is unavailable while the player is moving.";
+      this.updateStatusText();
+      return;
+    }
+    this.formationMessage = null;
+    this.scene.pause();
+    this.scene.launch("InventoryScene");
+  }
+
+  public returnFromInventory(savedMessage?: string): void {
+    this.scene.stop("InventoryScene");
+    this.scene.resume();
+    this.state = "IDLE";
+    this.formationMessage = savedMessage ?? null;
+    this.updateStatusText();
+  }
+
   public applyBattleResult(result: RTSBattleResult): void {
     if (
       !result ||
@@ -540,12 +601,12 @@ export class FieldScene extends Phaser.Scene {
     this.shopButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.keySettingsButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
     this.keySettingsButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
+    this.inventoryButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
+    this.inventoryButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.stateText.setText([
-      `State: ${this.state}`,
-      `Target: ${this.targetMonster?.definition.name ?? "None"}`,
-      `Gold: ${playerGold}`,
-      `Formation: ${deployedCount}/10 · Owned: ${formation.ownedUnits.length}/13 · Hero Slot: ${heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1}`,
-      `Hero: ${hero ? formatProgression(hero) : "Unavailable"}`,
+      "State: " + this.state + " · Target: " + (this.targetMonster?.definition.name ?? "None") + " · Gold: " + playerGold,
+      "Formation: " + deployedCount + "/10 · Owned: " + formation.ownedUnits.length + "/13 · Hero Slot: " + (heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1),
+      "Hero: " + (hero ? getHeroStatsLabel(this.game.registry, hero) : "Unavailable"),
       ...(this.formationMessage ? [this.formationMessage] : []),
     ]);
   }

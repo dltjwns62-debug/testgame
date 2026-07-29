@@ -41,7 +41,7 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 18, "Stage 13: Mercenary Shop", {
+    this.add.text(32, 18, "Stage 14: Mercenary Shop", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",

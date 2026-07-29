@@ -2,22 +2,53 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 13,
-  "currentStageName": "경험치·레벨·능력치 성장",
-  "stageStatus": "completed",
-  "activeTask": "13단계 완료 — 14단계 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 14,
+  "currentStageName": "아이템·인벤토리·장비",
+  "stageStatus": "review_pending",
+  "activeTask": "14단계 구현 완료 및 ChatGPT 검수 대기",
+  "workingBranch": "stage-14-items-inventory-equipment",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-  "nextStage": 14,
-  "nextStageName": "아이템·인벤토리·장비",
+  "nextStage": 15,
+  "nextStageName": "저장과 오프라인 진행",
   "reviewSubmission": {
-    "branch": "stage-13-experience-level-stats",
-    "tag": "review-stage-13-v1",
-    "version": 1,
+    "branch": "stage-14-items-inventory-equipment",
+    "tag": "review-stage-14-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 14,
+      "branch": "stage-14-items-inventory-equipment",
+      "tag": "review-stage-14-v2",
+      "version": 2,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": null,
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자 요청에 따라 수동 테스트를 요구하지 않음",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 14,
+      "branch": "stage-14-items-inventory-equipment",
+      "tag": "review-stage-14-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-29T18:00:00+09:00",
+      "commit": "97968057202745cb07eea1982578557c06751697",
+      "reason": "InventoryScene의 Unequip 버튼이 Available Items 영역과 겹칠 수 있고, registry 장비 진입점이 실제 FormationState 보유 유닛을 직접 검증하지 않음",
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자 요청에 따라 수동 테스트를 요구하지 않음",
+      "mainBranchMerged": false
+    },
     {
       "stage": 13,
       "branch": "stage-13-experience-level-stats",
@@ -466,23 +497,23 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-29T15:23:32+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
     "typecheck": "passed",
     "build": "passed",
     "devServer": "passed",
-    "browserAutomation": "not_tested",
+    "browserAutomation": "partial_passed",
     "userRunTest": "skipped_by_user",
-    "userRunTestReason": "이번 단계에서는 사용자가 수동 테스트를 요청하지 않았으며 주요 마일스톤 통합 테스트에서 진행 예정",
-    "chatGptCodeReview": "approved"
+    "userRunTestReason": "사용자 요청에 따라 14단계 수동 테스트를 요구하지 않음",
+    "chatGptCodeReview": "pending"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-29T15:23:32+09:00"
+  "lastUpdated": "2026-07-29T17:50:47+09:00"
 }

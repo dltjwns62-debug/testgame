@@ -28,6 +28,16 @@ import {
 } from "../controlGroups";
 import { getOrCreateFormationState, grantRosterUnitExperience } from "../formationState";
 import {
+  addItemDefinitionsToInventory,
+  calculateFinalUnitStats,
+  calculatePhysicalDamage,
+  getEquippedModifierTotals,
+  getMonsterDropTable,
+  getOrCreateInventoryState,
+  getItemDefinition,
+  rollDrops,
+} from "../items";
+import {
   createDefaultKeyBindingState,
   findControlGroupIndexByCode,
   getKeyCodeLabel,
@@ -124,6 +134,7 @@ export class BattleScene extends Phaser.Scene {
   private bonusExperienceTotal = 0;
   private readonly directExperienceByRosterUnitId = new Map<string, number>();
   private readonly bonusExperienceByRosterUnitId = new Map<string, number>();
+  private lootItems: RTSBattleResult["loot"] = [];
   private readonly units = new Map<string, RTSBattleUnit>();
   private readonly unitVisuals = new Map<string, UnitVisual>();
   private readonly slotVisuals = new Map<number, SlotVisual>();
@@ -277,6 +288,7 @@ export class BattleScene extends Phaser.Scene {
     this.bonusExperienceTotal = 0;
     this.directExperienceByRosterUnitId.clear();
     this.bonusExperienceByRosterUnitId.clear();
+    this.lootItems = [];
     this.units.clear();
     this.unitVisuals.clear();
     this.slotVisuals.clear();
@@ -346,7 +358,17 @@ export class BattleScene extends Phaser.Scene {
     }
 
     const progression = normalizeProgressionState(entry);
-    const stats = calculateProgressionStats(definition.maxHp, definition.attackDamage, progression.level);
+    const equipmentModifiers = getEquippedModifierTotals(
+      getOrCreateInventoryState(this.game.registry),
+      entry.rosterUnitId,
+    );
+    const stats = calculateFinalUnitStats(
+      definition.maxHp,
+      definition.attackDamage,
+      definition.defense,
+      progression.level,
+      equipmentModifiers,
+    );
     return {
       battleUnitId: entry.rosterUnitId,
       rosterUnitId: entry.rosterUnitId,
@@ -361,6 +383,8 @@ export class BattleScene extends Phaser.Scene {
       baseMaxHp: definition.maxHp,
       attackDamage: stats.attackDamage,
       baseAttackDamage: definition.attackDamage,
+      defense: stats.defense,
+      baseDefense: definition.defense,
       level: progression.level,
       experience: progression.experience,
       attackIntervalMs: definition.attackIntervalMs,
@@ -379,6 +403,7 @@ export class BattleScene extends Phaser.Scene {
       lastAttackedAt: 0,
       isAlive: true,
       experienceRewardGranted: false,
+      dropRollCompleted: false,
       slotIndex: entry.slotIndex,
       skills: [...definition.skills],
       skillReadyAtMs: {},
@@ -404,6 +429,8 @@ export class BattleScene extends Phaser.Scene {
       baseMaxHp: enemyDefinition.maxHp,
       attackDamage: enemyDefinition.attackDamage,
       baseAttackDamage: enemyDefinition.attackDamage,
+      defense: enemyDefinition.defense,
+      baseDefense: enemyDefinition.defense,
       level: 1,
       experience: 0,
       attackIntervalMs: enemyDefinition.attackIntervalMs,
@@ -422,6 +449,7 @@ export class BattleScene extends Phaser.Scene {
       lastAttackedAt: 0,
       isAlive: true,
       experienceRewardGranted: false,
+      dropRollCompleted: false,
       slotIndex: null,
       skills: [],
       skillReadyAtMs: {},
@@ -436,7 +464,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 12, "Stage 13: Experience & Growth", {
+    this.add.text(32, 12, "Stage 14: Items & Equipment", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
@@ -447,7 +475,7 @@ export class BattleScene extends Phaser.Scene {
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "12px",
     });
-    this.add.text(34, 57, "Earn direct EXP and battle-end bonuses.", {
+    this.add.text(34, 57, "Earn EXP, collect loot, and grow stronger with equipment.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "11px",
@@ -682,7 +710,7 @@ export class BattleScene extends Phaser.Scene {
       return false;
     }
 
-    target.currentHp = Math.max(0, target.currentHp - damage);
+    target.currentHp = Math.max(0, target.currentHp - calculatePhysicalDamage(damage, target.defense));
     if (target.currentHp === 0) {
       this.markUnitDead(target, caster);
     }
@@ -1231,6 +1259,10 @@ export class BattleScene extends Phaser.Scene {
       unit.experienceRewardGranted = true;
       this.grantDirectExperience(killer);
     }
+    if (unit.team === "ENEMY" && !unit.dropRollCompleted) {
+      unit.dropRollCompleted = true;
+      this.rollEnemyDrops(unit);
+    }
     unit.currentHp = 0;
     unit.isAlive = false;
     unit.state = "DEAD";
@@ -1281,11 +1313,18 @@ export class BattleScene extends Phaser.Scene {
     }
 
     const previousMaxHp = unit.maxHp;
-    const stats = calculateProgressionStats(unit.baseMaxHp, unit.baseAttackDamage, result.next.level);
+    const stats = calculateFinalUnitStats(
+      unit.baseMaxHp,
+      unit.baseAttackDamage,
+      unit.baseDefense,
+      result.next.level,
+      getEquippedModifierTotals(getOrCreateInventoryState(this.game.registry), unit.rosterUnitId),
+    );
     unit.level = result.next.level;
     unit.experience = result.next.experience;
     unit.maxHp = stats.maxHp;
     unit.attackDamage = stats.attackDamage;
+    unit.defense = stats.defense;
     if (unit.isAlive) {
       unit.currentHp = Math.min(unit.maxHp, Math.max(0, unit.currentHp + (unit.maxHp - previousMaxHp)));
     }
@@ -1298,6 +1337,25 @@ export class BattleScene extends Phaser.Scene {
       );
     }
     return result;
+  }
+
+  private rollEnemyDrops(enemy: RTSBattleUnit): void {
+    const dropTable = getMonsterDropTable(enemy.sourceWorldMonsterId ?? this.sourceWorldMonsterId);
+    const itemDefinitionIds = rollDrops(dropTable);
+    if (itemDefinitionIds.length === 0) {
+      return;
+    }
+    const added = addItemDefinitionsToInventory(this.game.registry, itemDefinitionIds);
+    itemDefinitionIds.forEach((itemDefinitionId, index) => {
+      const itemInstanceId = added.itemInstanceIds[index];
+      if (itemInstanceId) {
+        this.lootItems.push({ itemInstanceId, itemDefinitionId });
+      }
+    });
+    const names = itemDefinitionIds
+      .map((itemDefinitionId) => getItemDefinition(itemDefinitionId)?.displayName ?? itemDefinitionId)
+      .join(", ");
+    this.addAttackLog(enemy.displayName + " dropped: " + names + ".");
   }
 
   private grantBattleEndBonusExperience(outcome: BattleOutcome): void {
@@ -1346,7 +1404,8 @@ export class BattleScene extends Phaser.Scene {
       return;
     }
 
-    target.currentHp = Math.max(0, target.currentHp - attacker.attackDamage);
+    const damage = calculatePhysicalDamage(attacker.attackDamage, target.defense);
+    target.currentHp = Math.max(0, target.currentHp - damage);
     target.lastAttackerId = attacker.battleUnitId;
     target.lastAttackedAt = this.combatTimeMs;
     if (target.team === "ALLY") {
@@ -1366,7 +1425,7 @@ export class BattleScene extends Phaser.Scene {
         target.attackElapsedMs = 0;
       }
     }
-    this.addAttackLog(`${attacker.displayName} dealt ${attacker.attackDamage} to ${target.displayName}.`);
+    this.addAttackLog(attacker.displayName + " dealt " + damage + " to " + target.displayName + ".");
     if (target.currentHp === 0) {
       this.markUnitDead(target, attacker);
     }
@@ -1404,12 +1463,29 @@ export class BattleScene extends Phaser.Scene {
       directExperienceTotal: this.directExperienceTotal,
       bonusExperienceTotal: this.bonusExperienceTotal,
       experienceRewards: this.getExperienceRewards(),
+      loot: [...this.lootItems],
     };
     const fieldScene = this.scene.get("FieldScene") as FieldScene;
     fieldScene.applyBattleResult(result);
+    const lootLine = this.getLootSummaryLine();
     this.outcomeText.setText(outcome === "VICTORY"
-      ? ["VICTORY", `${this.enemyDisplayName} squad defeated.`, `Reward: +${this.goldReward} Gold`, `Direct EXP: ${this.directExperienceTotal}`, `Bonus EXP: ${this.bonusExperienceTotal}`]
-      : ["DEFEAT", "All allied units are defeated.", "Reward: 0 Gold", `Direct EXP: ${this.directExperienceTotal}`, "Bonus EXP: 0"]);
+      ? ["VICTORY", this.enemyDisplayName + " squad defeated.", "Reward: +" + this.goldReward + " Gold", "Direct EXP: " + this.directExperienceTotal, "Bonus EXP: " + this.bonusExperienceTotal, lootLine]
+      : ["DEFEAT", "All allied units are defeated.", "Reward: 0 Gold", "Direct EXP: " + this.directExperienceTotal, "Bonus EXP: 0", lootLine]);
+  }
+
+  private getLootSummaryLine(): string {
+    if (this.lootItems.length === 0) {
+      return "Loot: None";
+    }
+    const counts = new Map<string, number>();
+    for (const loot of this.lootItems) {
+      counts.set(loot.itemDefinitionId, (counts.get(loot.itemDefinitionId) ?? 0) + 1);
+    }
+    return "Loot: " + [...counts.entries()]
+      .map(([itemDefinitionId, count]) => (
+        (getItemDefinition(itemDefinitionId)?.displayName ?? itemDefinitionId) + " x" + count
+      ))
+      .join(", ");
   }
 
   private saveCurrentSelectionToGroup(groupIndex: ControlGroupIndex): void {
@@ -1698,7 +1774,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private getSelectionInfoLabel(unit: RTSBattleUnit): string {
-    return `${unit.displayName} · ${formatProgression(unit)} · HP ${unit.currentHp}/${unit.maxHp} · ATK ${unit.attackDamage}`;
+    return `${unit.displayName} · ${formatProgression(unit)} · HP ${unit.currentHp}/${unit.maxHp} · ATK ${unit.attackDamage} · DEF ${unit.defense}`;
   }
 
   private getHealthRatio(currentHp: number, maxHp: number): number {

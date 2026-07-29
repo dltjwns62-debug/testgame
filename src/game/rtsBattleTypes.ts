@@ -55,6 +55,8 @@ export type RTSBattleUnit = {
   baseMaxHp: number;
   attackDamage: number;
   baseAttackDamage: number;
+  defense: number;
+  baseDefense: number;
   level: number;
   experience: number;
   attackIntervalMs: number;
@@ -74,6 +76,7 @@ export type RTSBattleUnit = {
   lastAttackedAt: number;
   isAlive: boolean;
   experienceRewardGranted: boolean;
+  dropRollCompleted: boolean;
   slotIndex: number | null;
   skills: UnitSkillId[];
   skillReadyAtMs: Partial<Record<UnitSkillId, number>>;
@@ -98,13 +101,22 @@ export type RTSBattleResult = {
     directExperience: number;
     bonusExperience: number;
   }>;
+  loot: Array<{
+    itemInstanceId: string;
+    itemDefinitionId: string;
+  }>;
 };
 
 export type EnemyDefinition = Pick<MonsterDefinition, "id" | "name" | "color" | "goldReward" | "experienceReward"> & {
   maxHp: number;
   attackDamage: number;
+  defense: number;
   attackIntervalMs: number;
   moveSpeed: number;
   attackRange: number;
   collisionRadius: number;
+  dropTable: readonly {
+    itemDefinitionId: string;
+    dropChance: number;
+  }[];
 };

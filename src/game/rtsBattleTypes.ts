@@ -86,6 +86,7 @@ export type RTSBattleSceneData = {
   sourceWorldMonsterId: string;
   enemyCount: number;
   allyRoster: RosterEntry[];
+  autoRepeatBattle?: boolean;
 };
 
 export type RTSBattleResult = {

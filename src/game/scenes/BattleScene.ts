@@ -27,6 +27,7 @@ import {
   type ControlGroupMap,
 } from "../controlGroups";
 import { getOrCreateFormationState, grantRosterUnitExperience } from "../formationState";
+import { setAutoRepeatEnabled } from "../autoProgress";
 import {
   addItemDefinitionsToInventory,
   calculateFinalUnitStats,
@@ -128,6 +129,7 @@ export class BattleScene extends Phaser.Scene {
   private enemyDisplayName = "Slime 1";
   private enemyColor = 0xe67e91;
   private goldReward = 0;
+  private autoRepeatBattle = false;
   private experienceReward = 0;
   private battleEndExperienceGranted = false;
   private directExperienceTotal = 0;
@@ -282,6 +284,7 @@ export class BattleScene extends Phaser.Scene {
     this.enemyDisplayName = "Unknown enemy";
     this.enemyColor = 0x64748b;
     this.goldReward = 0;
+    this.autoRepeatBattle = false;
     this.experienceReward = 0;
     this.battleEndExperienceGranted = false;
     this.directExperienceTotal = 0;
@@ -316,6 +319,7 @@ export class BattleScene extends Phaser.Scene {
     this.enemyColor = enemyDefinition.color;
     this.goldReward = this.sanitizeGold(enemyDefinition.goldReward);
     this.experienceReward = this.sanitizeExperience(enemyDefinition.experienceReward);
+    this.autoRepeatBattle = data.autoRepeatBattle === true;
 
     const roster = [...data.allyRoster].sort((first, second) => first.slotIndex - second.slotIndex);
     const invalidAlly = roster.find((entry) => {
@@ -524,6 +528,10 @@ export class BattleScene extends Phaser.Scene {
 
     this.autoHuntEnabled = enabled;
     this.game.registry.set(AUTO_HUNT_REGISTRY_KEY, enabled);
+    if (!enabled && this.autoRepeatBattle) {
+      setAutoRepeatEnabled(this.game.registry, false);
+      this.addAttackLog("Repeat Hunt stopped because Battle Auto Hunt was disabled.");
+    }
     this.addAttackLog(enabled ? "Auto Hunt enabled." : "Auto Hunt disabled.");
 
     if (enabled) {
@@ -1471,6 +1479,9 @@ export class BattleScene extends Phaser.Scene {
     this.outcomeText.setText(outcome === "VICTORY"
       ? ["VICTORY", this.enemyDisplayName + " squad defeated.", "Reward: +" + this.goldReward + " Gold", "Direct EXP: " + this.directExperienceTotal, "Bonus EXP: " + this.bonusExperienceTotal, lootLine]
       : ["DEFEAT", "All allied units are defeated.", "Reward: 0 Gold", "Direct EXP: " + this.directExperienceTotal, "Bonus EXP: 0", lootLine]);
+    if (this.autoRepeatBattle) {
+      this.time.delayedCall(1400, () => fieldScene.returnFromBattle(outcome));
+    }
   }
 
   private getLootSummaryLine(): string {
@@ -1818,6 +1829,9 @@ export class BattleScene extends Phaser.Scene {
       Array.isArray(candidate.allyRoster) &&
       candidate.allyRoster.length >= 1 &&
       candidate.allyRoster.length <= RTS_ALLY_COUNT)) {
+      return false;
+    }
+    if (candidate.autoRepeatBattle !== undefined && candidate.autoRepeatBattle !== true && candidate.autoRepeatBattle !== false) {
       return false;
     }
 

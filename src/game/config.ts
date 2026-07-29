@@ -5,6 +5,8 @@ import { FormationScene } from "./scenes/FormationScene";
 import { KeySettingsScene } from "./scenes/KeySettingsScene";
 import { InventoryScene } from "./scenes/InventoryScene";
 import { ShopScene } from "./scenes/ShopScene";
+import { BootstrapScene } from "./scenes/BootstrapScene";
+import { SaveDataScene } from "./scenes/SaveDataScene";
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -18,5 +20,5 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 960,
     height: 540,
   },
-  scene: [FieldScene, FormationScene, ShopScene, KeySettingsScene, InventoryScene, BattleScene],
+  scene: [BootstrapScene, FieldScene, FormationScene, ShopScene, KeySettingsScene, InventoryScene, SaveDataScene, BattleScene],
 };

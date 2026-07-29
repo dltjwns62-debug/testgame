@@ -37,6 +37,18 @@ export const PLAYER_GOLD_REGISTRY_KEY = "testgame.playerGold";
 export const KEY_BINDINGS_REGISTRY_KEY = "testgame.keyBindings";
 export const CONTROL_GROUPS_REGISTRY_KEY = "testgame.controlGroups";
 export const INVENTORY_REGISTRY_KEY = "testgame.inventory";
+export const AUTO_PROGRESS_REGISTRY_KEY = "testgame.autoProgress";
+export const PERSISTENCE_META_REGISTRY_KEY = "testgame.persistenceMeta";
+export const PERSISTENCE_SUMMARY_REGISTRY_KEY = "testgame.persistenceSummary";
+export const SAVE_SCHEMA_VERSION = 1;
+export const SAVE_PRIMARY_KEY = "testgame.save.primary";
+export const SAVE_BACKUP_KEY = "testgame.save.backup";
+export const SAVE_TEMP_KEY = "testgame.save.temp";
+export const SAVE_RECOVERY_KEY = "testgame.save.recovery";
+export const OFFLINE_MIN_DURATION_MS = 60_000;
+export const OFFLINE_MAX_DURATION_MS = 8 * 60 * 60 * 1000;
+export const AUTO_SAVE_DEBOUNCE_MS = 500;
+export const AUTO_SAVE_INTERVAL_MS = 30_000;
 export const INITIAL_OWNED_UNIT_COUNT = 10;
 export const MAX_OWNED_UNIT_COUNT = 13;
 
@@ -78,6 +90,13 @@ export type MonsterDefinition = {
   attackIntervalMs: number;
   goldReward: number;
   experienceReward: number;
+};
+
+export const OFFLINE_CYCLE_DURATION_MS: Readonly<Record<string, number>> = {
+  "slime-1": 180_000,
+  "slime-2": 210_000,
+  "slime-3": 240_000,
+  "slime-4": 300_000,
 };
 
 export const PLAYER_POSITION = {

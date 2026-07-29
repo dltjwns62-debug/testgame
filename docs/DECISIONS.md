@@ -1,5 +1,14 @@
 # 프로젝트 결정 사항
 
+## 15단계 v2 검수 수정 결정
+
+- 결정: Storage API는 `safeGetItem`, `safeSetItem`, `safeRemoveItem`을 통해서만 호출하고, 읽기 예외 시 메모리 기본값으로 시작한다.
+- 결정: 미래 schemaVersion의 primary/backup/temp 후보는 덮어쓰지 않고 `NEWER_VERSION_BLOCKED` 상태로 보존한다.
+- 결정: Repeat Hunt 자동 이동과 수동 우클릭 이동을 구분하며, 수동 이동은 Repeat Hunt 해제 시 유지한다.
+- 결정: `victoryCountsByMonsterId`와 실제 Repeat Hunt 승리 수를 분리한다.
+- 결정: 15단계 v2 상태는 `review_pending`이며 검수 태그는 `review-stage-15-v2`이다.
+- 상태: 확정
+
 ## 15단계 저장과 오프라인 진행 결정 (검수 제출)
 
 - 결정: 저장은 서버가 아닌 브라우저 localStorage의 primary/backup/temp/recovery 키로 관리한다.

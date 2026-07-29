@@ -2,18 +2,18 @@
 
 ## Stage 15 저장과 오프라인 진행 — 검수 대기
 
-- 현재 검수 태그: `review-stage-15-v1`
+- 현재 검수 태그: `review-stage-15-v2`
 - 작업 브랜치: `stage-15-save-offline-progress`
 - 전체 단계: 17단계
 - 현재 단계: 15단계 — 저장과 오프라인 진행
 - 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업: localStorage 저장·복구, Repeat Hunt, 방치 보상과 Save Data UI 구현
+- 현재 작업: 15단계 검수 지적 수정 및 저장·복구·Repeat Hunt 상태 안정화
 - 완료된 단계: 1단계~14단계
 - 검수 통과된 단계: 1단계~14단계
 - 다음 단계: 16단계 — 성능 및 안정화
 - `main` 정식 반영 여부: 미반영
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- ChatGPT 코드 검수: 재검수 대기 (`not_reviewed`)
 - 브라우저 자동화: Field·Save Data 화면과 Save Now·새로고침 복원 확인
 - 현재 알려진 문제: 기존 `favicon.ico` 404 비차단 경고
 
@@ -36,10 +36,10 @@
 - `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
 - 브라우저 확인: Stage 15 Field, Save Data, Save Now `SAVED`, 새로고침 후 Field 복원 확인
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- ChatGPT 코드 검수: 재검수 대기 (`not_reviewed`)
 - `main` 반영: 미반영
 
-마지막 갱신: 2026-07-30 01:40 (Asia/Seoul)
+마지막 갱신: 2026-07-30 02:00 (Asia/Seoul)
 
 ## Stage 14 아이템·인벤토리·장비 — 완료 (historical)
 

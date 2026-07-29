@@ -1,14 +1,14 @@
 # 실행 및 테스트 기록
 
-## Stage 15 저장과 오프라인 진행 — v1 검수 대기
+## Stage 15 저장과 오프라인 진행 — v2 검수 대기
 
 - 현재 작업 브랜치: `stage-15-save-offline-progress`
-- 현재 검수 태그: `review-stage-15-v1`
+- 현재 검수 태그: `review-stage-15-v2`
 - 15단계 상태: 검수 대기 (`review_pending`)
 - 완료된 단계: 1단계~14단계
 - 다음 단계: 16단계 — 성능 및 안정화
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- ChatGPT 코드 검수: 재검수 대기 (`not_reviewed`)
 - `main` 반영: 미반영
 
 ### 15단계 자동 검사
@@ -32,6 +32,14 @@
 - [x] SaveDataScene의 Save Now와 5초 이중 확인 Reset Save를 구현한다.
 - [ ] 실제 전투 승리 후 반복 사냥과 장시간 방치 통합 시나리오 — 사용자 수동 테스트 생략
 - [ ] ChatGPT 코드 검수 및 main 반영
+
+### v2 검수 수정 기록
+
+- Storage 읽기·쓰기·삭제는 예외를 삼키는 `safeGetItem`, `safeSetItem`, `safeRemoveItem`을 거친다.
+- 미래 schemaVersion의 backup/temp 후보를 덮어쓰지 않고 `NEWER_VERSION_BLOCKED`로 보존한다.
+- 저장 실패 시 기존 `savedAtMs`와 `lastActiveAtMs`를 보존한다.
+- `document.visibilitychange`에서 hidden 저장·visible 복귀 정산을 중복 없이 처리한다.
+- 사용자 수동 테스트는 계속 `skipped_by_user`이며 통과로 기록하지 않는다.
 
 ## Stage 14 아이템·인벤토리·장비 — 최종 승인 및 main 반영
 

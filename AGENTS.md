@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 15 scope note: the submitted work is limited to localStorage primary/backup/temp saving, schemaVersion 1 and checksum validation, Bootstrap restore, Repeat Hunt, offline Gold/EXP/item rewards, duplicate-claim prevention, Save Data UI, and existing 1~14 stage integration. It does not implement server save, accounts, cloud sync, multiplayer, service workers, equipment enhancement/sales/trading, or stage 16 stabilization.
+Stage 15 scope note: the submitted work is limited to localStorage primary/backup/temp saving, safe storage access, schemaVersion 1 and checksum validation, Bootstrap restore, Repeat Hunt, offline Gold/EXP/item rewards, duplicate-claim prevention, Save Data UI, and existing 1~14 stage integration. It does not implement server save, accounts, cloud sync, multiplayer, service workers, equipment enhancement/sales/trading, or stage 16 stabilization.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -71,9 +71,9 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 14단계 최초 검수 태그: `review-stage-14-v1` — 수정 요청 (보존)
 - 14단계 승인 검수 태그: `review-stage-14-v2`
 - 14단계 완료 태그: `stage-14-completed`
-- 15단계 검수 태그: `review-stage-15-v1`
+- 15단계 검수 태그: `review-stage-15-v2`
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- ChatGPT 코드 검수: 재검수 대기 (`not_reviewed`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계
 - 다음 단계: 16단계 — 성능 및 안정화

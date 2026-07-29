@@ -1,5 +1,15 @@
 # 변경 이력
 
+## 2026-07-30 — 15단계 v2 검수 수정 재제출
+
+- 15단계 최초 검수에서 지적된 저장소 예외·미래 스키마 보존·저장 실패 메타데이터 문제를 수정했다.
+- `document.visibilitychange` 기반 자동 저장과 hidden/visible 중복 정산을 보완했다.
+- 장비 정규화, Repeat Hunt 수동 이동 구분·재생성 대기, 실제 승리 통계, Reset 재시작을 보완했다.
+- 오프라인 요약 아이템을 ItemDefinition 표시명과 수량으로 표시한다.
+- 기존 `review-stage-15-v1`은 보존하고 `review-stage-15-v2`로 재제출한다.
+- 사용자 수동 테스트는 아직 실시하지 않아 `skipped_by_user`로 유지한다.
+- 15단계는 아직 완료되지 않았으며 `main`에는 반영하지 않는다.
+
 ## 2026-07-30 — 15단계 저장과 오프라인 진행 구현 및 검수 제출
 
 - `stage-15-save-offline-progress` 브랜치에서 저장·복구·Repeat Hunt·방치 보상을 구현함

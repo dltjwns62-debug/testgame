@@ -1,5 +1,20 @@
 # Test Game 개발 로드맵
 
+## Stage 15 저장과 오프라인 진행 — v2 검수 대기
+
+- 전체 단계: 17단계
+- 현재 단계: 15단계 — 저장과 오프라인 진행
+- 단계 상태: `review_pending`
+- 작업 브랜치: `stage-15-save-offline-progress`
+- 검수 태그: `review-stage-15-v2`
+- 완료된 단계: 1단계~14단계
+- 다음 단계: 16단계 — 성능 및 안정화
+- 사용자 실행 테스트: `skipped_by_user`
+- ChatGPT 코드 검수: `not_reviewed`
+- `main` 반영 여부: 미반영
+
+15단계 v1 검수 지적을 수정한 v2를 제출했으며, 16단계는 시작하지 않는다.
+
 ## Stage 14 final approval and main integration
 
 - 전체 단계: 17단계
@@ -81,7 +96,7 @@
 - 14단계 최초 검수 태그: `review-stage-14-v1` — 수정 요청
 - 14단계 승인 검수 태그: `review-stage-14-v2`
 - 14단계 완료 태그: `stage-14-completed`
-- 15단계 검수 태그: `review-stage-15-v1`
+- 15단계 검수 태그: `review-stage-15-v2`
 - 다음 단계: 16단계 — 성능 및 안정화
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계
 - 검수 승인된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계
@@ -702,7 +717,7 @@ Gold를 사용해 시험용이 아닌 용병을 구매하고, 구매한 용병�
 
 ### 단계 상태
 
-`review_pending` — `review-stage-15-v1` 제출, `main` 미반영
+`review_pending` — `review-stage-15-v2` 재제출, `main` 미반영
 
 ### 목표
 

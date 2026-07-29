@@ -1,10 +1,10 @@
 # Test Game
 
-## Stage 13 review submission
+## Stage 13 final approval and main integration
 
-13단계 **경험치·레벨·능력치 성장**을 구현하고 `stage-13-experience-level-stats`에서 `review-stage-13-v1`로 검수 제출한다. 현재 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 사용자 수동 테스트는 이번 단계에서 요청하지 않아 `skipped_by_user`로 기록한다.
+13단계 **경험치·레벨·능력치 성장**의 승인 검수 태그 `review-stage-13-v1`과 승인 커밋 `7add577d16d005087d16c23665804f6d3150c616`을 확인하고 `main`에 no-ff 병합했다. 현재 상태는 `completed`이며 완료 태그는 `stage-13-completed`이다. 사용자 수동 테스트는 실행하지 않아 `skipped_by_user`로 유지하며 통과로 기록하지 않는다.
 
-성장 상태는 `rosterUnitId` 기준으로 현재 세션의 Formation registry에 유지한다. 직접 처치 경험치와 전투 종료 보너스, 레벨별 최대 HP·공격력 계산, Formation·Battle·Field 성장 정보 표시를 구현했다. 브라우저 새로고침 영구 저장과 14단계 아이템·인벤토리·장비는 구현하지 않는다.
+성장 상태는 `rosterUnitId` 기준으로 현재 세션의 Formation registry에 유지한다. 직접 처치 경험치와 전투 종료 보너스, 레벨별 최대 HP·공격력 계산, Formation·Battle·Field 성장 정보 표시를 구현했다. 브라우저 새로고침 영구 저장과 14단계 아이템·인벤토리·장비는 아직 구현하지 않는다.
 
 ## Stage 12 final approval and main integration
 
@@ -57,11 +57,11 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 전체 개발 단계: 17단계
 - 현재 단계: 13단계
 - 현재 단계 이름: 경험치·레벨·능력치 성장
-- 현재 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-13-experience-level-stats`
+- 현재 상태: 완료 (`completed`)
+- 현재 작업 브랜치: `main`
 - 검수 태그: `review-stage-13-v1`
-- 완료 태그: 없음 (검수 대기)
-- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계
+- 완료 태그: `stage-13-completed`
+- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계
 - 다음 단계: 14단계 — 아이템·인벤토리·장비
 
 7단계 10대10 RTS 핵심 전투와 8단계 Auto Hunt·지역 동료 지원 기능은 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다.
@@ -83,7 +83,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - HP 감소·사망·선택 해제·전멸 승패
 - 기존 Gold 1회 지급·월드맵 몬스터 제거·3초 재생성 연결
 
-12단계에서는 부대 지정과 단축키 설정을 완료했고, 13단계에서는 경험치·레벨·능력치 성장을 구현한다. 브라우저 새로고침 이후 영구 저장은 15단계에서 다룬다.
+12단계에서는 부대 지정과 단축키 설정을 완료했고, 13단계에서는 경험치·레벨·능력치 성장을 완료했다. 브라우저 새로고침 이후 영구 저장은 후속 단계에서 다루며, 14단계 기능은 별도 시작 명령 전까지 구현하지 않는다.
 
 ## 알려진 문제
 
@@ -116,4 +116,4 @@ npm run typecheck
 npm run build
 ```
 
-1단계부터 12단계까지는 `main`에 반영됐다. 13단계는 `stage-13-experience-level-stats`에서 검수 대기 중이며, 다음 예정 단계는 14단계다. 14단계 기능은 별도 승인·시작 명령 전까지 구현하지 않는다.
+1단계부터 13단계까지는 `main`에 반영되어 완료됐다. 다음 예정 단계는 14단계이며, 별도 승인·시작 명령 전까지 14단계 기능은 구현하지 않는다.

@@ -4,11 +4,11 @@
   "totalStages": 17,
   "currentStage": 13,
   "currentStageName": "경험치·레벨·능력치 성장",
-  "stageStatus": "review_pending",
-  "activeTask": "13단계 경험치·레벨·능력치 성장 구현 완료 — review-stage-13-v1 검수 대기 중",
-  "workingBranch": "stage-13-experience-level-stats",
-  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  "stageStatus": "completed",
+  "activeTask": "13단계 완료 — 14단계 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
   "nextStage": 14,
   "nextStageName": "아이템·인벤토리·장비",
   "reviewSubmission": {
@@ -24,14 +24,15 @@
       "tag": "review-stage-13-v1",
       "version": 1,
       "submitted": true,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
-      "commit": null,
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-29T15:23:32+09:00",
+      "commit": "7add577d16d005087d16c23665804f6d3150c616",
+      "reason": "직접 처치 경험치, 생존 출전 유닛별 10% 종료 보너스, 중복 지급 방지, rosterUnitId 기반 성장 지속, 레벨·HP·공격력 계산 및 UI가 정적 검수를 통과함",
       "userRunTest": "skipped_by_user",
-      "userRunTestReason": "이번 단계에서는 사용자가 수동 테스트를 요청하지 않았으며 주요 마일스톤 통합 테스트에서 진행 예정",
-      "mainBranchMerged": false
+      "userRunTestReason": "사용자 테스트를 실행하지 않아 skipped_by_user로 유지",
+      "mainBranchMerged": true
     },
     {
       "stage": 12,
@@ -465,9 +466,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-29T15:23:32+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -477,11 +478,11 @@
     "browserAutomation": "not_tested",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "이번 단계에서는 사용자가 수동 테스트를 요청하지 않았으며 주요 마일스톤 통합 테스트에서 진행 예정",
-    "chatGptCodeReview": "pending"
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-29T01:31:58+09:00"
+  "lastUpdated": "2026-07-29T15:23:32+09:00"
 }

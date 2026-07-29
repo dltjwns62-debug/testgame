@@ -119,6 +119,8 @@ export class SaveDataScene extends Phaser.Scene {
     this.resetLabel.setText("Reset Save");
     this.messageText.setColor(result.ok ? "#9ce4b0" : "#f3c969").setText(result.message);
     this.refreshUi();
+    const fieldScene = this.scene.get("FieldScene") as FieldScene;
+    fieldScene.restartAfterReset(result.message);
   }
 
   private returnToField(): void {

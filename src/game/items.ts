@@ -254,6 +254,21 @@ export function normalizeInventoryState(value: unknown): InventoryState {
   return { itemInstances, equipmentByRosterUnitId, nextItemInstanceSequence };
 }
 
+export function normalizeInventoryStateForOwnedUnits(
+  value: unknown,
+  ownedRosterUnitIds: ReadonlySet<string>,
+): InventoryState {
+  const normalized = normalizeInventoryState(value);
+  return {
+    ...normalized,
+    equipmentByRosterUnitId: Object.fromEntries(
+      Object.entries(normalized.equipmentByRosterUnitId)
+        .filter(([rosterUnitId]) => ownedRosterUnitIds.has(rosterUnitId))
+        .map(([rosterUnitId, slots]) => [rosterUnitId, { ...slots }]),
+    ),
+  };
+}
+
 export function cloneInventoryState(state: InventoryState): InventoryState {
   const normalized = normalizeInventoryState(state);
   return {

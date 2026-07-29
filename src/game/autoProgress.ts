@@ -89,11 +89,14 @@ export function setSelectedAutoRepeatMonster(
 export function recordActualMonsterVictory(
   registry: Phaser.Data.DataManager,
   monsterId: string,
+  options: { autoRepeatVictory?: boolean } = {},
 ): AutoProgressState {
   const state = getOrCreateAutoProgressState(registry);
   if (isKnownMonsterId(monsterId)) {
     state.victoryCountsByMonsterId[monsterId] = safeCount(state.victoryCountsByMonsterId[monsterId]) + 1;
-    state.totalAutoRepeatVictories = safeCount(state.totalAutoRepeatVictories) + 1;
+    if (options.autoRepeatVictory === true) {
+      state.totalAutoRepeatVictories = safeCount(state.totalAutoRepeatVictories) + 1;
+    }
   }
   setAutoProgressState(registry, state);
   return state;

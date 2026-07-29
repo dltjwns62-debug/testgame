@@ -1472,6 +1472,7 @@ export class BattleScene extends Phaser.Scene {
       bonusExperienceTotal: this.bonusExperienceTotal,
       experienceRewards: this.getExperienceRewards(),
       loot: [...this.lootItems],
+      autoRepeatBattle: this.autoRepeatBattle,
     };
     const fieldScene = this.scene.get("FieldScene") as FieldScene;
     fieldScene.applyBattleResult(result);

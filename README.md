@@ -1,8 +1,8 @@
 # Test Game
 
-## Stage 15 review submission
+## Stage 15 completed after review
 
-15단계 **저장과 오프라인 진행**의 v2 검수 지적을 수정하고 `review-stage-15-v3`로 재제출한다. 현재 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 사용자 수동 테스트는 요청하지 않아 `skipped_by_user`로 기록하며 통과로 간주하지 않는다.
+15단계 **저장과 오프라인 진행**은 `review-stage-15-v3` 검수를 승인받아 `main`에 반영했고 완료 처리했다. 사용자 수동 테스트는 요청하지 않아 `skipped_by_user`로 기록하며 통과로 간주하지 않는다. 다음 단계는 별도 명령 전까지 시작하지 않는다.
 
 localStorage primary/backup/temp 안전 저장, schemaVersion 1과 checksum, Bootstrap 자동 복원, Repeat Hunt, 방치 Gold·EXP·아이템 정산, Save Data 화면을 구현했다. 서버 저장·계정·클라우드·멀티플레이어·16단계 안정화는 구현하지 않는다.
 
@@ -69,11 +69,11 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 전체 개발 단계: 17단계
 - 현재 단계: 15단계
 - 현재 단계 이름: 저장과 오프라인 진행
-- 현재 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-15-save-offline-progress`
+- 현재 상태: 완료 (`completed`)
+- 현재 작업 브랜치: `main`
 - 검수 태그: `review-stage-15-v3`
-- 완료 태그: 없음 (검수 대기)
-- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계
+- 완료 태그: `stage-15-completed`
+- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계
 - 다음 단계: 16단계 — 성능 및 안정화
 
 7단계 10대10 RTS 핵심 전투와 8단계 Auto Hunt·지역 동료 지원 기능은 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다.
@@ -128,4 +128,4 @@ npm run typecheck
 npm run build
 ```
 
-1단계부터 14단계까지는 `main`에 반영되어 완료됐다. 15단계는 작업 브랜치에서 검수 대기 중이며, 다음 예정 단계는 16단계다.
+1단계부터 15단계까지는 `main`에 반영되어 완료됐다. 15단계 완료 태그는 `stage-15-completed`이며, 다음 예정 단계는 16단계다.

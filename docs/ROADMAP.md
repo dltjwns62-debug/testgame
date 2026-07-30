@@ -1,19 +1,20 @@
 # Test Game 개발 로드맵
 
-## Stage 15 저장과 오프라인 진행 — v3 검수 대기
+## Stage 15 저장과 오프라인 진행 — 완료
 
 - 전체 단계: 17단계
 - 현재 단계: 15단계 — 저장과 오프라인 진행
-- 단계 상태: `review_pending`
-- 작업 브랜치: `stage-15-save-offline-progress`
+- 단계 상태: `completed`
+- 작업 브랜치: `main`
 - 검수 태그: `review-stage-15-v3`
-- 완료된 단계: 1단계~14단계
+- 완료 태그: `stage-15-completed`
+- 완료된 단계: 1단계~15단계
 - 다음 단계: 16단계 — 성능 및 안정화
 - 사용자 실행 테스트: `skipped_by_user`
-- ChatGPT 코드 검수: `pending`
-- `main` 반영 여부: 미반영
+- ChatGPT 코드 검수: `approved`
+- `main` 반영 여부: 완료
 
-15단계 v1 검수 지적을 수정한 v2를 제출했으며, 16단계는 시작하지 않는다.
+15단계 v1·v2 검수 지적을 수정한 v3가 승인되어 `main`에 반영됐으며, 16단계는 시작하지 않는다.
 
 ## Stage 14 final approval and main integration
 

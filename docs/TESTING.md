@@ -1,15 +1,16 @@
 # 실행 및 테스트 기록
 
-## Stage 15 저장과 오프라인 진행 — v3 검수 대기
+## Stage 15 저장과 오프라인 진행 — 완료
 
-- 현재 작업 브랜치: `stage-15-save-offline-progress`
+- 현재 작업 브랜치: `main`
 - 현재 검수 태그: `review-stage-15-v3`
-- 15단계 상태: 검수 대기 (`review_pending`)
-- 완료된 단계: 1단계~14단계
+- 15단계 상태: 완료 (`completed`)
+- 완료된 단계: 1단계~15단계
 - 다음 단계: 16단계 — 성능 및 안정화
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 재검수 대기 (`pending`)
-- `main` 반영: 미반영
+- ChatGPT 코드 검수: 승인 (`approved`)
+- `main` 반영: 완료
+- 완료 태그: `stage-15-completed`
 
 ### 15단계 자동 검사
 
@@ -20,6 +21,13 @@
 - 브라우저 UI: Stage 15 Field, Repeat Hunt OFF, Save Data 화면 확인
 - Save Now: `SAVED` 상태 확인
 - 새로고침: 저장 후 Field로 복원 확인
+
+### 15단계 승인 기록
+
+- 승인 검수 태그: `review-stage-15-v3`
+- 승인 커밋: `ca55144de6e6d2f72e941abb9a11b801c175355a`
+- 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`), 통과로 기록하지 않음
+- `main` no-ff 병합 및 완료 태그 생성: 완료
 
 ### 15단계 검증 항목
 

@@ -4,11 +4,11 @@
   "totalStages": 17,
   "currentStage": 15,
   "currentStageName": "저장과 오프라인 진행",
-  "stageStatus": "review_pending",
-  "activeTask": "15단계 v3 구현 완료 및 ChatGPT 재검수 대기",
-  "workingBranch": "stage-15-save-offline-progress",
-  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+  "stageStatus": "completed",
+  "activeTask": "15단계 완료 — 16단계 성능 및 안정화 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   "nextStage": 16,
   "nextStageName": "성능 및 안정화",
   "reviewSubmission": {
@@ -24,14 +24,15 @@
       "tag": "review-stage-15-v3",
       "version": 3,
       "submitted": true,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
-      "commit": null,
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-30T16:49:56+09:00",
+      "commit": "ca55144de6e6d2f72e941abb9a11b801c175355a",
       "userRunTest": "skipped_by_user",
       "userRunTestReason": "사용자 요청으로 수동 테스트 생략",
-      "mainBranchMerged": false
+      "reason": "Repeat Hunt와 오프라인 보상 조건 분리, Storage 예외·미래 스키마 보존, ghost 장비 정리, hidden lifecycle, 저장 실패 메타데이터, temp cleanup, rawElapsed 최소 60초, Reset 재시작과 통계 분리를 정적 코드 검수함",
+      "mainBranchMerged": true
     },
     {
       "stage": 15,
@@ -545,9 +546,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-30T16:49:56+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -557,11 +558,11 @@
     "browserAutomation": "partial_passed",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "사용자 요청에 따라 15단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "pending"
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-30T16:30:43+09:00"
+  "lastUpdated": "2026-07-30T16:49:56+09:00"
 }

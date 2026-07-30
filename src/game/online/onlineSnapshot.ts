@@ -10,13 +10,17 @@ import {
 } from "../constants";
 import { getOrCreateAutoProgressState, normalizeAutoProgressState } from "../autoProgress";
 import { getOrCreatePersistentControlGroupState, normalizePersistentControlGroupState } from "../controlGroups";
-import { getOrCreateFormationState, normalizeFormationState } from "../formationState";
-import { getOrCreateInventoryState, normalizeInventoryStateForOwnedUnits } from "../items";
+import { getOrCreateFormationState, isValidFormationState, normalizeFormationState } from "../formationState";
+import { getOrCreateInventoryState, isValidInventoryState, normalizeInventoryStateForOwnedUnits } from "../items";
 import { getOrCreateKeyBindingState, isValidKeyBindingState, createDefaultKeyBindingState } from "../keyBindings";
 import { getOrCreatePlayerGold, isValidPlayerGold } from "../playerEconomy";
 import { getPersistenceMeta } from "../persistence";
 import { ONLINE_PROTOCOL_VERSION, type DeviceId, type ClientInstanceId, type OnlinePlayerSnapshot, type ServerRevision } from "./onlineTypes";
 import { validateOnlineSnapshotShape, type OnlineValidationResult } from "./onlineValidation";
+
+function sameJson(left: unknown, right: unknown): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
 
 function stableStringify(value: unknown): string {
   if (value === null || typeof value !== "object") return JSON.stringify(value) ?? "null";
@@ -67,6 +71,19 @@ export function validateOnlineSnapshot(snapshot: unknown): OnlineValidationResul
   const shape = validateOnlineSnapshotShape(snapshot);
   if (!shape.ok) return shape;
   const candidate = snapshot as OnlinePlayerSnapshot;
+  const ownedIds = new Set(candidate.formation.ownedUnits.map((unit) => unit.rosterUnitId));
+  const normalizedInventory = normalizeInventoryStateForOwnedUnits(candidate.inventory, ownedIds);
+  const normalizedControlGroups = normalizePersistentControlGroupState(candidate.controlGroups, ownedIds);
+  const normalizedAutoProgress = normalizeAutoProgressState(candidate.autoProgress);
+  if (!isValidFormationState(candidate.formation) || !isValidInventoryState(candidate.inventory) ||
+    !isValidKeyBindingState(candidate.keyBindings) ||
+    !sameJson(candidate.ownedRoster, candidate.formation.ownedUnits) ||
+    !sameJson(candidate.progression, candidate.formation.ownedUnits) ||
+    !sameJson(candidate.inventory, normalizedInventory) ||
+    !sameJson(candidate.controlGroups, normalizedControlGroups) ||
+    !sameJson(candidate.autoProgress, normalizedAutoProgress)) {
+    return { ok: false, error: { code: "VALIDATION_FAILED", message: "Online snapshot canonical projections are inconsistent.", retryable: false } };
+  }
   return calculateSnapshotHash(candidate) === candidate.snapshotHash
     ? { ok: true }
     : { ok: false, error: { code: "VALIDATION_FAILED", message: "Online snapshot hash does not match its contents.", retryable: false } };

@@ -146,6 +146,7 @@ export type PushOperationsResponse = {
   acknowledgedOperationIds: OperationId[];
   duplicateOperationIds: OperationId[];
   rejectedOperationIds: OperationId[];
+  rejectedReasons: Record<OperationId, OnlineError>;
   snapshot: OnlinePlayerSnapshot | null;
 };
 

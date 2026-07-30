@@ -1,5 +1,6 @@
 import { normalizeOnlineSnapshot, validateOnlineSnapshot } from "./onlineSnapshot";
 import { ONLINE_PROTOCOL_VERSION, type BootstrapRequest, type BootstrapResponse, type OnlineGateway, type OnlineResult, type PullSnapshotRequest, type PullSnapshotResponse, type PushOperationsRequest, type PushOperationsResponse, type OnlinePlayerSnapshot } from "./onlineTypes";
+import { validateClientOperation } from "./onlineValidation";
 
 function error(code: "VALIDATION_FAILED" | "REVISION_CONFLICT" | "DUPLICATE_OPERATION", message: string, serverRevision?: number) {
   return { code, message, retryable: code === "REVISION_CONFLICT", serverRevision } as const;
@@ -55,9 +56,16 @@ export class MockOnlineGateway implements OnlineGateway {
     const acknowledgedOperationIds: string[] = [];
     const duplicateOperationIds: string[] = [];
     const rejectedOperationIds: string[] = [];
+    const rejectedReasons: PushOperationsResponse["rejectedReasons"] = {};
     for (const operation of request.operations) {
       if (this.acknowledgedOperationIds.has(operation.operationId)) {
         duplicateOperationIds.push(operation.operationId);
+        continue;
+      }
+      const operationValidation = validateClientOperation(operation);
+      if (!operationValidation.ok) {
+        rejectedOperationIds.push(operation.operationId);
+        rejectedReasons[operation.operationId] = operationValidation.error;
         continue;
       }
       if (operation.type === "SNAPSHOT_CHECKPOINT") {
@@ -66,6 +74,7 @@ export class MockOnlineGateway implements OnlineGateway {
         const valid = validateOnlineSnapshot(snapshot);
         if (!valid.ok) {
           rejectedOperationIds.push(operation.operationId);
+          rejectedReasons[operation.operationId] = valid.error;
           continue;
         }
         this.serverSnapshot = normalizeOnlineSnapshot(snapshot);
@@ -74,7 +83,7 @@ export class MockOnlineGateway implements OnlineGateway {
       acknowledgedOperationIds.push(operation.operationId);
       this.serverRevision += 1;
     }
-    return { ok: true, value: { serverRevision: this.serverRevision, acknowledgedOperationIds, duplicateOperationIds, rejectedOperationIds, snapshot: this.serverSnapshot } };
+    return { ok: true, value: { serverRevision: this.serverRevision, acknowledgedOperationIds, duplicateOperationIds, rejectedOperationIds, rejectedReasons, snapshot: this.serverSnapshot } };
   }
 
   public async disconnect(): Promise<void> {

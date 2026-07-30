@@ -1,19 +1,19 @@
 # 현재 개발 상태
 
-## Stage 16 성능 및 안정화 — v4 검수 대기
+## Stage 16 성능 및 안정화 — 완료
 
 - 전체 단계: 17단계
 - 현재 단계: 16단계 — 성능 및 안정화
-- 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-16-performance-stability`
+- 현재 단계 상태: 완료 (`completed`)
+- 현재 작업 브랜치: `main`
 - 현재 검수 태그: `review-stage-16-v4`
-- 완료된 단계: 1단계~15단계
-- 검수 통과된 단계: 1단계~15단계
+- 완료된 단계: 1단계~16단계
+- 검수 통과된 단계: 1단계~16단계
 - 다음 단계: 17단계 — 온라인 확장 준비
-- `main` 정식 반영 여부: 미반영
+- `main` 정식 반영 여부: 반영 완료
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
-- 현재 작업: 16단계 v4 Recovery 재시도 흐름 수정 및 재제출
+- ChatGPT 코드 검수: 승인 (`approved`)
+- 현재 작업: 16단계 완료 — 17단계 시작 명령 대기 중
 - 현재 알려진 문제: 없음. 브라우저 검사는 Field·diagnostics·favicon 범위만 확인했고 Battle 수동 상호작용은 미실행
 
 ### 16단계 구현 요약
@@ -36,7 +36,9 @@
 - 개발 서버: root·favicon HTTP 200 확인 후 종료 (`passed`)
 - 브라우저 자동 확인: Field Stage16, `diagnostics=1/0`, favicon, 콘솔 error/warning 없음 확인 (`partial_passed`)
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`), 통과로 기록하지 않음
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- ChatGPT 코드 검수: 승인 (`approved`)
+- `main` 반영: 완료
+- 완료 태그: `stage-16-completed`
 
 ## Stage 15 저장과 오프라인 진행 — 완료
 

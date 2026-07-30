@@ -1,11 +1,11 @@
 # 실행 및 테스트 기록
 
-## Stage 16 성능 및 안정화 — v4 검수 대기
+## Stage 16 성능 및 안정화 — 최종 승인 및 main 반영
 
 - 작업 브랜치: `stage-16-performance-stability`
 - 검수 태그: `review-stage-16-v4`
-- 상태: `review_pending`
-- 완료된 단계: 1단계~15단계
+- 상태: `completed`
+- 완료된 단계: 1단계~16단계
 - 다음 단계: 17단계 — 온라인 확장 준비 (미시작)
 
 ### 자동 검사
@@ -36,7 +36,9 @@
 - Recovery Try Again 전체 브라우저 상호작용은 실행하지 않아 `not_run`으로 남긴다.
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
 - 생략된 테스트는 통과로 간주하거나 표현하지 않는다.
-- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- ChatGPT 코드 검수: 승인 (`approved`)
+- `main` 반영: 완료
+- 완료 태그: `stage-16-completed`
 
 ## Stage 16 성능 점검 기준
 

@@ -1,18 +1,19 @@
 # Test Game 개발 로드맵
 
-## Stage 16 성능 및 안정화 — v4 `review_pending`
+## Stage 16 성능 및 안정화 — `completed`
 
 - 전체 단계: 17단계
 - 현재 단계: 16단계 — 성능 및 안정화
-- 작업 브랜치: `stage-16-performance-stability`
+- 작업 브랜치: `main`
 - 검수 태그: `review-stage-16-v4`
+- 완료 태그: `stage-16-completed`
 - 목표: 1~15단계 통합 회귀 안전성, 런타임 상태 복구, 저장·씬 수명주기 안정성, UI 갱신 비용과 진단 가시성을 확보한다.
 - 주요 구현 항목: Node `node:test` 기반 순수 로직 회귀 테스트, `StorageLike`·시계 주입, 경계 상태 검증·복구, 멱등 자동 저장 disposer, Field/Battle UI dirty/throttle, 런타임 오류 최근 20개 기록, `?diagnostics=1` 오버레이, quota 메타데이터, favicon, Recovery Try Again의 FATAL 제거·씬 정리·Bootstrap 재검증, 아키텍처·감사 문서.
-- 완료 조건: `npm ci`, `npm run typecheck`, `npm run test`, `npm run build`, `npm run check` 통과; 개발 서버 HTTP 200 확인; 사용자 수동 테스트와 ChatGPT 검수는 별도 승인 전까지 미완료로 기록; 작업 브랜치와 불변 검수 태그만 원격 반영.
+- 완료 조건: `npm ci`, `npm run typecheck`, `npm run test`, `npm run build`, `npm run check` 통과; 개발 서버 HTTP 200 확인; ChatGPT 검수 승인; `main` 반영 및 `stage-16-completed` 생성. 사용자 수동 테스트는 `skipped_by_user`로 기록한다.
 - 이 단계에서 구현하지 않을 항목: 17단계 온라인 확장, 계정·클라우드·멀티플레이어·서비스 워커, 새 게임 규칙과 신규 아이템/스킬.
 - 사용자 실행 테스트: 사용자 요청에 따라 `skipped_by_user`로 유지한다.
 
-16단계 v4는 검수 대기 상태이며 `main`에 반영하지 않았다. 다음 단계는 17단계 온라인 확장 준비이며 아직 시작하지 않았다.
+16단계 v4는 승인되어 `main`에 반영됐고 `stage-16-completed`로 완료됐다. 다음 단계는 17단계 온라인 확장 준비이며 아직 시작하지 않았다.
 
 ## Stage 15 저장과 오프라인 진행 — 완료
 

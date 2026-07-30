@@ -1,6 +1,10 @@
 # Stage 16 안정성 감사
 
-기준 브랜치: `main` (`cb04c9ddca566a866d3c0745725719b1041a7b28`)
+기준 브랜치: `main` (`6402990b46684d3ca83384b9fc669af12ca18580` 병합 후 완료 문서 커밋 전)
+
+최종 승인 태그: `review-stage-16-v4`
+완료 태그: `stage-16-completed`
+상태: 16단계 완료, 17단계 미시작
 
 작업 브랜치: `stage-16-performance-stability`
 

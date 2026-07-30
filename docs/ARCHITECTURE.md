@@ -1,5 +1,7 @@
 # 현재 구조와 확장 경계
 
+16단계 성능 및 안정화는 `review-stage-16-v4` 검수를 승인받아 `main`에 반영했으며, 완료 스냅샷은 `stage-16-completed` 태그로 고정한다. 17단계 온라인 확장은 아직 구현하지 않는다.
+
 ## Scene/UI 계층
 
 - `src/main.ts`: Phaser 진입점

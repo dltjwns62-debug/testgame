@@ -4,11 +4,11 @@
   "totalStages": 17,
   "currentStage": 16,
   "currentStageName": "성능 및 안정화",
-  "stageStatus": "review_pending",
-  "activeTask": "16단계 v4 구현 완료 및 ChatGPT 재검수 대기",
-  "workingBranch": "stage-16-performance-stability",
-  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  "stageStatus": "completed",
+  "activeTask": "16단계 완료 — 17단계 온라인 확장 준비 시작 명령 대기 중",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
   "nextStage": 17,
   "nextStageName": "온라인 확장 준비",
   "reviewSubmission": {
@@ -23,16 +23,16 @@
       "branch": "stage-16-performance-stability",
       "tag": "review-stage-16-v4",
       "version": 4,
-      "commit": "12bf120b72ee0059aa7821009925db93d3c664a8",
+      "commit": "474467a9908dede7990906bd4a5b113c91139d54",
       "submitted": true,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-31T02:56:00+09:00",
       "userRunTest": "skipped_by_user",
       "userRunTestReason": "사용자 수동 테스트는 skipped_by_user로 유지",
-      "mainBranchMerged": false,
-      "reason": "Recovery Try Again에서 기존 FATAL 이슈를 제거하고 모든 관련 씬을 정리한 뒤 Bootstrap에서 저장 상태를 다시 검증하도록 보완함"
+      "mainBranchMerged": true,
+      "reason": "1~15단계 회귀 31개 순수 로직 테스트, autosave 및 전역 오류 listener 수명주기, RuntimeState 검증과 FATAL 복구, Field/Battle UI 갱신 분리, diagnostics, Recovery Try Again의 기존 FATAL 제거와 Bootstrap 재검증 경로가 정적 코드 검수를 통과함"
     },
     {
       "stage": 16,
@@ -610,9 +610,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-31T02:56:00+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -624,9 +624,9 @@
     "browserAutomation": "partial_passed",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "사용자 요청에 따라 16단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "pending"
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-07-31T00:30:00+09:00"
+  "lastUpdated": "2026-07-31T02:56:00+09:00"
 }

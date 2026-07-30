@@ -12,8 +12,14 @@ export type RuntimeErrorRecord = {
 
 const recentErrors: RuntimeErrorRecord[] = [];
 let sequence = 0;
-let globalHandlersInstalled = false;
 let installedRegistry: { set(key: string, value: unknown): unknown } | null = null;
+type RuntimeErrorEventTarget = {
+  addEventListener(type: string, listener: (event: Event) => void): void;
+  removeEventListener(type: string, listener: (event: Event) => void): void;
+};
+let installedWindow: RuntimeErrorEventTarget | null = null;
+let errorHandler: ((event: Event) => void) | null = null;
+let unhandledRejectionHandler: ((event: Event) => void) | null = null;
 
 function safeMessage(error: unknown): string {
   if (error instanceof Error) return error.message || error.name;
@@ -46,21 +52,33 @@ export function recordRuntimeError(
   return record;
 }
 
-export function installGlobalRuntimeErrorHandlers(registry: { set(key: string, value: unknown): unknown }): void {
+export function installGlobalRuntimeErrorHandlers(
+  registry: { set(key: string, value: unknown): unknown },
+  eventTarget: RuntimeErrorEventTarget | null = typeof window === "undefined" ? null : window,
+): void {
   installedRegistry = registry;
-  if (globalHandlersInstalled || typeof window === "undefined") return;
-  globalHandlersInstalled = true;
-  window.addEventListener("error", (event) => {
-    recordRuntimeError("window.error", event.error ?? event.message, true);
-  });
-  window.addEventListener("unhandledrejection", (event) => {
-    recordRuntimeError("window.unhandledrejection", event.reason, true);
-  });
+  if (!eventTarget || installedWindow === eventTarget) return;
+  clearRuntimeErrorHandlers();
+  errorHandler = (event: Event) => {
+    const candidate = event as ErrorEvent;
+    recordRuntimeError("window.error", candidate.error ?? candidate.message, true);
+  };
+  unhandledRejectionHandler = (event: Event) => {
+    const candidate = event as PromiseRejectionEvent;
+    recordRuntimeError("window.unhandledrejection", candidate.reason, true);
+  };
+  installedWindow = eventTarget;
+  eventTarget.addEventListener("error", errorHandler);
+  eventTarget.addEventListener("unhandledrejection", unhandledRejectionHandler);
 }
 
 export function clearRuntimeErrorHandlers(): void {
-  // Browser globals do not expose stable references until the app is reset.
-  // The once-only installation avoids duplicate handlers and infinite recovery loops.
+  if (installedWindow && errorHandler && unhandledRejectionHandler) {
+    installedWindow.removeEventListener("error", errorHandler);
+    installedWindow.removeEventListener("unhandledrejection", unhandledRejectionHandler);
+  }
+  installedWindow = null;
+  errorHandler = null;
+  unhandledRejectionHandler = null;
   installedRegistry = null;
 }
-

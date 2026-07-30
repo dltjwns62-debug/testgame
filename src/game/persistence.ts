@@ -52,7 +52,7 @@ import { getOrCreatePlayerGold, isValidPlayerGold, setPlayerGold } from "./playe
 import { getOrCreateAutoProgressState, normalizeAutoProgressState, setAutoProgressState, type AutoProgressState } from "./autoProgress";
 import { calculateOfflineRewardPlan, type OfflineRewardSummary } from "./offlineProgress";
 import type { FormationState } from "./rtsBattleTypes";
-import { repairRuntimeStateAtBoundary } from "./runtimeStateValidation";
+import { clearRuntimeStateIssues, repairRuntimeStateAtBoundary } from "./runtimeStateValidation";
 
 export type SavePayload = {
   formation: FormationState;
@@ -128,6 +128,10 @@ const TRACKED_REGISTRY_KEYS = new Set([
 
 const savingRegistries = new WeakSet<object>();
 const saveTimers = new WeakMap<object, ReturnType<typeof setTimeout>>();
+let autoSaveControllerCount = 0;
+let autoSaveIntervalCount = 0;
+let autoSaveDebounceCount = 0;
+let storageWriteCount = 0;
 type AutoSaveController = {
   intervalHandle: ReturnType<typeof setInterval> | null;
   hidden: boolean;
@@ -208,7 +212,7 @@ export function safeGetItem(storage: StorageLike | null, key: string): SafeStora
 
 export function safeSetItem(storage: StorageLike | null, key: string, value: string): boolean {
   if (!storage) return false;
-  try { storage.setItem(key, value); return true; } catch { return false; }
+  try { storage.setItem(key, value); storageWriteCount += 1; return true; } catch { return false; }
 }
 
 export function safeRemoveItem(storage: StorageLike | null, key: string): boolean {
@@ -376,7 +380,51 @@ function readValidEnvelope(raw: string | null): SaveEnvelope | null {
   return parseSaveEnvelope(raw);
 }
 
-function hasFutureSchema(raw: string | null): boolean {
+export type SaveCandidate = {
+  key: typeof SAVE_PRIMARY_KEY | typeof SAVE_BACKUP_KEY | typeof SAVE_TEMP_KEY;
+  envelope: SaveEnvelope;
+};
+
+export function chooseSaveCandidate(
+  primaryRaw: string | null,
+  backupRaw: string | null,
+  tempRaw: string | null,
+): SaveCandidate | null {
+  const primary = readValidEnvelope(primaryRaw);
+  if (primary) return { key: SAVE_PRIMARY_KEY, envelope: primary };
+  const backup = readValidEnvelope(backupRaw);
+  if (backup) return { key: SAVE_BACKUP_KEY, envelope: backup };
+  const temp = readValidEnvelope(tempRaw);
+  if (temp) return { key: SAVE_TEMP_KEY, envelope: temp };
+  return null;
+}
+
+export function loadEnvelopeCandidates(storage: StorageLike | null): {
+  primary: SaveEnvelope | null;
+  backup: SaveEnvelope | null;
+  temp: SaveEnvelope | null;
+  candidate: SaveCandidate | null;
+  storageAvailable: boolean;
+} {
+  const primaryRead = safeGetItem(storage, SAVE_PRIMARY_KEY);
+  const backupRead = safeGetItem(storage, SAVE_BACKUP_KEY);
+  const tempRead = safeGetItem(storage, SAVE_TEMP_KEY);
+  if (!primaryRead.ok || !backupRead.ok || !tempRead.ok) {
+    return { primary: null, backup: null, temp: null, candidate: null, storageAvailable: false };
+  }
+  const primary = readValidEnvelope(primaryRead.value);
+  const backup = readValidEnvelope(backupRead.value);
+  const temp = readValidEnvelope(tempRead.value);
+  return {
+    primary,
+    backup,
+    temp,
+    candidate: chooseSaveCandidate(primaryRead.value, backupRead.value, tempRead.value),
+    storageAvailable: true,
+  };
+}
+
+export function hasFutureSchema(raw: string | null): boolean {
   if (!raw) return false;
   try {
     const candidate = JSON.parse(raw) as { schemaVersion?: unknown };
@@ -403,19 +451,20 @@ function byteSize(value: string): number {
   return unescape(encodeURIComponent(value)).length;
 }
 
-function savePayloadSafely(
+export function savePayloadSafely(
   payload: SavePayload,
   saveId: string,
   savedAtMs: number,
   lastActiveAtMs: number,
   source: string,
+  storageOverride: StorageLike | null = persistenceEnvironment.storage,
 ): SafeSaveResult {
   const envelope = buildEnvelope(payload, saveId, savedAtMs, lastActiveAtMs);
   const serialized = JSON.stringify(envelope);
   const bytes = byteSize(serialized);
   const startedAt = getPersistenceNow();
   const failure = (): SafeSaveResult => ({ ok: false, envelope, bytes, durationMs: Math.max(0, getPersistenceNow() - startedAt) });
-  const storage = persistenceEnvironment.storage;
+  const storage = storageOverride;
   if (!storage) {
     return failure();
   }
@@ -514,7 +563,8 @@ export function loadGame(registry: Phaser.Data.DataManager, nowMs = getPersisten
   const primary = readValidEnvelope(primaryRaw);
   const backup = readValidEnvelope(backupRaw);
   const temp = readValidEnvelope(tempRaw);
-  const source = primary ?? backup ?? temp;
+  const candidate = chooseSaveCandidate(primaryRaw, backupRaw, tempRaw);
+  const source = candidate?.envelope ?? null;
   if (!source) {
     if (primaryRaw) {
       safeSetItem(storage, SAVE_RECOVERY_KEY, primaryRaw);
@@ -539,7 +589,7 @@ export function loadGame(registry: Phaser.Data.DataManager, nowMs = getPersisten
     return { ok: saved.ok, meta, message: meta.message };
   }
 
-  const sourceKey = primary ? SAVE_PRIMARY_KEY : backup ? SAVE_BACKUP_KEY : SAVE_TEMP_KEY;
+  const sourceKey = candidate?.key ?? SAVE_PRIMARY_KEY;
   if (primaryRaw && !primary) {
     safeSetItem(storage, SAVE_RECOVERY_KEY, primaryRaw);
   }
@@ -594,6 +644,7 @@ export function resetSaveData(registry: Phaser.Data.DataManager, nowMs = getPers
   }
   const payload = createDefaultSavePayload();
   applySavePayload(registry, payload);
+  clearRuntimeStateIssues(registry);
   registry.remove(PERSISTENCE_SUMMARY_REGISTRY_KEY);
   const meta = { ...createDefaultMeta(), savedAtMs: nowMs, lastActiveAtMs: nowMs, status: "RESET_TO_DEFAULT" as const, message: "Save reset to defaults." };
   setPersistenceMeta(registry, meta);
@@ -663,14 +714,20 @@ export function installAutoSave(registry: Phaser.Data.DataManager): void {
     visibilityHandler: () => undefined,
   };
   autoSaveControllers.set(registry, controller);
+  autoSaveControllerCount += 1;
   const schedule = (): void => {
     if (controller.hidden || savingRegistries.has(registry) || !getPersistenceMeta(registry).autoSaveEnabled) {
       return;
     }
     const previous = saveTimers.get(registry);
-    if (previous) clearTimeout(previous);
+    if (previous) {
+      clearTimeout(previous);
+      autoSaveDebounceCount = Math.max(0, autoSaveDebounceCount - 1);
+    }
+    autoSaveDebounceCount += 1;
     saveTimers.set(registry, setTimeout(() => {
       saveTimers.delete(registry);
+      autoSaveDebounceCount = Math.max(0, autoSaveDebounceCount - 1);
       if (!controller.hidden && getPersistenceMeta(registry).autoSaveEnabled) saveRegistryState(registry, getPersistenceNow(), "autosave");
     }, AUTO_SAVE_DEBOUNCE_MS));
   };
@@ -678,6 +735,7 @@ export function installAutoSave(registry: Phaser.Data.DataManager): void {
     if (controller.intervalHandle !== null) {
       clearInterval(controller.intervalHandle);
       controller.intervalHandle = null;
+      autoSaveIntervalCount = Math.max(0, autoSaveIntervalCount - 1);
     }
   };
   const startInterval = (): void => {
@@ -685,6 +743,7 @@ export function installAutoSave(registry: Phaser.Data.DataManager): void {
     controller.intervalHandle = setInterval(() => {
       if (!controller.hidden && getPersistenceMeta(registry).autoSaveEnabled) saveRegistryState(registry, getPersistenceNow(), "autosave");
     }, AUTO_SAVE_INTERVAL_MS);
+    autoSaveIntervalCount += 1;
   };
   const saveOnceForLifecycle = (allowWhenHidden = false): void => {
     if (controller.hidden && !allowWhenHidden) return;
@@ -709,7 +768,10 @@ export function installAutoSave(registry: Phaser.Data.DataManager): void {
       if (document.visibilityState === "hidden") {
         controller.hidden = true;
         const pending = saveTimers.get(registry);
-        if (pending) clearTimeout(pending);
+        if (pending) {
+          clearTimeout(pending);
+          autoSaveDebounceCount = Math.max(0, autoSaveDebounceCount - 1);
+        }
         saveTimers.delete(registry);
         stopInterval();
         saveOnceForLifecycle(true);
@@ -731,9 +793,15 @@ export function installAutoSave(registry: Phaser.Data.DataManager): void {
 export function uninstallAutoSave(registry: Phaser.Data.DataManager): void {
   const controller = autoSaveControllers.get(registry);
   if (!controller) return;
-  if (controller.intervalHandle !== null) clearInterval(controller.intervalHandle);
+  if (controller.intervalHandle !== null) {
+    clearInterval(controller.intervalHandle);
+    autoSaveIntervalCount = Math.max(0, autoSaveIntervalCount - 1);
+  }
   const pending = saveTimers.get(registry);
-  if (pending) clearTimeout(pending);
+  if (pending) {
+    clearTimeout(pending);
+    autoSaveDebounceCount = Math.max(0, autoSaveDebounceCount - 1);
+  }
   saveTimers.delete(registry);
   registry.events.off("changedata", controller.changedataHandler);
   if (typeof window !== "undefined") {
@@ -742,6 +810,7 @@ export function uninstallAutoSave(registry: Phaser.Data.DataManager): void {
   }
   if (typeof document !== "undefined") document.removeEventListener("visibilitychange", controller.visibilityHandler);
   autoSaveControllers.delete(registry);
+  autoSaveControllerCount = Math.max(0, autoSaveControllerCount - 1);
 }
 
 export function getAutoSaveDiagnostics(registry: Phaser.Data.DataManager): {
@@ -749,6 +818,10 @@ export function getAutoSaveDiagnostics(registry: Phaser.Data.DataManager): {
   intervalActive: boolean;
   debouncePending: boolean;
   hidden: boolean;
+  controllerCount: number;
+  intervalCount: number;
+  debounceCount: number;
+  storageWriteCount: number;
 } {
   const controller = autoSaveControllers.get(registry);
   return {
@@ -756,5 +829,9 @@ export function getAutoSaveDiagnostics(registry: Phaser.Data.DataManager): {
     intervalActive: controller?.intervalHandle !== null && controller?.intervalHandle !== undefined,
     debouncePending: saveTimers.has(registry),
     hidden: controller?.hidden ?? false,
+    controllerCount: autoSaveControllerCount,
+    intervalCount: autoSaveIntervalCount,
+    debounceCount: autoSaveDebounceCount,
+    storageWriteCount,
   };
 }

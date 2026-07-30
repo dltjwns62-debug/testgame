@@ -39,6 +39,10 @@ export type RuntimeStateIssue = {
   recoverable: boolean;
 };
 
+export function hasFatalRuntimeStateIssue(issues: readonly RuntimeStateIssue[]): boolean {
+  return issues.some((entry) => entry.severity === "FATAL");
+}
+
 function issue(
   id: string,
   severity: RuntimeIssueSeverity,
@@ -55,6 +59,14 @@ function sameJson(left: unknown, right: unknown): boolean {
 
 export function inspectRuntimeState(registry: Phaser.Data.DataManager): RuntimeStateIssue[] {
   const issues: RuntimeStateIssue[] = [];
+  const storedIssues = registry.get(RUNTIME_STATE_ISSUES_REGISTRY_KEY);
+  if (Array.isArray(storedIssues)) {
+    for (const stored of storedIssues) {
+      if (stored && typeof stored === "object" && (stored as RuntimeStateIssue).severity === "FATAL") {
+        issues.push(stored as RuntimeStateIssue);
+      }
+    }
+  }
   const formation = registry.get(FORMATION_REGISTRY_KEY);
   const formationValid = isValidFormationState(formation);
   if (!formationValid) {
@@ -94,6 +106,22 @@ export function inspectRuntimeState(registry: Phaser.Data.DataManager): RuntimeS
     issues.push(issue("persistence.timestamps.invalid", "RECOVERABLE", "persistenceMeta", "Persistence timestamps are invalid."));
   }
   return issues;
+}
+
+export function recordFatalRuntimeStateIssue(
+  registry: Phaser.Data.DataManager,
+  id: string,
+  path: string,
+  message: string,
+): RuntimeStateIssue {
+  const fatal = issue(id, "FATAL", path, message, false);
+  registry.set(RUNTIME_STATE_ISSUES_REGISTRY_KEY, [fatal]);
+  registry.set(AUTO_HUNT_REGISTRY_KEY, false);
+  return fatal;
+}
+
+export function clearRuntimeStateIssues(registry: Phaser.Data.DataManager): void {
+  registry.set(RUNTIME_STATE_ISSUES_REGISTRY_KEY, []);
 }
 
 export function repairRuntimeStateAtBoundary(registry: Phaser.Data.DataManager): RuntimeStateIssue[] {

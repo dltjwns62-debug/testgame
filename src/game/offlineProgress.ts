@@ -39,7 +39,7 @@ export type OfflineRewardPlan = {
 };
 
 function safeNow(value: number): number {
-  return Number.isFinite(value) && value >= 0 ? Math.floor(value) : Date.now();
+  return Number.isFinite(value) && value >= 0 ? Math.floor(value) : 0;
 }
 
 function safeElapsed(nowMs: number, lastActiveAtMs: number): number {

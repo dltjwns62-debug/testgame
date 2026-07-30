@@ -1,5 +1,15 @@
 # 프로젝트 결정 사항
 
+## 17단계 v2 검수 재제출 결정
+
+- 결정: `review-stage-17-v1`의 수정 요청 이력과 태그는 이동·삭제하지 않고 `review-stage-17-v2`를 새 제출 태그로 사용한다.
+- 결정: pending operation은 operation 배열이 아니라 상태·재시도 횟수·다음 시각·거부 사유를 가진 record로 보존하며, ACK와 duplicate ACK만 제거한다.
+- 결정: queue cap 초과와 corrupted JSON은 기존 유효 record를 조용히 삭제하지 않고 오류 결과와 보존된 queue를 반환한다.
+- 결정: coordinator는 요청별 AbortController와 generation/revision guard를 사용하고 dispose 이후 registry/UI callback을 차단한다.
+- 결정: snapshot과 operation은 canonical consistency, payload hash, payload 크기, 민감·transient 필드를 검증하며 실제 보상 결과는 client authoritative 값으로 받지 않는다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`, 실제 서버·계정·네트워크 검사는 `not_run`, ChatGPT 코드 검수는 `pending`으로 유지한다.
+- 상태: 확정
+
 ## 17단계 온라인 확장 준비 결정
 
 - 결정: 실제 서버 없이 protocol v1, snapshot, gateway, operation queue, conflict와 sync 경계만 준비한다.

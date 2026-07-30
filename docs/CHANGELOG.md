@@ -1,5 +1,13 @@
 # 변경 이력
 
+## 2026-07-31 — 17단계 v1 검수 수정 및 v2 재제출 — 검수 대기
+
+- v1 정적 검수에서 요청된 queue record/retry/backoff/rejection 보존과 cap 초과 데이터 보존을 보완했다.
+- coordinator AbortController·dispose·stale response·server revision 보호와 Disabled mode 무호출 경계를 보완했다.
+- canonical snapshot·operation payload 검증, Online Status async lifecycle, OpenAPI 3.0.3 계약과 자동 테스트 범위를 보완했다.
+- `review-stage-17-v1`은 `changes_requested` 이력과 불변 태그로 보존하고, 현재 제출 태그는 `review-stage-17-v2`다.
+- 실제 서버·계정·네트워크는 구현하지 않았으며 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+
 ## 2026-07-31 — 17단계 온라인 확장 준비 제출 — 검수 대기
 
 - 16단계 완료 main에서 `stage-17-online-expansion-readiness` 작업 브랜치를 생성했다.

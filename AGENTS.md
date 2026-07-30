@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 17 scope note: the submitted work is limited to online protocol v1 contracts, local OnlinePlayerSnapshot validation, Disabled/Mock gateways, operation idempotency and pending queue, conflict policy, sync coordinator, Online Status UI, API contract, threat model, and automatic tests. It does not implement a real server, HTTP/WebSocket transport, accounts, OAuth, cloud sync, multiplayer, chat, commerce, deployment, or Stage 18.
+Stage 17 scope note: the submitted v2 work is limited to online protocol v1 contracts, local OnlinePlayerSnapshot validation, Disabled/Mock gateways, operation idempotency and record-based pending queue with retry/backoff/rejection preservation, conflict policy, revision-guarded sync coordinator lifecycle, Online Status UI lifecycle, API contract, threat model, and automatic tests. It does not implement a real server, HTTP/WebSocket transport, accounts, OAuth, cloud sync, multiplayer, chat, commerce, deployment, or Stage 18.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -34,12 +34,14 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 28. 저장 로직은 `StorageLike`와 주입 가능한 시계를 사용하며, quota/스토리지 실패 시 검증된 primary·backup을 훼손하지 않고 성공으로 기록하지 않는다.
 29. 자동 저장과 씬 타이머·이벤트는 멱등적으로 설치하고 shutdown 시 disposer로 정리한다.
 30. diagnostics 오버레이는 `?diagnostics=1`에서만 표시하고 게임 규칙을 변경하지 않는다.
+31. 온라인 queue는 cap 초과·거부 record를 자동 삭제하거나 조용히 잘라내지 않으며, coordinator dispose 이후 stale callback으로 registry/UI를 갱신하지 않는다.
+32. 검수 제출은 현재 버전 태그만 갱신하고 과거 검수 태그와 이력을 보존한다.
 
 ## 현재 단계 기준
 
 - 전체 단계: 17단계
 - 현재 단계: 17단계 — 온라인 확장 준비
-- 현재 단계 상태: 진행 중 (`in_progress`), 검수 제출 상태는 `review_pending`
+- 현재 단계 상태: 구현 완료·검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-17-online-expansion-readiness`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
@@ -81,7 +83,8 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 16단계 v2 검수 태그: `review-stage-16-v2` — 수정 요청
 - 16단계 현재 검수 태그: `review-stage-16-v4` (승인)
 - 16단계 완료 태그: `stage-16-completed`
-- 17단계 검수 태그: `review-stage-17-v1`
+- 17단계 최초 검수 태그: `review-stage-17-v1` — 수정 요청
+- 17단계 현재 검수 태그: `review-stage-17-v2`
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
 - ChatGPT 코드 검수: 검수 대기 (`pending`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계, 16단계

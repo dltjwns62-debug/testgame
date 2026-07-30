@@ -5,7 +5,7 @@
   "currentStage": 17,
   "currentStageName": "온라인 확장 준비",
   "stageStatus": "review_pending",
-  "activeTask": "17단계 구현 완료 및 ChatGPT 검수 대기",
+  "activeTask": "17단계 v2 구현 완료 및 ChatGPT 재검수 대기",
   "workingBranch": "stage-17-online-expansion-readiness",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
@@ -15,16 +15,16 @@
   "projectCompletion": "pending_review",
   "reviewSubmission": {
     "branch": "stage-17-online-expansion-readiness",
-    "tag": "review-stage-17-v1",
-    "version": 1,
+    "tag": "review-stage-17-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
     {
       "stage": 17,
       "branch": "stage-17-online-expansion-readiness",
-      "tag": "review-stage-17-v1",
-      "version": 1,
+      "tag": "review-stage-17-v2",
+      "version": 2,
       "commit": null,
       "submitted": true,
       "approved": false,
@@ -32,7 +32,23 @@
       "reviewer": null,
       "reviewedAt": null,
       "userRunTest": "skipped_by_user",
-      "mainBranchMerged": false
+      "mainBranchMerged": false,
+      "reason": "queue record/retry backoff/rejection 보존과 cap 초과 데이터 보존, coordinator lifecycle·revision guard, canonical snapshot·operation validation, Online Status lifecycle, OpenAPI와 테스트 범위를 보완함"
+    },
+    {
+      "stage": 17,
+      "branch": "stage-17-online-expansion-readiness",
+      "tag": "review-stage-17-v1",
+      "version": 1,
+      "commit": "2322e44fbf0ab84db56f58358a4996674af75af1",
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-31T04:55:00+09:00",
+      "userRunTest": "skipped_by_user",
+      "mainBranchMerged": false,
+      "reason": "Pending queue가 제한 초과 시 기존 operation을 조용히 제거하고 retry/backoff 상태가 없으며, Sync Coordinator가 dispose·stale response·revision 하향을 차단하지 못하고 rejected operation을 제거하며, Conflict resolver가 변경 snapshot의 이전 hash를 유지하고, Snapshot·Operation 검증과 Online Status 수명주기·OpenAPI·자동 테스트 범위가 불완전함"
     },
     {
       "stage": 16,
@@ -644,5 +660,5 @@
   },
   "mainBranchMerged": false,
   "knownIssues": [],
-  "lastUpdated": "2026-07-31T04:00:00+09:00"
+  "lastUpdated": "2026-07-31T05:26:50+09:00"
 }

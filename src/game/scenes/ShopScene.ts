@@ -6,6 +6,7 @@ import { SHOP_OFFERS, type ShopOffer } from "../shopCatalog";
 import { tryPurchaseShopOffer, type ShopPurchaseFailureReason } from "../shopPurchase";
 import type { AllyUnitDefinition } from "../rtsBattleDefinitions";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { FieldScene } from "./FieldScene";
 
 type OfferVisual = {
@@ -25,6 +26,7 @@ export class ShopScene extends Phaser.Scene {
   }
 
   public create(): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.offerVisuals.clear();
     this.purchaseInProgress = false;
     this.drawBackground();

@@ -17,6 +17,7 @@ import {
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import { calculateFinalUnitStats, getEquippedModifierTotals, getOrCreateInventoryState } from "../items";
 import { formatProgression } from "../progression";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { FormationState, OwnedRosterUnit } from "../rtsBattleTypes";
 import type { FieldScene } from "./FieldScene";
 
@@ -49,6 +50,7 @@ export class FormationScene extends Phaser.Scene {
   }
 
   public create(): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.selectedRosterUnitId = null;
     this.slotVisuals.clear();
     this.ownedVisuals.clear();

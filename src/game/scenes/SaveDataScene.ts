@@ -7,6 +7,7 @@ import {
   saveRegistryState,
 } from "../persistence";
 import type { FieldScene } from "./FieldScene";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 
 export class SaveDataScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
@@ -20,6 +21,7 @@ export class SaveDataScene extends Phaser.Scene {
   }
 
   public create(): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.drawBackground();
     this.add.text(32, 20, "Stage 15: Save Data", {
       color: "#f3f8e9",
@@ -114,6 +116,7 @@ export class SaveDataScene extends Phaser.Scene {
       this.messageText.setColor("#f3c969").setText("Click Reset Save again within 5 seconds to confirm.");
       return;
     }
+    repairRuntimeStateAtBoundary(this.game.registry);
     const result = resetSaveData(this.game.registry, now);
     this.resetConfirmUntil = 0;
     this.resetLabel.setText("Reset Save");

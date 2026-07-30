@@ -25,6 +25,7 @@ import {
   setSelectedAutoRepeatMonster,
 } from "../autoProgress";
 import { getAndClearOfflineSummary } from "../persistence";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { OfflineRewardSummary } from "../offlineProgress";
 import type { BattleOutcome, OwnedRosterUnit, RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
@@ -78,6 +79,9 @@ export class FieldScene extends Phaser.Scene {
   private repeatMovementInProgress = false;
   private summaryOpen = false;
   private summaryOverlay: Phaser.GameObjects.Container | null = null;
+  private statusDirty = true;
+  private statusElapsedMs = 100;
+  private lastStatusText = "";
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
@@ -88,6 +92,7 @@ export class FieldScene extends Phaser.Scene {
   }
 
   public create(data?: unknown): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     getOrCreateFormationState(this.game.registry);
     getOrCreatePlayerGold(this.game.registry);
     getOrCreateKeyBindingState(this.game.registry);
@@ -131,7 +136,8 @@ export class FieldScene extends Phaser.Scene {
       return;
     }
     this.movePlayer(delta);
-    this.updateStatusText();
+    this.statusElapsedMs += Math.max(0, delta);
+    if (this.statusDirty || this.statusElapsedMs >= 100) this.updateStatusText();
   }
 
   private drawField(): void {
@@ -557,6 +563,7 @@ export class FieldScene extends Phaser.Scene {
   }
 
   public applyBattleResult(result: RTSBattleResult): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     if (
       !result ||
       !this.battleTransitionStarted ||
@@ -685,13 +692,19 @@ export class FieldScene extends Phaser.Scene {
     this.repeatButtonLabel?.setText("Repeat: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF"));
     this.saveDataButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
     this.saveDataButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
-    this.stateText.setText([
+    const nextText = [
       "State: " + this.state + " · Target: " + (this.targetMonster?.definition.name ?? "None") + " · Gold: " + playerGold,
       "Formation: " + deployedCount + "/10 · Owned: " + formation.ownedUnits.length + "/13 · Hero Slot: " + (heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1),
       "Hero: " + (hero ? getHeroStatsLabel(this.game.registry, hero) : "Unavailable"),
       "Repeat Hunt: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF") + " · Target: " + (autoProgress.selectedMonsterId ?? "None"),
       ...(this.formationMessage ? [this.formationMessage] : []),
-    ]);
+    ].join("\n");
+    if (nextText !== this.lastStatusText) {
+      this.stateText.setText(nextText);
+      this.lastStatusText = nextText;
+    }
+    this.statusDirty = false;
+    this.statusElapsedMs = 0;
   }
 
   private addStage15Controls(): void {

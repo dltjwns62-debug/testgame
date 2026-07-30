@@ -28,6 +28,7 @@ import {
 } from "../controlGroups";
 import { getOrCreateFormationState, grantRosterUnitExperience } from "../formationState";
 import { setAutoRepeatEnabled } from "../autoProgress";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import {
   addItemDefinitionsToInventory,
   calculateFinalUnitStats,
@@ -153,10 +154,13 @@ export class BattleScene extends Phaser.Scene {
   private attackLogText!: Phaser.GameObjects.Text;
   private autoHuntButton!: AutoHuntButtonVisual;
   private readonly controlGroupTexts = new Map<ControlGroupIndex, Phaser.GameObjects.Text>();
+  private readonly delayedEvents = new Set<Phaser.Time.TimerEvent>();
   private dragStart: PointerPosition | null = null;
   private dragEnd: PointerPosition | null = null;
   private isDragging = false;
   private suppressArenaPointer = false;
+  private uiDirty = true;
+  private uiElapsedMs = 100;
 
   private readonly handleBattleKeyDown = (event: KeyboardEvent): void => {
     if (event.repeat || event.shiftKey) {
@@ -212,6 +216,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   public create(data: unknown): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.resetBattle(data);
     this.drawBackground();
     this.addHeader();
@@ -234,12 +239,13 @@ export class BattleScene extends Phaser.Scene {
 
   public update(_time: number, delta: number): void {
     if (this.dataError) {
-      this.updateUi();
+      this.updateUiIfDue(0);
       return;
     }
 
     if (this.combatState !== "RUNNING") {
       this.refreshAllVisuals();
+      this.updateUiIfDue(delta);
       return;
     }
 
@@ -259,10 +265,16 @@ export class BattleScene extends Phaser.Scene {
       this.checkBattleOutcome();
     }
     this.refreshAllVisuals();
-    this.updateUi();
+    this.updateUiIfDue(safeDelta);
+  }
+
+  private updateUiIfDue(deltaMs: number): void {
+    this.uiElapsedMs += Math.max(0, deltaMs);
+    if (this.uiDirty || this.uiElapsedMs >= 100) this.updateUi();
   }
 
   private resetBattle(data: unknown): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.returnStarted = false;
     this.combatState = "RUNNING";
     this.resultCommitted = false;
@@ -728,7 +740,7 @@ export class BattleScene extends Phaser.Scene {
   private showSkillEffect(position: BattlePosition, radius: number, color: number): void {
     const effect = this.add.arc(position.x, position.y, radius, 0, 360, false, color, 0.08)
       .setStrokeStyle(2, color, 0.55);
-    this.time.delayedCall(240, () => effect.destroy());
+    this.scheduleDelayed(240, () => effect.destroy());
   }
 
   private addArenaInteraction(): void {
@@ -1481,7 +1493,7 @@ export class BattleScene extends Phaser.Scene {
       ? ["VICTORY", this.enemyDisplayName + " squad defeated.", "Reward: +" + this.goldReward + " Gold", "Direct EXP: " + this.directExperienceTotal, "Bonus EXP: " + this.bonusExperienceTotal, lootLine]
       : ["DEFEAT", "All allied units are defeated.", "Reward: 0 Gold", "Direct EXP: " + this.directExperienceTotal, "Bonus EXP: 0", lootLine]);
     if (this.autoRepeatBattle) {
-      this.time.delayedCall(1400, () => fieldScene.returnFromBattle(outcome));
+      this.scheduleDelayed(1400, () => fieldScene.returnFromBattle(outcome));
     }
   }
 
@@ -1726,6 +1738,8 @@ export class BattleScene extends Phaser.Scene {
     this.updateSkillUi();
     this.refreshControlGroupUi();
     this.refreshSlotUi();
+    this.uiDirty = false;
+    this.uiElapsedMs = 0;
   }
 
   private refreshControlGroupUi(): void {
@@ -1804,6 +1818,17 @@ export class BattleScene extends Phaser.Scene {
     this.input.off("pointermove", this.handlePointerMove, this);
     this.input.off("pointerup", this.handlePointerUp, this);
     this.input.keyboard?.off("keydown", this.handleBattleKeyDown, this);
+    for (const timer of this.delayedEvents) this.time.removeEvent(timer);
+    this.delayedEvents.clear();
+  }
+
+  private scheduleDelayed(delayMs: number, callback: () => void): void {
+    let timer: Phaser.Time.TimerEvent;
+    timer = this.time.delayedCall(delayMs, () => {
+      this.delayedEvents.delete(timer);
+      callback();
+    });
+    this.delayedEvents.add(timer);
   }
 
   private sanitizeGold(value: number): number {

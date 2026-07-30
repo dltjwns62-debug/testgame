@@ -17,6 +17,7 @@ import {
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import { calculateFinalUnitStats, getEquippedModifierTotals, getOrCreateInventoryState } from "../items";
 import { formatProgression } from "../progression";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { FormationState, OwnedRosterUnit } from "../rtsBattleTypes";
 import type { FieldScene } from "./FieldScene";
 
@@ -49,6 +50,7 @@ export class FormationScene extends Phaser.Scene {
   }
 
   public create(): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.selectedRosterUnitId = null;
     this.slotVisuals.clear();
     this.ownedVisuals.clear();
@@ -73,7 +75,7 @@ export class FormationScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 18, "Stage 14: Formation & Equipment", {
+    this.add.text(32, 18, "Stage 16: Formation & Runtime State", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",

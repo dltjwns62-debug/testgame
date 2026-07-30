@@ -1,5 +1,43 @@
 # 현재 개발 상태
 
+## Stage 16 성능 및 안정화 — v4 검수 대기
+
+- 전체 단계: 17단계
+- 현재 단계: 16단계 — 성능 및 안정화
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-16-performance-stability`
+- 현재 검수 태그: `review-stage-16-v4`
+- 완료된 단계: 1단계~15단계
+- 검수 통과된 단계: 1단계~15단계
+- 다음 단계: 17단계 — 온라인 확장 준비
+- `main` 정식 반영 여부: 미반영
+- 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- 현재 작업: 16단계 v4 Recovery 재시도 흐름 수정 및 재제출
+- 현재 알려진 문제: 없음. 브라우저 검사는 Field·diagnostics·favicon 범위만 확인했고 Battle 수동 상호작용은 미실행
+
+### 16단계 구현 요약
+
+- `StorageLike`·`PersistenceEnvironment` 경계로 저장소와 시계를 주입할 수 있게 했다.
+- 런타임 상태를 Bootstrap, 주요 씬 진입, 전투 결과와 저장 경계에서 검사·복구하고 이슈를 registry에 기록한다.
+- 자동 저장 controller를 멱등적으로 설치하고 이벤트·타이머 disposer를 제공한다.
+- Field/Battle의 상태 UI 갱신을 dirty flag와 100ms 주기로 제한하고 전투 시각 갱신과 분리했다.
+- 최근 20개 런타임 오류, diagnostics query overlay, 저장 바이트·소요 시간·출처 메타데이터, SVG favicon을 추가했다.
+- Recovery Try Again은 기존 FATAL 이슈를 명시적으로 제거하고 Recovery·SaveData·Battle·Field를 정리한 뒤 Bootstrap에서 저장 상태를 다시 검증한다.
+- 17단계 온라인 확장 기능은 구현하지 않았다.
+
+### 16단계 검증 기록
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run test`: 통과 (`passed`, 31개)
+- `npm run build`: 통과 (`passed`)
+- `npm run check`: 통과 (`passed`)
+- 개발 서버: root·favicon HTTP 200 확인 후 종료 (`passed`)
+- 브라우저 자동 확인: Field Stage16, `diagnostics=1/0`, favicon, 콘솔 error/warning 없음 확인 (`partial_passed`)
+- 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`), 통과로 기록하지 않음
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
+
 ## Stage 15 저장과 오프라인 진행 — 완료
 
 - 현재 검수 태그: `review-stage-15-v3`

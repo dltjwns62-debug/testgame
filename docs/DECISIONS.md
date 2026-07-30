@@ -1,5 +1,43 @@
 # 프로젝트 결정 사항
 
+## 16단계 v4 Recovery 재시도 결정
+
+- 결정: Recovery Try Again은 사용자의 명시적 재시도 동작으로 기존 runtime FATAL 이슈를 먼저 제거한다.
+- 결정: Try Again은 Recovery·SaveData·Battle·Field를 중복 없이 정리한 뒤 Bootstrap을 시작한다.
+- 결정: Bootstrap은 저장을 다시 불러오고 상태를 재검증하며, 문제가 계속되면 새 FATAL을 기록하고 Recovery로 전환한다.
+- 결정: Recovery 재시도 전체 브라우저 상호작용은 실행하지 않았으므로 `passed`로 기록하지 않는다.
+- 결정: v1·v2·v3 검수 태그와 이력은 보존하고 `review-stage-16-v4`를 새 제출 버전으로 사용한다.
+- 상태: 확정
+
+## 16단계 v3 검수 재제출 결정
+
+- 결정: v1·v2 검수 태그와 이력을 이동·삭제하지 않고 `review-stage-16-v3`를 새 제출 버전으로 사용한다.
+- 결정: Runtime Error handler는 clear 후 registry를 설정하고 named listener를 설치하며, 동일 target 재설치 시 최신 registry를 갱신한다.
+- 결정: FATAL 상태는 Battle Auto Hunt·Repeat Hunt·반복 pending을 중단하고 RecoveryScene으로 보낸다.
+- 결정: SaveDataScene은 `returnScene` 출처를 받아 Recovery와 Field에 각각 명시적으로 복귀하며 Reset 성공은 Bootstrap에서 재시작한다.
+- 결정: diagnostics UI update rate는 Field와 Battle을 별도 측정한다.
+- 상태: 확정
+
+## 16단계 v2 검수 재제출 결정
+
+- 결정: v1의 수정 요청 이력과 `review-stage-16-v1` 태그는 불변으로 보존하고 `review-stage-16-v2`를 새 제출 버전으로 사용한다.
+- 결정: 회귀 테스트는 Node `node:test`와 `tsx`만 사용하고 Phaser 전체를 복제하지 않는다.
+- 결정: 전역 오류 handler는 named reference를 저장해 실제 removeEventListener와 재설치를 지원한다.
+- 결정: 복구 불가능한 FATAL 상태는 전투·보상 적용을 차단하고 RecoveryScene의 Try Again·Return to Field·Save Data·Reset Save로 보낸다.
+- 결정: Field offline summary는 Bootstrap 전달 또는 registry changedata 단발 이벤트로만 소비한다.
+- 결정: 모든 활성 화면의 현재 단계 표기는 Stage 16으로 맞추고 Stage 17 온라인 기능은 구현하지 않는다.
+- 상태: 확정
+
+## 16단계 성능 및 안정화 제출 결정
+
+- 결정: 저장소와 시계는 `StorageLike`·`PersistenceEnvironment` 경계로 주입 가능하게 유지한다.
+- 결정: 런타임 상태 검증·복구는 프레임 루프가 아닌 Bootstrap, 씬 진입, 저장·복구, 전투 결과 경계에서 실행한다.
+- 결정: autosave와 scene delayed timer는 멱등 설치와 명시적 disposer를 사용해 중복 실행을 방지한다.
+- 결정: Field/Battle UI는 dirty flag 또는 약 100ms 주기로 갱신하고, 전투 시각 업데이트와 UI 텍스트 갱신을 분리한다.
+- 결정: diagnostics는 `?diagnostics=1`에서만 표시하며 게임 로직을 변경하지 않는다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`, ChatGPT 코드 검수는 `not_reviewed`, 17단계는 미시작으로 제출한다.
+- 상태: 확정
+
 ## 15단계 검수 승인 및 main 반영 결정
 
 - 결정: `review-stage-15-v3`의 승인 커밋 `ca55144de6e6d2f72e941abb9a11b801c175355a`를 `main`에 no-ff 병합한다.

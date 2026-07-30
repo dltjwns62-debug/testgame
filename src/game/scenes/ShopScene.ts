@@ -6,6 +6,7 @@ import { SHOP_OFFERS, type ShopOffer } from "../shopCatalog";
 import { tryPurchaseShopOffer, type ShopPurchaseFailureReason } from "../shopPurchase";
 import type { AllyUnitDefinition } from "../rtsBattleDefinitions";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { FieldScene } from "./FieldScene";
 
 type OfferVisual = {
@@ -25,6 +26,7 @@ export class ShopScene extends Phaser.Scene {
   }
 
   public create(): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.offerVisuals.clear();
     this.purchaseInProgress = false;
     this.drawBackground();
@@ -41,7 +43,7 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 18, "Stage 14: Mercenary Shop", {
+    this.add.text(32, 18, "Stage 16: Mercenary Shop & Stability", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",

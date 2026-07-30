@@ -1,6 +1,14 @@
 # Test Game
 
-## Stage 15 completed after review
+## Stage 16 성능 및 안정화 — v4 검수 대기
+
+현재 제출 단계는 16단계 **성능 및 안정화**다. 작업 브랜치는 `stage-16-performance-stability`, 검수 태그는 `review-stage-16-v4`, 상태는 `review_pending`이며 `main`에는 아직 병합하지 않았다. 1~15단계는 완료된 상태로 보존하고, 17단계 **온라인 확장 준비**는 아직 시작하지 않는다.
+
+이번 단계에서는 1~15단계 회귀 테스트, 주입 가능한 저장소·시계 경계, 런타임 상태 검증 및 복구, 자동 저장 수명주기 정리, Field/Battle UI 갱신 제한, diagnostics 오버레이, 최근 런타임 오류 기록, 저장 용량 메타데이터와 favicon을 추가했다. v4에서는 Recovery의 Try Again이 기존 FATAL 이슈를 명시적으로 제거하고 전체 씬을 정리한 뒤 Bootstrap에서 재검증하도록 보완했다. 사용자 수동 테스트는 사용자 요청에 따라 `skipped_by_user`로 유지하며 통과로 기록하지 않는다.
+
+Stage 16 관련 문서: [아키텍처](docs/ARCHITECTURE.md), [성능·안정화 감사](docs/STAGE16-AUDIT.md), [테스트 기록](docs/TESTING.md), [로드맵](docs/ROADMAP.md), [현재 상태](docs/STATUS.md).
+
+## Stage 15 completed after review (historical)
 
 15단계 **저장과 오프라인 진행**은 `review-stage-15-v3` 검수를 승인받아 `main`에 반영했고 완료 처리했다. 사용자 수동 테스트는 요청하지 않아 `skipped_by_user`로 기록하며 통과로 간주하지 않는다. 다음 단계는 별도 명령 전까지 시작하지 않는다.
 
@@ -67,14 +75,14 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 프로젝트 이름: Test Game
 - 장르: 자동사냥 방치형 웹게임
 - 전체 개발 단계: 17단계
-- 현재 단계: 15단계
-- 현재 단계 이름: 저장과 오프라인 진행
-- 현재 상태: 완료 (`completed`)
-- 현재 작업 브랜치: `main`
-- 검수 태그: `review-stage-15-v3`
+- 현재 단계: 16단계
+- 현재 단계 이름: 성능 및 안정화
+- 현재 상태: 검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-16-performance-stability`
+- 검수 태그: `review-stage-16-v3`
 - 완료 태그: `stage-15-completed`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계
-- 다음 단계: 16단계 — 성능 및 안정화
+- 다음 단계: 17단계 — 온라인 확장 준비
 
 7단계 10대10 RTS 핵심 전투와 8단계 Auto Hunt·지역 동료 지원 기능은 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다.
 
@@ -99,8 +107,8 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 
 ## 알려진 문제
 
-- `favicon.ico`가 없어 브라우저 콘솔에 비차단 404가 표시될 수 있다.
-- 게임 기능에는 영향이 없으며, 수정이 필요하면 다음 작업 브랜치에서 별도 검수한다.
+- 현재 알려진 기능상 문제는 없다.
+- 자동 브라우저 확인은 Field·diagnostics·favicon 범위만 실행했고, Battle 전체 상호작용과 사용자 수동 테스트는 `skipped_by_user`로 남겨 두었다.
 
 ## 문서
 

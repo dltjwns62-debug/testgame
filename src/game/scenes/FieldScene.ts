@@ -10,6 +10,7 @@ import {
   PLAYER_POSITION,
   PLAYER_MOVE_SPEED,
   PLAYER_RADIUS,
+  PERSISTENCE_SUMMARY_REGISTRY_KEY,
   type MonsterDefinition,
 } from "../constants";
 import { buildBattleRosterFromFormation, getOrCreateFormationState, isValidFormationState } from "../formationState";
@@ -25,6 +26,7 @@ import {
   setSelectedAutoRepeatMonster,
 } from "../autoProgress";
 import { getAndClearOfflineSummary } from "../persistence";
+import { hasFatalRuntimeStateIssue, inspectRuntimeState, repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { OfflineRewardSummary } from "../offlineProgress";
 import type { BattleOutcome, OwnedRosterUnit, RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
@@ -78,6 +80,22 @@ export class FieldScene extends Phaser.Scene {
   private repeatMovementInProgress = false;
   private summaryOpen = false;
   private summaryOverlay: Phaser.GameObjects.Container | null = null;
+  private statusDirty = true;
+  private statusElapsedMs = 100;
+  private lastStatusText = "";
+  private statusUpdateCount = 0;
+  private runtimeFatal = false;
+  private pendingSummary: OfflineRewardSummary | null = null;
+  private readonly handleSummaryChanged = (_parent: unknown, key: string): void => {
+    if (key !== PERSISTENCE_SUMMARY_REGISTRY_KEY) return;
+    const summary = this.game.registry.get(PERSISTENCE_SUMMARY_REGISTRY_KEY) as OfflineRewardSummary | undefined;
+    if (!summary) return;
+    this.game.registry.remove(PERSISTENCE_SUMMARY_REGISTRY_KEY);
+    if (summary.applied || summary.recoveredMessage || summary.rawElapsedMs >= 60_000) {
+      if (this.summaryOpen) this.pendingSummary = summary;
+      else this.showOfflineSummary(summary);
+    }
+  };
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
@@ -88,6 +106,9 @@ export class FieldScene extends Phaser.Scene {
   }
 
   public create(data?: unknown): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
+    const runtimeIssues = inspectRuntimeState(this.game.registry);
+    this.runtimeFatal = hasFatalRuntimeStateIssue(runtimeIssues);
     getOrCreateFormationState(this.game.registry);
     getOrCreatePlayerGold(this.game.registry);
     getOrCreateKeyBindingState(this.game.registry);
@@ -105,8 +126,11 @@ export class FieldScene extends Phaser.Scene {
     MONSTERS.forEach((monster) => this.addMonster(monster));
 
     this.setupCanvasContextMenu();
+    this.game.registry.events.on("changedata", this.handleSummaryChanged);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.clearRespawnTimers, this);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.clearRespawnTimers, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.clearSummaryListener, this);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.clearSummaryListener, this);
     const bootData = data && typeof data === "object" ? data as {
       persistenceMessage?: string;
       offlineSummary?: OfflineRewardSummary;
@@ -118,20 +142,20 @@ export class FieldScene extends Phaser.Scene {
     } else if (bootData.persistenceMessage && bootData.persistenceMessage !== "Save loaded.") {
       this.formationMessage = bootData.persistenceMessage;
     }
+    if (this.runtimeFatal) {
+      this.state = "IDLE";
+      this.formationMessage = "A required game state could not be repaired. Use Safe Recovery to continue.";
+    }
     this.updateStatusText();
   }
 
   public update(_time: number, delta: number): void {
-    const liveSummary = !this.summaryOpen ? getAndClearOfflineSummary(this.game.registry) : null;
-    if (liveSummary && (liveSummary.applied || liveSummary.recoveredMessage || liveSummary.rawElapsedMs >= 60_000)) {
-      this.showOfflineSummary(liveSummary);
-      return;
-    }
     if (this.summaryOpen) {
       return;
     }
     this.movePlayer(delta);
-    this.updateStatusText();
+    this.statusElapsedMs += Math.max(0, delta);
+    if (this.statusDirty || this.statusElapsedMs >= 100) this.updateStatusText();
   }
 
   private drawField(): void {
@@ -153,14 +177,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 15: Save & Offline Progress", {
+    this.add.text(48, 36, "Stage 16: Performance & Stability", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Repeat hunts, safe saves, and offline rewards.", {
+    this.add.text(50, 66, "Stable runtime, safe saves, and efficient UI updates.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -381,7 +405,7 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private startBattleTransition(): void {
-    if (this.battleTransitionStarted || !this.targetMonster) {
+    if (this.runtimeFatal || this.battleTransitionStarted || !this.targetMonster) {
       return;
     }
 
@@ -420,6 +444,11 @@ export class FieldScene extends Phaser.Scene {
     }
 
     const autoProgress = getOrCreateAutoProgressState(this.game.registry);
+    if (hasFatalRuntimeStateIssue(inspectRuntimeState(this.game.registry))) {
+      setAutoRepeatEnabled(this.game.registry, false);
+      this.repeatAfterBattlePending = false;
+      this.repeatMovementInProgress = false;
+    }
     const shouldRepeat = outcome === "VICTORY" && autoProgress.autoRepeatEnabled &&
       autoProgress.selectedMonsterId !== null;
     if (!shouldRepeat && autoProgress.autoRepeatEnabled) {
@@ -531,7 +560,7 @@ export class FieldScene extends Phaser.Scene {
     }
     if (!this.prepareMenuEntry("Save Data is unavailable while the player is moving.")) return;
     this.scene.pause();
-    this.scene.launch("SaveDataScene");
+    this.scene.launch("SaveDataScene", { returnScene: "FieldScene" });
   }
 
   public returnFromSaveData(savedMessage?: string): void {
@@ -557,6 +586,11 @@ export class FieldScene extends Phaser.Scene {
   }
 
   public applyBattleResult(result: RTSBattleResult): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
+    if (hasFatalRuntimeStateIssue(inspectRuntimeState(this.game.registry))) {
+      this.battleResultApplied = false;
+      return;
+    }
     if (
       !result ||
       !this.battleTransitionStarted ||
@@ -662,10 +696,26 @@ export class FieldScene extends Phaser.Scene {
     });
   }
 
+  public getManagedTimerCount(): number {
+    let count = this.repeatAfterBattlePending ? 1 : 0;
+    this.monsterViews.forEach((monster) => { if (monster.respawnEvent) count += 1; });
+    return count;
+  }
+
+  public getDiagnosticsSnapshot(): { uiUpdates: number; managedTimers: number } {
+    return { uiUpdates: this.statusUpdateCount, managedTimers: this.getManagedTimerCount() };
+  }
+
+  private clearSummaryListener(): void {
+    this.game.registry.events.off("changedata", this.handleSummaryChanged);
+    this.pendingSummary = null;
+  }
+
   private updateStatusText(): void {
     if (!this.stateText) {
       return;
     }
+    this.statusUpdateCount += 1;
 
     const formation = getOrCreateFormationState(this.game.registry);
     const deployedCount = formation.slots.filter((slot) => slot.rosterUnitId !== null).length;
@@ -685,13 +735,19 @@ export class FieldScene extends Phaser.Scene {
     this.repeatButtonLabel?.setText("Repeat: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF"));
     this.saveDataButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
     this.saveDataButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
-    this.stateText.setText([
+    const nextText = [
       "State: " + this.state + " · Target: " + (this.targetMonster?.definition.name ?? "None") + " · Gold: " + playerGold,
       "Formation: " + deployedCount + "/10 · Owned: " + formation.ownedUnits.length + "/13 · Hero Slot: " + (heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1),
       "Hero: " + (hero ? getHeroStatsLabel(this.game.registry, hero) : "Unavailable"),
       "Repeat Hunt: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF") + " · Target: " + (autoProgress.selectedMonsterId ?? "None"),
       ...(this.formationMessage ? [this.formationMessage] : []),
-    ]);
+    ].join("\n");
+    if (nextText !== this.lastStatusText) {
+      this.stateText.setText(nextText);
+      this.lastStatusText = nextText;
+    }
+    this.statusDirty = false;
+    this.statusElapsedMs = 0;
   }
 
   private addStage15Controls(): void {
@@ -826,11 +882,14 @@ export class FieldScene extends Phaser.Scene {
     this.summaryOverlay?.destroy(true);
     this.summaryOverlay = null;
     this.summaryOpen = false;
+    const pendingSummary = this.pendingSummary;
+    this.pendingSummary = null;
     const state = getOrCreateAutoProgressState(this.game.registry);
     if (state.autoRepeatEnabled && state.selectedMonsterId) {
       const target = this.monsterViews.get(state.selectedMonsterId);
       if (target?.isAvailable) this.selectMonster(state.selectedMonsterId, "REPEAT");
     }
+    if (pendingSummary) this.showOfflineSummary(pendingSummary);
     this.updateStatusText();
   }
 }

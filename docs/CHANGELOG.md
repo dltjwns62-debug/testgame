@@ -1,5 +1,43 @@
 # 변경 이력
 
+## 2026-07-31 — 16단계 v4 Recovery 재시도 수정 및 재제출 — 검수 대기
+
+- v3 검수에서 지적된 Recovery Try Again의 FATAL 잔존과 Bootstrap·Recovery 반복 가능성을 수정했다.
+- Try Again은 기존 runtime FATAL 이슈를 명시적으로 제거하고 Recovery·SaveData·Battle·Field를 정리한 뒤 Bootstrap을 시작한다.
+- Bootstrap은 저장을 다시 불러오고 현재 상태를 재검증하며, 문제가 계속되면 새 FATAL을 기록하고 Recovery로 돌아간다.
+- Recovery 재시도 준비 함수와 실제 FATAL 제거·재발 검증 테스트를 추가해 총 31개 자동 테스트를 유지한다.
+- `review-stage-16-v1`, `review-stage-16-v2`, `review-stage-16-v3` 태그와 이력을 보존하고 새 제출 태그는 `review-stage-16-v4`다.
+- 사용자 테스트는 `skipped_by_user`로 유지하고 17단계는 아직 시작하지 않았다.
+
+## 2026-07-31 — 16단계 v3 검수 재제출
+
+- v2의 `changes_requested` 이력과 `review-stage-16-v2` 태그를 불변으로 보존한다.
+- Runtime Error handler 설치 순서를 고쳐 최초 registry 참조와 실제 이벤트 기록을 보장한다.
+- FATAL 상태에서 Battle Auto Hunt와 Repeat Hunt를 모두 끄고 보상·반복 진행을 차단한다.
+- RecoveryScene과 SaveDataScene의 Field/Recovery 반환 출처를 명시하고 Reset은 Bootstrap에서 재시작한다.
+- diagnostics에서 Field/Battle UI updates/sec를 분리하고 순수 Scene 전환 helper와 회귀 테스트를 추가했다.
+- 현재 제출 태그는 `review-stage-16-v3`, 상태는 `review_pending`, 사용자 테스트는 `skipped_by_user`, 17단계는 미시작이다.
+
+## 2026-07-30 — 16단계 v2 검수 재제출
+
+- v1 검수의 `changes_requested` 결과와 원인, `review-stage-16-v1` 태그를 보존한다.
+- 회귀 테스트를 27개로 확대해 SaveEnvelope·복구·오프라인 진행·정규화·전투 순수 로직을 실제 소스 함수로 검증한다.
+- 전역 runtime error listener를 named handler로 관리하고 실제 제거·재설치를 지원한다.
+- FATAL 상태를 기록하고 전투 진입·보상 적용을 차단하며 RecoveryScene으로 안전 복구한다.
+- Field offline summary를 매 프레임 destructive read하지 않고 registry named changedata handler로 한 번만 전달한다.
+- 모든 활성 Scene의 화면 표기를 Stage 16으로 정정하고 Battle visual/UI 갱신과 diagnostics 카운터를 보완한다.
+- 현재 제출 태그는 `review-stage-16-v2`, 상태는 `review_pending`, 사용자 테스트는 `skipped_by_user`, 17단계는 미시작이다.
+
+## 2026-07-30 — 16단계 성능 및 안정화 제출
+
+- 1~15단계 회귀 범위를 유지하면서 저장·복구와 런타임 상태 경계를 검증·복구하도록 했다.
+- `StorageLike`·주입 가능한 시계, quota 안전 저장 메타데이터, 멱등 autosave disposer를 추가했다.
+- Field/Battle UI의 불필요한 매 프레임 텍스트 갱신을 제한하고 씬 delayed timer 정리를 보강했다.
+- 최근 런타임 오류 20개 기록, `?diagnostics=1` 전용 진단 오버레이, favicon과 Node 회귀 테스트를 추가했다.
+- `docs/ARCHITECTURE.md`와 `docs/STAGE16-AUDIT.md`를 추가했다.
+- 자동 검사는 `npm run typecheck`, `npm run test`, `npm run build`까지 통과했다. 사용자 수동 테스트는 `skipped_by_user`이며 17단계는 시작하지 않았다.
+- 검수 태그 `review-stage-16-v1`, 상태 `review_pending`, `main` 미반영으로 제출한다.
+
 ## 2026-07-30 — 15단계 검수 승인 및 main 반영 — 완료
 
 - `review-stage-15-v3`와 승인 커밋 `ca55144de6e6d2f72e941abb9a11b801c175355a`를 확인했다.

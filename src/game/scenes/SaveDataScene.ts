@@ -6,7 +6,8 @@ import {
   resetSaveData,
   saveRegistryState,
 } from "../persistence";
-import type { FieldScene } from "./FieldScene";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
+import { getResetRestartScene, getSaveDataReturnScene, type SaveDataReturnScene } from "../sceneNavigation";
 
 export class SaveDataScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
@@ -14,14 +15,17 @@ export class SaveDataScene extends Phaser.Scene {
   private resetButton!: Phaser.GameObjects.Rectangle;
   private resetLabel!: Phaser.GameObjects.Text;
   private resetConfirmUntil = 0;
+  private returnScene: SaveDataReturnScene = "FieldScene";
 
   public constructor() {
     super("SaveDataScene");
   }
 
-  public create(): void {
+  public create(data?: unknown): void {
+    this.returnScene = getSaveDataReturnScene(data);
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.drawBackground();
-    this.add.text(32, 20, "Stage 15: Save Data", {
+    this.add.text(32, 20, "Stage 16: Save Data & Stability", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
@@ -52,7 +56,7 @@ export class SaveDataScene extends Phaser.Scene {
     });
     this.resetButton = this.addButton(480, 455, 180, "Reset Save", () => this.resetSave());
     this.resetLabel = this.resetButton.getData("label") as Phaser.GameObjects.Text;
-    this.addButton(710, 455, 180, "Back to Field", () => this.returnToField());
+    this.addButton(710, 455, 180, this.returnScene === "RecoveryScene" ? "Back to Recovery" : "Back to Field", () => this.returnToField());
     this.refreshUi();
   }
 
@@ -114,17 +118,28 @@ export class SaveDataScene extends Phaser.Scene {
       this.messageText.setColor("#f3c969").setText("Click Reset Save again within 5 seconds to confirm.");
       return;
     }
+    repairRuntimeStateAtBoundary(this.game.registry);
     const result = resetSaveData(this.game.registry, now);
     this.resetConfirmUntil = 0;
     this.resetLabel.setText("Reset Save");
     this.messageText.setColor(result.ok ? "#9ce4b0" : "#f3c969").setText(result.message);
     this.refreshUi();
-    const fieldScene = this.scene.get("FieldScene") as FieldScene;
-    fieldScene.restartAfterReset(result.message);
+    if (result.ok) {
+      this.scene.stop("SaveDataScene");
+      this.scene.stop("RecoveryScene");
+      this.scene.stop("BattleScene");
+      this.scene.stop("FieldScene");
+      this.scene.start(getResetRestartScene(), { persistenceMessage: result.message });
+    }
   }
 
   private returnToField(): void {
-    const fieldScene = this.scene.get("FieldScene") as FieldScene;
+    this.scene.stop("SaveDataScene");
+    if (this.returnScene === "RecoveryScene") {
+      this.scene.resume("RecoveryScene");
+      return;
+    }
+    const fieldScene = this.scene.get("FieldScene") as import("./FieldScene").FieldScene;
     fieldScene.returnFromSaveData(this.messageText.text);
   }
 }

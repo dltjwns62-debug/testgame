@@ -28,6 +28,9 @@ import {
 } from "../controlGroups";
 import { getOrCreateFormationState, grantRosterUnitExperience } from "../formationState";
 import { setAutoRepeatEnabled } from "../autoProgress";
+import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
+import { recordFatalRuntimeStateIssue } from "../runtimeStateValidation";
+import { recordRuntimeError } from "../runtimeErrors";
 import {
   addItemDefinitionsToInventory,
   calculateFinalUnitStats,
@@ -153,10 +156,16 @@ export class BattleScene extends Phaser.Scene {
   private attackLogText!: Phaser.GameObjects.Text;
   private autoHuntButton!: AutoHuntButtonVisual;
   private readonly controlGroupTexts = new Map<ControlGroupIndex, Phaser.GameObjects.Text>();
+  private readonly allyBySlot = new Map<number, RTSBattleUnit>();
+  private readonly delayedEvents = new Set<Phaser.Time.TimerEvent>();
   private dragStart: PointerPosition | null = null;
   private dragEnd: PointerPosition | null = null;
   private isDragging = false;
   private suppressArenaPointer = false;
+  private uiDirty = true;
+  private uiElapsedMs = 100;
+  private visualStateDirty = true;
+  private uiUpdateCount = 0;
 
   private readonly handleBattleKeyDown = (event: KeyboardEvent): void => {
     if (event.repeat || event.shiftKey) {
@@ -212,6 +221,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   public create(data: unknown): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.resetBattle(data);
     this.drawBackground();
     this.addHeader();
@@ -219,11 +229,14 @@ export class BattleScene extends Phaser.Scene {
     this.addBattleUnits();
     this.addSelectionUi();
     this.addBottomUi();
+    this.markVisualStateDirty();
     this.refreshAllVisuals();
     this.updateUi();
 
     if (this.dataError) {
       this.outcomeText.setText(["BATTLE DATA ERROR", this.dataError, "Return to Field to continue."]);
+      recordRuntimeError("BattleScene", new Error(this.dataError), false, this.game.registry);
+      this.scene.launch("RecoveryScene", { message: this.dataError });
     } else if (this.getAliveUnits("ENEMY").length === 0) {
       this.commitResult("VICTORY");
     }
@@ -234,12 +247,13 @@ export class BattleScene extends Phaser.Scene {
 
   public update(_time: number, delta: number): void {
     if (this.dataError) {
-      this.updateUi();
+      this.updateUiIfDue(0);
       return;
     }
 
     if (this.combatState !== "RUNNING") {
       this.refreshAllVisuals();
+      this.updateUiIfDue(delta);
       return;
     }
 
@@ -259,10 +273,24 @@ export class BattleScene extends Phaser.Scene {
       this.checkBattleOutcome();
     }
     this.refreshAllVisuals();
-    this.updateUi();
+    this.updateUiIfDue(safeDelta);
+  }
+
+  public getManagedTimerCount(): number {
+    return this.delayedEvents.size;
+  }
+
+  public getDiagnosticsSnapshot(): { uiUpdates: number; managedTimers: number } {
+    return { uiUpdates: this.uiUpdateCount, managedTimers: this.getManagedTimerCount() };
+  }
+
+  private updateUiIfDue(deltaMs: number): void {
+    this.uiElapsedMs += Math.max(0, deltaMs);
+    if (this.uiDirty || this.uiElapsedMs >= 100) this.updateUi();
   }
 
   private resetBattle(data: unknown): void {
+    repairRuntimeStateAtBoundary(this.game.registry);
     this.returnStarted = false;
     this.combatState = "RUNNING";
     this.resultCommitted = false;
@@ -296,6 +324,7 @@ export class BattleScene extends Phaser.Scene {
     this.unitVisuals.clear();
     this.slotVisuals.clear();
     this.selectedUnitIds.clear();
+    this.markVisualStateDirty();
     this.attackLogs.length = 0;
     this.dragStart = null;
     this.dragEnd = null;
@@ -304,12 +333,14 @@ export class BattleScene extends Phaser.Scene {
 
     if (!this.isRTSBattleSceneData(data)) {
       this.dataError = "The battle payload is invalid.";
+      recordFatalRuntimeStateIssue(this.game.registry, "battle.payload.invalid", "battleData", this.dataError);
       return;
     }
 
     const enemyDefinition = getEnemyDefinition(data.sourceWorldMonsterId);
     if (!enemyDefinition) {
       this.dataError = `Unknown world monster: ${data.sourceWorldMonsterId}`;
+      recordFatalRuntimeStateIssue(this.game.registry, "battle.enemy.invalid", "battleData.sourceWorldMonsterId", this.dataError);
       return;
     }
 
@@ -328,6 +359,7 @@ export class BattleScene extends Phaser.Scene {
     });
     if (invalidAlly) {
       this.dataError = `Invalid ally definition: ${invalidAlly.unitDefinitionId}`;
+      recordFatalRuntimeStateIssue(this.game.registry, "battle.ally.invalid", "battleData.allyRoster", this.dataError);
       return;
     }
 
@@ -341,6 +373,7 @@ export class BattleScene extends Phaser.Scene {
 
     if (this.units.size !== roster.length) {
       this.dataError = "The ally roster contains invalid unit definitions.";
+      recordFatalRuntimeStateIssue(this.game.registry, "battle.roster.invalid", "battleData.allyRoster", this.dataError);
       this.units.clear();
       return;
     }
@@ -468,7 +501,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 12, "Stage 14: Items & Equipment", {
+    this.add.text(32, 12, "Stage 16: Performance & Stability", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
@@ -527,6 +560,7 @@ export class BattleScene extends Phaser.Scene {
     }
 
     this.autoHuntEnabled = enabled;
+    this.markVisualStateDirty();
     this.game.registry.set(AUTO_HUNT_REGISTRY_KEY, enabled);
     if (!enabled && this.autoRepeatBattle) {
       setAutoRepeatEnabled(this.game.registry, false);
@@ -569,8 +603,11 @@ export class BattleScene extends Phaser.Scene {
   private updateAutoHuntUi(): void {
     const color = this.autoHuntEnabled ? 0x3b9b6f : 0x26394b;
     const stroke = this.autoHuntEnabled ? 0x9ce4b0 : 0x54748a;
-    this.autoHuntButton?.background.setFillStyle(color, 1).setStrokeStyle(1, stroke, 1);
-    this.autoHuntButton?.label.setText(`Auto Hunt: ${this.autoHuntEnabled ? "ON" : "OFF"}`);
+    const label = `Auto Hunt: ${this.autoHuntEnabled ? "ON" : "OFF"}`;
+    if (this.autoHuntButton?.label.text !== label) {
+      this.autoHuntButton?.background.setFillStyle(color, 1).setStrokeStyle(1, stroke, 1);
+      this.autoHuntButton?.label.setText(label);
+    }
   }
 
   private getSingleSelectedSkillOwner(): RTSBattleUnit | null {
@@ -728,7 +765,7 @@ export class BattleScene extends Phaser.Scene {
   private showSkillEffect(position: BattlePosition, radius: number, color: number): void {
     const effect = this.add.arc(position.x, position.y, radius, 0, 360, false, color, 0.08)
       .setStrokeStyle(2, color, 0.55);
-    this.time.delayedCall(240, () => effect.destroy());
+    this.scheduleDelayed(240, () => effect.destroy());
   }
 
   private addArenaInteraction(): void {
@@ -1279,6 +1316,7 @@ export class BattleScene extends Phaser.Scene {
     unit.commandDestination = null;
     unit.attackElapsedMs = 0;
     this.selectedUnitIds.delete(unit.battleUnitId);
+    this.markVisualStateDirty();
     this.unitVisuals.get(unit.battleUnitId)?.interactionZone.disableInteractive();
   }
 
@@ -1481,7 +1519,7 @@ export class BattleScene extends Phaser.Scene {
       ? ["VICTORY", this.enemyDisplayName + " squad defeated.", "Reward: +" + this.goldReward + " Gold", "Direct EXP: " + this.directExperienceTotal, "Bonus EXP: " + this.bonusExperienceTotal, lootLine]
       : ["DEFEAT", "All allied units are defeated.", "Reward: 0 Gold", "Direct EXP: " + this.directExperienceTotal, "Bonus EXP: 0", lootLine]);
     if (this.autoRepeatBattle) {
-      this.time.delayedCall(1400, () => fieldScene.returnFromBattle(outcome));
+      this.scheduleDelayed(1400, () => fieldScene.returnFromBattle(outcome));
     }
   }
 
@@ -1522,6 +1560,7 @@ export class BattleScene extends Phaser.Scene {
     const ids = recallControlGroup(this.controlGroups, groupIndex, this.units);
     this.selectedUnitIds.clear();
     ids.forEach((unitId) => this.selectedUnitIds.add(unitId));
+    this.markVisualStateDirty();
     this.refreshAllVisuals();
     const groupLabel = getControlGroupOrdinalLabel(groupIndex);
     this.addAttackLog(ids.length > 0
@@ -1538,6 +1577,7 @@ export class BattleScene extends Phaser.Scene {
 
     this.selectedUnitIds.clear();
     this.selectedUnitIds.add(unitId);
+    this.markVisualStateDirty();
     this.updateUi();
   }
 
@@ -1548,6 +1588,7 @@ export class BattleScene extends Phaser.Scene {
         this.selectedUnitIds.add(unit.battleUnitId);
       }
     }
+    this.markVisualStateDirty();
     this.updateUi();
   }
 
@@ -1641,6 +1682,7 @@ export class BattleScene extends Phaser.Scene {
         this.selectUnitsInRectangle(this.dragStart, this.dragEnd);
       } else if (!this.suppressArenaPointer) {
         this.selectedUnitIds.clear();
+        this.markVisualStateDirty();
         this.updateUi();
       }
     }
@@ -1677,6 +1719,22 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private refreshAllVisuals(): void {
+    this.refreshUnitTransformsAndHealth();
+    if (this.visualStateDirty) this.refreshUnitStateVisuals();
+  }
+
+  private refreshUnitTransformsAndHealth(): void {
+    for (const unit of this.units.values()) {
+      const visual = this.unitVisuals.get(unit.battleUnitId);
+      if (!visual) continue;
+      visual.container.setPosition(unit.position.x, unit.position.y);
+      visual.interactionZone.setPosition(unit.position.x, unit.position.y);
+      visual.guardReachRing.setPosition(unit.guardPosition.x, unit.guardPosition.y);
+      visual.healthFill.setDisplaySize(32 * this.getHealthRatio(unit.currentHp, unit.maxHp), 4);
+    }
+  }
+
+  private refreshUnitStateVisuals(): void {
     const selectedAllies = this.getSelectedAliveAllies();
     const selectedAllyId = selectedAllies.length === 1 ? selectedAllies[0].battleUnitId : null;
     for (const unit of this.units.values()) {
@@ -1685,9 +1743,6 @@ export class BattleScene extends Phaser.Scene {
         continue;
       }
 
-      visual.container.setPosition(unit.position.x, unit.position.y);
-      visual.interactionZone.setPosition(unit.position.x, unit.position.y);
-      visual.guardReachRing.setPosition(unit.guardPosition.x, unit.guardPosition.y);
       visual.container.setAlpha(unit.isAlive ? 1 : 0.28);
       visual.interactionZone.setActive(unit.isAlive);
       if (!unit.isAlive) {
@@ -1701,31 +1756,38 @@ export class BattleScene extends Phaser.Scene {
         unit.battleUnitId === selectedAllyId &&
         !this.autoHuntEnabled,
       );
-      visual.healthFill.setDisplaySize(32 * this.getHealthRatio(unit.currentHp, unit.maxHp), 4);
     }
+    this.visualStateDirty = false;
+  }
+
+  private markVisualStateDirty(): void {
+    this.visualStateDirty = true;
   }
 
   private updateUi(): void {
+    this.uiUpdateCount += 1;
     const selected = this.getSelectedAliveAllies();
     const aliveAllies = this.getAliveUnits("ALLY").length;
     const aliveEnemies = this.getAliveUnits("ENEMY").length;
-    this.statusText?.setText([
+    this.setTextIfChanged(this.statusText, [
       `Allies: ${aliveAllies}/${RTS_ALLY_COUNT}`,
       `Enemies: ${aliveEnemies}/${RTS_ENEMY_COUNT}`,
       `State: ${this.dataError ? "INVALID_DATA" : this.combatState}`,
     ]);
-    this.selectedInfoText?.setText(this.dataError
+    this.setTextIfChanged(this.selectedInfoText, this.dataError
       ? "Battle cannot start with invalid data. Return to Field."
       : selected.length === 0
       ? "No allies selected. Left-click or drag to select; right-click to command."
       : selected.length === 1
       ? `${this.getSelectionInfoLabel(selected[0])} · Melee reach: ${selected[0].attackRange}px${this.autoHuntEnabled ? "" : ` · Guard: ${RTS_GUARD_AGGRO_RANGE}px`}`
       : `${selected.length} ally selected${selected.length === 1 ? "" : "s"}. Manual commands have priority over Auto Hunt.`);
-    this.attackLogText?.setText(["Recent orders", ...(this.attackLogs.length > 0 ? this.attackLogs.slice(-3) : ["No orders yet."])]);
+    this.setTextIfChanged(this.attackLogText, ["Recent orders", ...(this.attackLogs.length > 0 ? this.attackLogs.slice(-3) : ["No orders yet."])]);
     this.updateAutoHuntUi();
     this.updateSkillUi();
     this.refreshControlGroupUi();
     this.refreshSlotUi();
+    this.uiDirty = false;
+    this.uiElapsedMs = 0;
   }
 
   private refreshControlGroupUi(): void {
@@ -1739,31 +1801,45 @@ export class BattleScene extends Phaser.Scene {
       const totalCount = this.controlGroups.get(groupIndex)?.length ?? 0;
       const livingCount = getAvailableControlGroupMemberIds(this.controlGroups, groupIndex, this.units).length;
       const ordinal = getControlGroupOrdinalLabel(groupIndex);
-      visual.setText(`G${ordinal} [${key}]: ${totalCount > 0 ? `${livingCount}/${totalCount}` : "--"}`);
+      this.setTextIfChanged(visual, `G${ordinal} [${key}]: ${totalCount > 0 ? `${livingCount}/${totalCount}` : "--"}`);
     }
   }
 
   private refreshSlotUi(): void {
+    this.allyBySlot.clear();
+    for (const candidate of this.units.values()) {
+      if (candidate.team === "ALLY" && candidate.slotIndex !== null && candidate.slotIndex !== undefined) {
+        this.allyBySlot.set(candidate.slotIndex, candidate);
+      }
+    }
     for (let index = 0; index < RTS_ALLY_COUNT; index += 1) {
-      const unit = [...this.units.values()].find((candidate) => candidate.team === "ALLY" && candidate.slotIndex === index);
+      const unit = this.allyBySlot.get(index);
       const visual = this.slotVisuals.get(index);
       if (!visual) {
         continue;
       }
 
       if (!unit) {
-        visual.nameText.setText("EMPTY").setColor("#8795a8");
-        visual.stateText.setText("AVAILABLE").setColor("#8795a8");
+        this.setTextIfChanged(visual.nameText, "EMPTY");
+        this.setTextIfChanged(visual.stateText, "AVAILABLE");
+        visual.nameText.setColor("#8795a8");
+        visual.stateText.setColor("#8795a8");
         visual.hpFill.setDisplaySize(0, 4);
         continue;
       }
 
-      visual.nameText.setText(unit.displayName);
+      this.setTextIfChanged(visual.nameText, unit.displayName);
       const stateLabel = unit.commandMode === "AUTO_HUNT" ? `AUTO / ${unit.state}` : unit.state;
-      visual.stateText.setText(unit.isAlive ? stateLabel : "DEAD");
+      this.setTextIfChanged(visual.stateText, unit.isAlive ? stateLabel : "DEAD");
       visual.stateText.setColor(unit.isAlive ? "#b9cad7" : "#ef9a9a");
       visual.hpFill.setDisplaySize(54 * this.getHealthRatio(unit.currentHp, unit.maxHp), 4);
     }
+  }
+
+  private setTextIfChanged(text: Phaser.GameObjects.Text | undefined, value: string | readonly string[]): void {
+    if (!text) return;
+    const next = typeof value === "string" ? value : value.join("\n");
+    if (text.text !== next) text.setText(next);
   }
 
   private getAliveUnits(team: "ALLY" | "ENEMY"): RTSBattleUnit[] {
@@ -1804,6 +1880,17 @@ export class BattleScene extends Phaser.Scene {
     this.input.off("pointermove", this.handlePointerMove, this);
     this.input.off("pointerup", this.handlePointerUp, this);
     this.input.keyboard?.off("keydown", this.handleBattleKeyDown, this);
+    for (const timer of this.delayedEvents) this.time.removeEvent(timer);
+    this.delayedEvents.clear();
+  }
+
+  private scheduleDelayed(delayMs: number, callback: () => void): void {
+    let timer: Phaser.Time.TimerEvent;
+    timer = this.time.delayedCall(delayMs, () => {
+      this.delayedEvents.delete(timer);
+      callback();
+    });
+    this.delayedEvents.add(timer);
   }
 
   private sanitizeGold(value: number): number {

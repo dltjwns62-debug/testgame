@@ -1,5 +1,43 @@
 # 실행 및 테스트 기록
 
+## Stage 17 온라인 확장 준비 — 검수 대기
+
+- 작업 브랜치: `stage-17-online-expansion-readiness`
+- 검수 태그: `review-stage-17-v1`
+- 상태: `review_pending`
+- 완료된 단계: 1단계~16단계
+- 다음 단계: 없음 — 전체 로드맵의 마지막 단계
+
+### 자동 검사
+
+- `tests/stage17.test.ts`: protocol/snapshot, Disabled/Mock Gateway, operation queue, conflict resolver, sync coordinator 검사
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run test`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`)
+- `npm run check`: 통과 (`passed`)
+- `npm run dev -- --host 127.0.0.1`: root·favicon HTTP 200 확인 후 종료 (`passed`)
+- OpenAPI JSON: `JSON.parse` 검사 통과
+
+### Stage 17 검사 범위
+
+- protocol version 1, snapshot hash, malformed/future protocol, transient/auth field 제외
+- Disabled Gateway의 `ONLINE_DISABLED`와 local game 비변경
+- Mock bootstrap/pull/push, revision, duplicate operation, conflict 재현
+- FIFO queue, operationId 중복 방지, partial acknowledgement, serialization, 200개·512 KiB 제한
+- server-authoritative Gold/EXP/inventory와 local preference 유지 conflict 정책
+- sync coordinator의 DISABLED/OFFLINE/ONLINE/SYNCING/CONFLICT 전환과 dispose
+
+### 미실행·수동 상태
+
+- 실제 HTTP/WebSocket 서버: `not_run`
+- 실제 계정·OAuth·token provider: `not_run`
+- 실제 클라우드·DB·멀티플레이어: `not_run`
+- 실제 브라우저 전체 전투·장시간 방치 통합: `not_run`
+- 사용자 수동 테스트: `skipped_by_user`
+- 생략·미실행 항목은 통과로 간주하거나 표현하지 않는다.
+- ChatGPT 코드 검수: `pending`
+
 ## Stage 16 성능 및 안정화 — 최종 승인 및 main 반영
 
 - 작업 브랜치: `stage-16-performance-stability`

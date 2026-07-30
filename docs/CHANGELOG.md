@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-07-31 — 17단계 온라인 확장 준비 제출 — 검수 대기
+
+- 16단계 완료 main에서 `stage-17-online-expansion-readiness` 작업 브랜치를 생성했다.
+- protocol v1, OnlinePlayerSnapshot, Disabled/Mock Gateway, operation queue, conflict resolver와 sync coordinator를 추가했다.
+- Online Status Scene을 추가했으며 기본 모드는 Disabled, `?onlineMock=1`만 메모리 Mock으로 동작한다.
+- OpenAPI 계약, threat model, provider 비교 문서를 추가했지만 실제 서버·계정·네트워크·클라우드·멀티플레이어는 구현하지 않았다.
+- Stage 17 자동 테스트와 기존 회귀 테스트를 실행하고 사용자 테스트는 `skipped_by_user`로 유지한다.
+- 새 검수 태그는 `review-stage-17-v1`이며 main에는 아직 반영하지 않았다.
+
 ## 2026-07-31 — 16단계 v4 검수 승인 및 main 반영 — 완료
 
 - `review-stage-16-v4` 승인과 승인 커밋 `474467a9908dede7990906bd4a5b113c91139d54`를 확인했다.

@@ -2,22 +2,38 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 16,
-  "currentStageName": "성능 및 안정화",
-  "stageStatus": "completed",
-  "activeTask": "16단계 완료 — 17단계 온라인 확장 준비 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 17,
+  "currentStageName": "온라인 확장 준비",
+  "stageStatus": "review_pending",
+  "activeTask": "17단계 구현 완료 및 ChatGPT 검수 대기",
+  "workingBranch": "stage-17-online-expansion-readiness",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-  "nextStage": 17,
-  "nextStageName": "온라인 확장 준비",
+  "nextStage": null,
+  "nextStageName": null,
+  "finalStage": true,
+  "projectCompletion": "pending_review",
   "reviewSubmission": {
-    "branch": "stage-16-performance-stability",
-    "tag": "review-stage-16-v4",
-    "version": 4,
+    "branch": "stage-17-online-expansion-readiness",
+    "tag": "review-stage-17-v1",
+    "version": 1,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 17,
+      "branch": "stage-17-online-expansion-readiness",
+      "tag": "review-stage-17-v1",
+      "version": 1,
+      "commit": null,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "userRunTest": "skipped_by_user",
+      "mainBranchMerged": false
+    },
     {
       "stage": 16,
       "branch": "stage-16-performance-stability",
@@ -610,9 +626,9 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-31T02:56:00+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
@@ -623,10 +639,10 @@
     "devServer": "passed",
     "browserAutomation": "partial_passed",
     "userRunTest": "skipped_by_user",
-    "userRunTestReason": "사용자 요청에 따라 16단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "approved"
+    "userRunTestReason": "사용자 요청에 따라 17단계 수동 테스트를 요구하지 않음",
+    "chatGptCodeReview": "pending"
   },
-  "mainBranchMerged": true,
+  "mainBranchMerged": false,
   "knownIssues": [],
-  "lastUpdated": "2026-07-31T02:56:00+09:00"
+  "lastUpdated": "2026-07-31T04:00:00+09:00"
 }

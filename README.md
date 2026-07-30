@@ -1,5 +1,13 @@
 # Test Game
 
+## Stage 17 온라인 확장 준비 — 검수 대기
+
+현재 단계는 17단계 **온라인 확장 준비**다. 작업 브랜치는 `stage-17-online-expansion-readiness`, 검수 태그는 `review-stage-17-v1`, 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 1~16단계는 완료 상태로 보존하고, 이번 단계는 실제 서버·계정·클라우드 없이 미래 연결 계약만 준비한다.
+
+`OnlinePlayerSnapshot`, protocol v1, `OnlineGateway`, Disabled/Mock adapter, operation queue, conflict resolution, sync coordinator, Online Status Scene과 API·위협 모델 문서를 추가했다. 기본 모드는 `DISABLED`이며 `?onlineMock=1`에서만 메모리 Mock 모드를 사용할 수 있다. 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+
+Stage 17 관련 문서: [온라인 준비](docs/ONLINE-READINESS.md), [프로토콜](docs/ONLINE-PROTOCOL.md), [위협 모델](docs/THREAT-MODEL.md), [API 계약](docs/online-api.openapi.json), [테스트 기록](docs/TESTING.md), [현재 상태](docs/STATUS.md).
+
 ## Stage 16 성능 및 안정화 — 완료
 
 16단계 **성능 및 안정화**는 `review-stage-16-v4` 검수를 승인받아 `main`에 반영했고 `stage-16-completed`로 완료 처리했다. 현재 안정 기준 브랜치는 `main`이며, 17단계 **온라인 확장 준비**는 아직 시작하지 않는다.

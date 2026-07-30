@@ -39,4 +39,4 @@ Field, Battle, Formation, Shop, Keys, Inventory, Save Data, Recovery Scene은 �
 
 ## Stage 17 확장 경계
 
-서버 authoritative 상태, API endpoint, 인증, 데이터베이스, 저장 충돌 해결, 프로토콜·실시간 네트워크, 계정·멀티플레이어는 Stage 16에서 구현하지 않는다. Stage 17에서 이 경계를 문서화하고 서버 adapter 후보를 검토한다.
+서버 authoritative 상태, API endpoint, 인증, 데이터베이스, 저장 충돌 해결, 프로토콜·실시간 네트워크, 계정·멀티플레이어의 실제 서비스는 아직 구현하지 않는다. Stage 17은 이 경계를 문서화하고 Disabled/Mock adapter 후보를 검토한다.

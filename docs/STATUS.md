@@ -1,5 +1,44 @@
 # 현재 개발 상태
 
+## Stage 17 온라인 확장 준비 — 검수 대기
+
+- 전체 단계: 17단계
+- 현재 단계: 17단계 — 온라인 확장 준비
+- 현재 단계 상태: 구현 완료·검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-17-online-expansion-readiness`
+- 현재 검수 태그: `review-stage-17-v1`
+- 완료된 단계: 1단계~16단계
+- 검수 통과된 단계: 1단계~16단계
+- 다음 단계: 없음 — 전체 로드맵의 마지막 단계
+- `main` 정식 반영 여부: 미반영
+- 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- 현재 작업: 온라인 계약·Disabled/Mock adapter·동기화 준비 경계 생성
+- 현재 알려진 문제: 실제 서버·실제 네트워크·실제 계정은 구현하지 않음
+
+### 17단계 구현 요약
+
+- protocol v1 `OnlinePlayerSnapshot`과 canonical snapshot hash를 정의했다.
+- SaveEnvelope와 분리된 서버 sync payload, transient battle/runtime/auth 데이터 제외 규칙을 정의했다.
+- 기본 `DisabledOnlineGateway`와 `?onlineMock=1` 전용 메모리 `MockOnlineGateway`를 추가했다.
+- operation envelope, idempotent FIFO queue, retry·revision·conflict 계약을 추가했다.
+- server-authoritative conflict resolver와 `OnlineSyncCoordinator` 상태 전환을 추가했다.
+- `OnlineStatusScene`에서 Disabled/Mock 상태를 명시하고 기존 localStorage 게임을 유지한다.
+- OpenAPI 계약, threat model, provider 비교 문서를 추가했다.
+
+### 17단계 검증 기록
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run test`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`)
+- `npm run check`: 통과 (`passed`)
+- 개발 서버: root·favicon HTTP 200 확인 후 종료 (`passed`)
+- 브라우저 자동 확인: Stage 17·Online Status·Disabled/Mock 표시 범위 확인 (`partial_passed`)
+- 실제 서버·실제 계정·실제 네트워크: `not_run`
+- 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
+
 ## Stage 16 성능 및 안정화 — 완료
 
 - 전체 단계: 17단계

@@ -1,5 +1,16 @@
 # 프로젝트 결정 사항
 
+## 17단계 온라인 확장 준비 결정
+
+- 결정: 실제 서버 없이 protocol v1, snapshot, gateway, operation queue, conflict와 sync 경계만 준비한다.
+- 결정: 기본 런타임은 `DisabledOnlineGateway`로 유지하고 실제 네트워크 요청을 하지 않는다.
+- 결정: `?onlineMock=1`은 테스트·개발 전용 메모리 `MockOnlineGateway`이며 실제 서버나 계정을 모사하지 않는다.
+- 결정: `OnlinePlayerSnapshot`은 기존 SaveEnvelope와 분리하고 transient battle/runtime/auth 데이터를 포함하지 않는다.
+- 결정: 미래 server authoritative 영역은 Gold, progression, inventory, owned roster, reward claim이며 client preference는 별도 conflict 정책으로 다룬다.
+- 결정: 실제 provider, HTTP/WebSocket, OAuth, DB, 클라우드, PvP와 멀티플레이어는 후속 범위로 남긴다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`, 실제 네트워크·계정 검사는 `not_run`으로 기록한다.
+- 상태: 확정
+
 ## 16단계 v4 검수 승인 및 main 반영 결정
 
 - 결정: `review-stage-16-v4`와 승인 커밋 `474467a9908dede7990906bd4a5b113c91139d54`를 승인한다.

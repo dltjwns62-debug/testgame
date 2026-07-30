@@ -501,7 +501,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 12, "Stage 16: Performance & Stability", {
+    this.add.text(32, 12, "Stage 17: Online Expansion Readiness", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",

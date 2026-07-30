@@ -8,6 +8,7 @@ import { ShopScene } from "./scenes/ShopScene";
 import { BootstrapScene } from "./scenes/BootstrapScene";
 import { SaveDataScene } from "./scenes/SaveDataScene";
 import { RecoveryScene } from "./scenes/RecoveryScene";
+import { OnlineStatusScene } from "./scenes/OnlineStatusScene";
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -21,5 +22,5 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     width: 960,
     height: 540,
   },
-  scene: [BootstrapScene, FieldScene, FormationScene, ShopScene, KeySettingsScene, InventoryScene, SaveDataScene, BattleScene, RecoveryScene],
+  scene: [BootstrapScene, FieldScene, FormationScene, ShopScene, KeySettingsScene, InventoryScene, SaveDataScene, BattleScene, RecoveryScene, OnlineStatusScene],
 };

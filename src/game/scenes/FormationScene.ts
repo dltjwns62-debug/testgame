@@ -75,7 +75,7 @@ export class FormationScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 18, "Stage 16: Formation & Runtime State", {
+    this.add.text(32, 18, "Stage 17: Formation & Local Runtime", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",

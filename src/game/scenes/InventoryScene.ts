@@ -114,7 +114,7 @@ export class InventoryScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(30, 16, "Stage 16: Inventory & Equipment Stability", {
+    this.add.text(30, 16, "Stage 17: Inventory & Local Runtime", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",

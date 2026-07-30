@@ -1,5 +1,14 @@
 # 프로젝트 결정 사항
 
+## 16단계 v4 Recovery 재시도 결정
+
+- 결정: Recovery Try Again은 사용자의 명시적 재시도 동작으로 기존 runtime FATAL 이슈를 먼저 제거한다.
+- 결정: Try Again은 Recovery·SaveData·Battle·Field를 중복 없이 정리한 뒤 Bootstrap을 시작한다.
+- 결정: Bootstrap은 저장을 다시 불러오고 상태를 재검증하며, 문제가 계속되면 새 FATAL을 기록하고 Recovery로 전환한다.
+- 결정: Recovery 재시도 전체 브라우저 상호작용은 실행하지 않았으므로 `passed`로 기록하지 않는다.
+- 결정: v1·v2·v3 검수 태그와 이력은 보존하고 `review-stage-16-v4`를 새 제출 버전으로 사용한다.
+- 상태: 확정
+
 ## 16단계 v3 검수 재제출 결정
 
 - 결정: v1·v2 검수 태그와 이력을 이동·삭제하지 않고 `review-stage-16-v3`를 새 제출 버전으로 사용한다.

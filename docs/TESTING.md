@@ -1,16 +1,16 @@
 # 실행 및 테스트 기록
 
-## Stage 16 성능 및 안정화 — v3 검수 대기
+## Stage 16 성능 및 안정화 — v4 검수 대기
 
 - 작업 브랜치: `stage-16-performance-stability`
-- 검수 태그: `review-stage-16-v3`
+- 검수 태그: `review-stage-16-v4`
 - 상태: `review_pending`
 - 완료된 단계: 1단계~15단계
 - 다음 단계: 17단계 — 온라인 확장 준비 (미시작)
 
 ### 자동 검사
 
-- `tests/stage16.test.ts`: 30개 테스트
+- `tests/stage16.test.ts`: 31개 테스트
 - `npm ci`: 통과
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run test`: 통과 (`passed`)
@@ -26,12 +26,14 @@
 - 60초 미만·정확히 60초·cycle 경계의 Repeat Hunt 방치 정산과 중복 claim 방지
 - Formation/Hero/deployed roster, control group, inventory equipment, Gold, level/EXP, Auto Hunt와 timestamp 경계 복구
 - Bootstrap/load/reset/scene restart에서 중복 autosave listener·timer·transition이 남지 않음
+- Recovery Try Again에서 기존 FATAL 이슈를 제거하고 씬을 정리한 뒤 Bootstrap 재검증을 수행함
 - Field/Battle 전투 규칙과 1~15단계 UI·저장·장비·부대 지정 회귀
 
 ### 수동·브라우저 검사 상태
 
 - 자동 브라우저 확인: Field Stage16 표기, `diagnostics=1` overlay, `diagnostics=0` 비표시, favicon HTTP 200, 콘솔 error/warning 없음 확인 (`partial_passed`)
 - Battle 화면의 전체 수동 전투 상호작용은 실행하지 않아 사용자 수동 테스트 대기로 남긴다.
+- Recovery Try Again 전체 브라우저 상호작용은 실행하지 않아 `not_run`으로 남긴다.
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
 - 생략된 테스트는 통과로 간주하거나 표현하지 않는다.
 - ChatGPT 코드 검수: 검수 대기 (`pending`)

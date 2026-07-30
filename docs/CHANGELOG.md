@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-07-31 — 16단계 v4 Recovery 재시도 수정 및 재제출 — 검수 대기
+
+- v3 검수에서 지적된 Recovery Try Again의 FATAL 잔존과 Bootstrap·Recovery 반복 가능성을 수정했다.
+- Try Again은 기존 runtime FATAL 이슈를 명시적으로 제거하고 Recovery·SaveData·Battle·Field를 정리한 뒤 Bootstrap을 시작한다.
+- Bootstrap은 저장을 다시 불러오고 현재 상태를 재검증하며, 문제가 계속되면 새 FATAL을 기록하고 Recovery로 돌아간다.
+- Recovery 재시도 준비 함수와 실제 FATAL 제거·재발 검증 테스트를 추가해 총 31개 자동 테스트를 유지한다.
+- `review-stage-16-v1`, `review-stage-16-v2`, `review-stage-16-v3` 태그와 이력을 보존하고 새 제출 태그는 `review-stage-16-v4`다.
+- 사용자 테스트는 `skipped_by_user`로 유지하고 17단계는 아직 시작하지 않았다.
+
 ## 2026-07-31 — 16단계 v3 검수 재제출
 
 - v2의 `changes_requested` 이력과 `review-stage-16-v2` 태그를 불변으로 보존한다.

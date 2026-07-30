@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 16 scope note: the submitted work is limited to 1~15 regression coverage, injected persistence boundaries, runtime state validation and repair at scene/save boundaries, idempotent autosave lifecycle cleanup, throttled Field/Battle UI updates, diagnostics, runtime error recording, quota metadata, favicon delivery, and automatic regression tests. It does not implement online expansion, accounts, cloud sync, multiplayer, service workers, or stage 17.
+Stage 16 scope note: the submitted work is limited to 1~15 regression coverage, injected persistence boundaries, runtime state validation and repair at scene/save boundaries, idempotent autosave lifecycle cleanup, throttled Field/Battle UI updates, diagnostics, runtime error recording, quota metadata, favicon delivery, safe Recovery Try Again restart, and automatic regression tests. It does not implement online expansion, accounts, cloud sync, multiplayer, service workers, or stage 17.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -79,7 +79,7 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 15단계 완료 태그: `stage-15-completed`
 - 16단계 최초 검수 태그: `review-stage-16-v1` — 수정 요청
 - 16단계 v2 검수 태그: `review-stage-16-v2` — 수정 요청
-- 16단계 현재 검수 태그: `review-stage-16-v3`
+- 16단계 현재 검수 태그: `review-stage-16-v4`
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
 - ChatGPT 코드 검수: 검수 대기 (`pending`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계

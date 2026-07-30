@@ -22,7 +22,7 @@ import { addExperience, calculateBattleEndBonusExperience, normalizeProgressionS
 import { createFormationDestinations, moveToward } from "../src/game/rtsBattleUtils";
 import type { RTSBattleUnit } from "../src/game/rtsBattleTypes";
 import { installGlobalRuntimeErrorHandlers, clearRuntimeErrorHandlers, getRecentRuntimeErrors } from "../src/game/runtimeErrors";
-import { hasFatalRuntimeStateIssue, recordFatalRuntimeStateIssue } from "../src/game/runtimeStateValidation";
+import { hasFatalRuntimeStateIssue, inspectRuntimeState, prepareRecoveryRetry, recordFatalRuntimeStateIssue } from "../src/game/runtimeStateValidation";
 import { getResetRestartScene, getSaveDataReturnScene } from "../src/game/sceneNavigation";
 import { AUTO_HUNT_REGISTRY_KEY, AUTO_PROGRESS_REGISTRY_KEY, RUNTIME_ERRORS_REGISTRY_KEY, RUNTIME_STATE_ISSUES_REGISTRY_KEY } from "../src/game/constants";
 
@@ -348,6 +348,20 @@ test("FATAL runtime state disables Battle Auto Hunt and Repeat Hunt while recove
   assert.equal(values.get(AUTO_HUNT_REGISTRY_KEY), false);
   assert.equal((values.get(AUTO_PROGRESS_REGISTRY_KEY) as { autoRepeatEnabled: boolean }).autoRepeatEnabled, false);
   assert.equal((values.get(RUNTIME_STATE_ISSUES_REGISTRY_KEY) as Array<{ severity: string }>)[0].severity, "FATAL");
+});
+
+test("Recovery retry clears the old FATAL issue and allows a fresh validation", () => {
+  const values = new Map<string, unknown>();
+  const registry = {
+    get: (key: string) => values.get(key),
+    set: (key: string, value: unknown) => values.set(key, value),
+  };
+  recordFatalRuntimeStateIssue(registry as never, "bootstrap.invalid", "save", "Saved state is invalid.");
+  assert.equal(hasFatalRuntimeStateIssue(inspectRuntimeState(registry as never)), true);
+  prepareRecoveryRetry(registry as never);
+  assert.equal(hasFatalRuntimeStateIssue(inspectRuntimeState(registry as never)), false);
+  recordFatalRuntimeStateIssue(registry as never, "bootstrap.invalid", "save", "Saved state is invalid again.");
+  assert.equal(hasFatalRuntimeStateIssue(inspectRuntimeState(registry as never)), true);
 });
 
 test("Save Data return and reset destinations are decided by pure helpers", () => {

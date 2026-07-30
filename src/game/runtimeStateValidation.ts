@@ -127,6 +127,10 @@ export function clearRuntimeStateIssues(registry: Phaser.Data.DataManager): void
   registry.set(RUNTIME_STATE_ISSUES_REGISTRY_KEY, []);
 }
 
+export function prepareRecoveryRetry(registry: Phaser.Data.DataManager): void {
+  clearRuntimeStateIssues(registry);
+}
+
 export function repairRuntimeStateAtBoundary(registry: Phaser.Data.DataManager): RuntimeStateIssue[] {
   const issues = inspectRuntimeState(registry);
   const formation = registry.get(FORMATION_REGISTRY_KEY);

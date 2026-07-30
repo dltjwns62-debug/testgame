@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH } from "../constants";
 import { resetSaveData } from "../persistence";
-import { clearRuntimeStateIssues } from "../runtimeStateValidation";
+import { prepareRecoveryRetry } from "../runtimeStateValidation";
 
 export class RecoveryScene extends Phaser.Scene {
   private messageText!: Phaser.GameObjects.Text;
@@ -27,7 +27,7 @@ export class RecoveryScene extends Phaser.Scene {
     this.messageText = this.add.text(GAME_WIDTH / 2, 205, message, {
       color: "#ffd6d6", fontFamily: "Segoe UI, sans-serif", fontSize: "14px", align: "center", wordWrap: { width: 650 },
     }).setOrigin(0.5);
-    this.addButton(300, 360, "Try Again", () => this.scene.start("BootstrapScene"));
+    this.addButton(300, 360, "Try Again", () => this.tryAgain());
     this.addButton(480, 360, "Return to Field", () => this.returnToField());
     this.addButton(660, 360, "Save Data", () => {
       this.scene.pause("RecoveryScene");
@@ -55,12 +55,21 @@ export class RecoveryScene extends Phaser.Scene {
   }
 
   private returnToField(): void {
-    clearRuntimeStateIssues(this.game.registry);
+    prepareRecoveryRetry(this.game.registry);
     this.scene.stop("RecoveryScene");
     this.scene.stop("BattleScene");
     this.scene.stop("SaveDataScene");
     this.scene.stop("FieldScene");
     this.scene.start("FieldScene", { persistenceMessage: "Recovered to a safe Field IDLE state." });
+  }
+
+  private tryAgain(): void {
+    prepareRecoveryRetry(this.game.registry);
+    this.scene.stop("RecoveryScene");
+    this.scene.stop("SaveDataScene");
+    this.scene.stop("BattleScene");
+    this.scene.stop("FieldScene");
+    this.scene.start("BootstrapScene");
   }
 
   private resetSave(): void {

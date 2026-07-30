@@ -122,6 +122,12 @@ export function getOrCreateFormationState(registry: Phaser.Data.DataManager): Fo
   return fallback;
 }
 
+export function normalizeFormationState(value: unknown): FormationState {
+  return isValidFormationState(value)
+    ? cloneFormationState(value)
+    : createDefaultFormationState();
+}
+
 export function setFormationState(registry: Phaser.Data.DataManager, state: FormationState): void {
   if (!isValidFormationState(state)) {
     throw new Error("Invalid formation state");

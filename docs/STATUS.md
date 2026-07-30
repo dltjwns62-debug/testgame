@@ -1,6 +1,55 @@
 # 현재 개발 상태
 
-## Stage 14 아이템·인벤토리·장비 — 완료
+## Stage 15 저장과 오프라인 진행 — 검수 대기
+
+- 현재 검수 태그: `review-stage-15-v3`
+- 작업 브랜치: `stage-15-save-offline-progress`
+- 전체 단계: 17단계
+- 현재 단계: 15단계 — 저장과 오프라인 진행
+- 현재 단계 상태: 검수 대기 (`review_pending`)
+- 현재 작업: 15단계 v2 검수 지적 수정 및 Repeat Hunt·오프라인 수명주기 안정화
+- 완료된 단계: 1단계~14단계
+- 검수 통과된 단계: 1단계~14단계
+- 다음 단계: 16단계 — 성능 및 안정화
+- `main` 정식 반영 여부: 미반영
+- 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 재검수 대기 (`pending`)
+- 브라우저 자동화: Field·Save Data 화면과 Save Now·새로고침 복원 확인
+- 현재 알려진 문제: 기존 `favicon.ico` 404 비차단 경고
+
+### 15단계 구현 요약
+
+- BootstrapScene에서 저장을 먼저 불러오고 정규화한 뒤 FieldScene을 시작한다.
+- SaveEnvelope, schemaVersion 1, FNV-1a checksum과 primary/backup/temp/recovery 저장 키를 추가했다.
+- Formation, Gold, KeyBinding, Control Group, Inventory, Battle Auto Hunt와 AutoProgress를 허용 목록으로 저장한다.
+- Repeat Hunt 대상 선택·승리 해금·전투 자동 복귀·Defeat 중단·메뉴 일시정지를 연결했다.
+- 방치 시간은 최소 60초·최대 8시간 cap과 대상별 cycle로 계산하며 Gold·출전 유닛 EXP·아이템을 정산한다.
+- 방치 아이템 결과는 saveId·claim sequence·monsterId·cycle index 기반 결정적 난수를 사용하고 100개 cap을 둔다.
+- SaveDataScene에서 Save Now, 5초 이중 확인 Reset Save, 저장 상태와 Repeat Hunt 상태를 표시한다.
+- 사용자 수동 전투·장시간 방치 통합 테스트는 사용자 요청으로 생략한다.
+
+### 15단계 검증 기록
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`, 비차단 chunk 크기 경고 있음)
+- `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
+- 브라우저 확인: Stage 15 Field, Save Data, Save Now `SAVED`, 새로고침 후 Field 복원 확인
+- 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 재검수 대기 (`not_reviewed`)
+- `main` 반영: 미반영
+
+마지막 갱신: 2026-07-30 02:00 (Asia/Seoul)
+
+### v3 검수 수정 요약
+
+- Repeat Hunt ON은 첫 실제 승리 전에도 허용하고, 오프라인 보상은 몬스터별 첫 승리 후에만 해금한다.
+- hidden 진입 저장과 pagehide/beforeunload 중복 저장을 분리해 `lastActiveAtMs` 재갱신을 방지한다.
+- primary 검증 성공 후 temp 삭제 실패는 저장 성공과 cleanup warning으로 분리한다.
+- 오프라인 최소 60초는 `rawElapsedMs` 기준으로 판정한다.
+- 현재 v3 상태: 검수 대기 (`review_pending`), ChatGPT 코드 검수 `pending`.
+
+## Stage 14 아이템·인벤토리·장비 — 완료 (historical)
 
 - 현재 검수 태그: `review-stage-14-v2`
 - 작업 브랜치: `main`

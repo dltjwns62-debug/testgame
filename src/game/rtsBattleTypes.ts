@@ -86,6 +86,7 @@ export type RTSBattleSceneData = {
   sourceWorldMonsterId: string;
   enemyCount: number;
   allyRoster: RosterEntry[];
+  autoRepeatBattle?: boolean;
 };
 
 export type RTSBattleResult = {
@@ -105,6 +106,7 @@ export type RTSBattleResult = {
     itemInstanceId: string;
     itemDefinitionId: string;
   }>;
+  autoRepeatBattle?: boolean;
 };
 
 export type EnemyDefinition = Pick<MonsterDefinition, "id" | "name" | "color" | "goldReward" | "experienceReward"> & {

@@ -116,6 +116,16 @@ function sanitizePersistentControlGroupState(
   }));
 }
 
+export function normalizePersistentControlGroupState(
+  value: unknown,
+  ownedRosterUnitIds: ReadonlySet<string>,
+): PersistentControlGroupState {
+  if (hasPersistentShape(value)) {
+    return sanitizePersistentControlGroupState(value, ownedRosterUnitIds);
+  }
+  return createEmptyPersistentControlGroupState();
+}
+
 export function getOrCreatePersistentControlGroupState(
   registry: Phaser.Data.DataManager,
   ownedRosterUnitIds: ReadonlySet<string>,

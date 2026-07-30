@@ -1,5 +1,36 @@
 # 변경 이력
 
+## 2026-07-30 — 15단계 v3 검수 수정 재제출
+
+- Repeat Hunt를 첫 실제 승리 전에도 켤 수 있도록 하고, 오프라인 보상만 몬스터별 첫 승리 후 해금한다.
+- hidden 진입 저장 이후 pagehide/beforeunload 중복 저장으로 `lastActiveAtMs`가 갱신되지 않도록 수정했다.
+- 검증된 primary 저장 후 temp 삭제만 실패한 경우 저장 성공과 cleanup warning을 분리한다.
+- 오프라인 최소 60초 조건을 `rawElapsedMs` 기준으로 적용하고, 미만 시간은 remainder에 합산하지 않는다.
+- `review-stage-15-v1`과 `review-stage-15-v2`를 보존하고 `review-stage-15-v3`로 재제출한다.
+- 사용자 수동 테스트는 `skipped_by_user`로 유지하며 16단계는 시작하지 않는다.
+
+## 2026-07-30 — 15단계 v2 검수 수정 재제출
+
+- 15단계 최초 검수에서 지적된 저장소 예외·미래 스키마 보존·저장 실패 메타데이터 문제를 수정했다.
+- `document.visibilitychange` 기반 자동 저장과 hidden/visible 중복 정산을 보완했다.
+- 장비 정규화, Repeat Hunt 수동 이동 구분·재생성 대기, 실제 승리 통계, Reset 재시작을 보완했다.
+- 오프라인 요약 아이템을 ItemDefinition 표시명과 수량으로 표시한다.
+- 기존 `review-stage-15-v1`은 보존하고 `review-stage-15-v2`로 재제출한다.
+- 사용자 수동 테스트는 아직 실시하지 않아 `skipped_by_user`로 유지한다.
+- 15단계는 아직 완료되지 않았으며 `main`에는 반영하지 않는다.
+
+## 2026-07-30 — 15단계 저장과 오프라인 진행 구현 및 검수 제출
+
+- `stage-15-save-offline-progress` 브랜치에서 저장·복구·Repeat Hunt·방치 보상을 구현함
+- SaveEnvelope schemaVersion 1, FNV-1a checksum, primary/backup/temp/recovery 안전 저장과 미래 버전 차단 추가
+- BootstrapScene에서 저장을 먼저 복원하고 FieldScene을 시작하도록 연결함
+- Formation, Gold, KeyBinding, Control Group, Inventory, Battle Auto Hunt와 AutoProgress 저장 추가
+- Repeat Hunt 대상 선택·승리 해금·전투 자동 복귀·Defeat 중단·메뉴 일시정지 추가
+- 방치 Gold·출전 유닛 EXP·결정적 아이템 드롭과 8시간·100개 cap 추가
+- SaveDataScene, Save Now, Reset Save 이중 확인, 저장 상태 UI 추가
+- `review-stage-15-v1`로 검수 제출하며 `main`에는 병합하지 않음
+- 사용자 수동 테스트는 `skipped_by_user`로 기록하고 통과로 간주하지 않음
+
 ## 2026-07-30 — 14단계 검수 승인 및 main 반영 — 완료
 
 - 승인 검수 태그 `review-stage-14-v2`와 승인 커밋 `c61bcf0c14b1520733b707a7acd62b3ed90eeccd`을 확인했다.

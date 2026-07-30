@@ -1,5 +1,56 @@
 # 실행 및 테스트 기록
 
+## Stage 15 저장과 오프라인 진행 — v3 검수 대기
+
+- 현재 작업 브랜치: `stage-15-save-offline-progress`
+- 현재 검수 태그: `review-stage-15-v3`
+- 15단계 상태: 검수 대기 (`review_pending`)
+- 완료된 단계: 1단계~14단계
+- 다음 단계: 16단계 — 성능 및 안정화
+- 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- ChatGPT 코드 검수: 재검수 대기 (`pending`)
+- `main` 반영: 미반영
+
+### 15단계 자동 검사
+
+- `npm ci`: 통과
+- `npm run typecheck`: 통과
+- `npm run build`: 통과 (비차단 chunk 크기 경고 있음)
+- `npm run dev -- --host 127.0.0.1`: HTTP 200 확인 후 종료
+- 브라우저 UI: Stage 15 Field, Repeat Hunt OFF, Save Data 화면 확인
+- Save Now: `SAVED` 상태 확인
+- 새로고침: 저장 후 Field로 복원 확인
+
+### 15단계 검증 항목
+
+- [x] SaveEnvelope, schemaVersion 1, checksum과 primary/backup/temp 저장 구조를 구현한다.
+- [x] BootstrapScene에서 저장 복원 후 FieldScene을 시작한다.
+- [x] Formation·Gold·KeyBinding·Control Group·Inventory·AutoProgress를 저장한다.
+- [x] Repeat Hunt 대상 선택, 승리 해금, ON/OFF와 Battle Auto Hunt 연동을 구현한다.
+- [x] 최소 60초·최대 8시간 방치 시간 및 대상별 cycle 계산을 구현한다.
+- [x] 방치 Gold·EXP·결정적 아이템 드롭·100개 cap과 중복 정산 방지를 구현한다.
+- [x] SaveDataScene의 Save Now와 5초 이중 확인 Reset Save를 구현한다.
+- [ ] 실제 전투 승리 후 반복 사냥과 장시간 방치 통합 시나리오 — 사용자 수동 테스트 생략
+- [ ] ChatGPT 코드 검수 및 main 반영
+
+### v2 검수 수정 기록
+
+- Storage 읽기·쓰기·삭제는 예외를 삼키는 `safeGetItem`, `safeSetItem`, `safeRemoveItem`을 거친다.
+- 미래 schemaVersion의 backup/temp 후보를 덮어쓰지 않고 `NEWER_VERSION_BLOCKED`로 보존한다.
+- 저장 실패 시 기존 `savedAtMs`와 `lastActiveAtMs`를 보존한다.
+- `document.visibilitychange`에서 hidden 저장·visible 복귀 정산을 중복 없이 처리한다.
+- 사용자 수동 테스트는 계속 `skipped_by_user`이며 통과로 기록하지 않는다.
+
+### v3 검수 수정 기록
+
+- Repeat Hunt ON: 첫 실제 승리 전에도 유효한 선택 몬스터와 Formation이면 활성화된다.
+- Offline Rewards: 해당 몬스터의 첫 실제 승리 전에는 잠금 상태로 보상을 지급하지 않는다.
+- hidden 진입 저장 후 pagehide/beforeunload 중복 저장: `lastActiveAtMs` 재갱신 없음.
+- temp cleanup 실패: 검증된 primary 저장 성공을 유지하고 cleanup warning으로 분리한다.
+- `rawElapsedMs`가 60초 미만이면 보상·cycle을 만들지 않고 기존 remainder를 유지한다.
+
+## Stage 14 아이템·인벤토리·장비 — 최종 승인 및 main 반영
+
 ## Stage 14 아이템·인벤토리·장비 — 최종 승인 및 main 반영
 
 - 현재 작업 브랜치: `main`

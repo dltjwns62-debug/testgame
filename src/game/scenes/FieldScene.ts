@@ -3,6 +3,7 @@ import {
   CONTACT_DISTANCE,
   GAME_HEIGHT,
   GAME_WIDTH,
+  AUTO_HUNT_REGISTRY_KEY,
   MONSTERS,
   MONSTER_RADIUS,
   MONSTER_RESPAWN_DELAY_MS,
@@ -14,10 +15,18 @@ import {
 import { buildBattleRosterFromFormation, getOrCreateFormationState, isValidFormationState } from "../formationState";
 import { addPlayerGold, getOrCreatePlayerGold } from "../playerEconomy";
 import { getOrCreateKeyBindingState } from "../keyBindings";
-import { calculateFinalUnitStats, getEquippedModifierTotals, getOrCreateInventoryState } from "../items";
+import { calculateFinalUnitStats, getEquippedModifierTotals, getItemDefinition, getOrCreateInventoryState } from "../items";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import { formatProgression } from "../progression";
-import type { OwnedRosterUnit, RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
+import {
+  getOrCreateAutoProgressState,
+  recordActualMonsterVictory,
+  setAutoRepeatEnabled,
+  setSelectedAutoRepeatMonster,
+} from "../autoProgress";
+import { getAndClearOfflineSummary } from "../persistence";
+import type { OfflineRewardSummary } from "../offlineProgress";
+import type { BattleOutcome, OwnedRosterUnit, RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
@@ -60,7 +69,15 @@ export class FieldScene extends Phaser.Scene {
   private keySettingsButtonLabel!: Phaser.GameObjects.Text;
   private inventoryButton!: Phaser.GameObjects.Rectangle;
   private inventoryButtonLabel!: Phaser.GameObjects.Text;
+  private repeatButton!: Phaser.GameObjects.Rectangle;
+  private repeatButtonLabel!: Phaser.GameObjects.Text;
+  private saveDataButton!: Phaser.GameObjects.Rectangle;
+  private saveDataButtonLabel!: Phaser.GameObjects.Text;
   private formationMessage: string | null = null;
+  private repeatAfterBattlePending = false;
+  private repeatMovementInProgress = false;
+  private summaryOpen = false;
+  private summaryOverlay: Phaser.GameObjects.Container | null = null;
 
   private readonly handleCanvasContextMenu = (event: MouseEvent): void => {
     event.preventDefault();
@@ -70,7 +87,7 @@ export class FieldScene extends Phaser.Scene {
     super("FieldScene");
   }
 
-  public create(): void {
+  public create(data?: unknown): void {
     getOrCreateFormationState(this.game.registry);
     getOrCreatePlayerGold(this.game.registry);
     getOrCreateKeyBindingState(this.game.registry);
@@ -82,6 +99,7 @@ export class FieldScene extends Phaser.Scene {
     this.addShopButton();
     this.addKeySettingsButton();
     this.addInventoryButton();
+    this.addStage15Controls();
     this.player = this.addPlayer();
 
     MONSTERS.forEach((monster) => this.addMonster(monster));
@@ -89,9 +107,29 @@ export class FieldScene extends Phaser.Scene {
     this.setupCanvasContextMenu();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.clearRespawnTimers, this);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.clearRespawnTimers, this);
+    const bootData = data && typeof data === "object" ? data as {
+      persistenceMessage?: string;
+      offlineSummary?: OfflineRewardSummary;
+    } : {};
+    const registrySummary = getAndClearOfflineSummary(this.game.registry);
+    const summary = bootData.offlineSummary ?? registrySummary;
+    if (summary && (summary.applied || summary.recoveredMessage || summary.rawElapsedMs >= 60_000)) {
+      this.showOfflineSummary(summary);
+    } else if (bootData.persistenceMessage && bootData.persistenceMessage !== "Save loaded.") {
+      this.formationMessage = bootData.persistenceMessage;
+    }
+    this.updateStatusText();
   }
 
   public update(_time: number, delta: number): void {
+    const liveSummary = !this.summaryOpen ? getAndClearOfflineSummary(this.game.registry) : null;
+    if (liveSummary && (liveSummary.applied || liveSummary.recoveredMessage || liveSummary.rawElapsedMs >= 60_000)) {
+      this.showOfflineSummary(liveSummary);
+      return;
+    }
+    if (this.summaryOpen) {
+      return;
+    }
     this.movePlayer(delta);
     this.updateStatusText();
   }
@@ -115,14 +153,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 14: Items & Equipment", {
+    this.add.text(48, 36, "Stage 15: Save & Offline Progress", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Collect loot, manage inventory, and equip your roster.", {
+    this.add.text(50, 66, "Repeat hunts, safe saves, and offline rewards.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -256,7 +294,7 @@ export class FieldScene extends Phaser.Scene {
     monsterObject.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       const currentMonster = this.monsterViews.get(monster.id);
       if (pointer.button === 2 && currentMonster?.isAvailable) {
-        this.selectMonster(monster.id);
+        this.selectMonster(monster.id, "MANUAL");
       }
     });
 
@@ -275,7 +313,7 @@ export class FieldScene extends Phaser.Scene {
     this.game.canvas.removeEventListener("contextmenu", this.handleCanvasContextMenu);
   }
 
-  private selectMonster(monsterId: string): void {
+  private selectMonster(monsterId: string, source: "MANUAL" | "REPEAT" = "MANUAL"): void {
     if (this.battleTransitionStarted) {
       return;
     }
@@ -292,6 +330,8 @@ export class FieldScene extends Phaser.Scene {
     this.targetMonster = nextTarget;
     this.targetMonster.selectionMarker.setVisible(true);
     this.battleResultApplied = false;
+    this.repeatMovementInProgress = source === "REPEAT";
+    setSelectedAutoRepeatMonster(this.game.registry, monsterId);
 
     const distance = Phaser.Math.Distance.Between(
       this.player.x,
@@ -364,16 +404,29 @@ export class FieldScene extends Phaser.Scene {
       sourceWorldMonsterId: target.id,
       enemyCount: 10,
       allyRoster,
+      autoRepeatBattle: (() => {
+        const autoProgress = getOrCreateAutoProgressState(this.game.registry);
+        return autoProgress.autoRepeatEnabled && autoProgress.selectedMonsterId === target.id;
+      })(),
     };
 
     this.scene.pause();
     this.scene.launch("BattleScene", battleData);
   }
 
-  public returnFromBattle(): void {
+  public returnFromBattle(outcome?: BattleOutcome): void {
     if (!this.battleTransitionStarted) {
       return;
     }
+
+    const autoProgress = getOrCreateAutoProgressState(this.game.registry);
+    const shouldRepeat = outcome === "VICTORY" && autoProgress.autoRepeatEnabled &&
+      autoProgress.selectedMonsterId !== null;
+    if (!shouldRepeat && autoProgress.autoRepeatEnabled) {
+      setAutoRepeatEnabled(this.game.registry, false);
+      this.formationMessage = outcome === "DEFEAT" ? "Repeat Hunt stopped after defeat." : "Repeat Hunt paused by menu.";
+    }
+    this.repeatAfterBattlePending = shouldRepeat;
 
     this.battleTransitionStarted = false;
     this.state = "IDLE";
@@ -386,12 +439,7 @@ export class FieldScene extends Phaser.Scene {
     if (this.battleTransitionStarted) {
       return;
     }
-    if (this.state === "MOVING") {
-      this.formationMessage = "Formation is unavailable while the player is moving.";
-      this.updateStatusText();
-      return;
-    }
-
+    if (!this.prepareMenuEntry("Formation is unavailable while the player is moving.")) return;
     this.formationMessage = null;
     this.scene.pause();
     this.scene.launch("FormationScene");
@@ -409,12 +457,7 @@ export class FieldScene extends Phaser.Scene {
     if (this.battleTransitionStarted || this.state === "BATTLE") {
       return;
     }
-    if (this.state === "MOVING") {
-      this.formationMessage = "Shop is unavailable while the player is moving.";
-      this.updateStatusText();
-      return;
-    }
-
+    if (!this.prepareMenuEntry("Shop is unavailable while the player is moving.")) return;
     this.formationMessage = null;
     this.scene.pause();
     this.scene.launch("ShopScene");
@@ -432,12 +475,7 @@ export class FieldScene extends Phaser.Scene {
     if (this.battleTransitionStarted || this.state === "BATTLE") {
       return;
     }
-    if (this.state === "MOVING") {
-      this.formationMessage = "Key settings are unavailable while the player is moving.";
-      this.updateStatusText();
-      return;
-    }
-
+    if (!this.prepareMenuEntry("Key settings are unavailable while the player is moving.")) return;
     this.formationMessage = null;
     this.scene.pause();
     this.scene.launch("KeySettingsScene");
@@ -473,11 +511,7 @@ export class FieldScene extends Phaser.Scene {
     if (this.battleTransitionStarted || this.state === "BATTLE") {
       return;
     }
-    if (this.state === "MOVING") {
-      this.formationMessage = "Inventory is unavailable while the player is moving.";
-      this.updateStatusText();
-      return;
-    }
+    if (!this.prepareMenuEntry("Inventory is unavailable while the player is moving.")) return;
     this.formationMessage = null;
     this.scene.pause();
     this.scene.launch("InventoryScene");
@@ -489,6 +523,37 @@ export class FieldScene extends Phaser.Scene {
     this.state = "IDLE";
     this.formationMessage = savedMessage ?? null;
     this.updateStatusText();
+  }
+
+  public openSaveData(): void {
+    if (this.battleTransitionStarted || this.state === "BATTLE") {
+      return;
+    }
+    if (!this.prepareMenuEntry("Save Data is unavailable while the player is moving.")) return;
+    this.scene.pause();
+    this.scene.launch("SaveDataScene");
+  }
+
+  public returnFromSaveData(savedMessage?: string): void {
+    this.scene.stop("SaveDataScene");
+    this.scene.resume();
+    this.state = "IDLE";
+    this.formationMessage = savedMessage ?? null;
+    this.updateStatusText();
+  }
+
+  public restartAfterReset(message: string): void {
+    this.summaryOverlay?.destroy(true);
+    this.summaryOverlay = null;
+    this.summaryOpen = false;
+    this.targetMonster = null;
+    this.repeatAfterBattlePending = false;
+    this.repeatMovementInProgress = false;
+    this.battleTransitionStarted = false;
+    this.battleResultApplied = false;
+    this.scene.stop("SaveDataScene");
+    this.scene.stop("BattleScene");
+    this.scene.restart({ persistenceMessage: message });
   }
 
   public applyBattleResult(result: RTSBattleResult): void {
@@ -529,6 +594,9 @@ export class FieldScene extends Phaser.Scene {
       }
 
       this.battleResultApplied = true;
+      recordActualMonsterVictory(this.game.registry, targetMonster.definition.id, {
+        autoRepeatVictory: result.autoRepeatBattle === true,
+      });
       this.hideMonster(targetMonster);
       this.targetMonster = null;
       this.scheduleRespawn(targetMonster);
@@ -574,6 +642,15 @@ export class FieldScene extends Phaser.Scene {
     monster.container.setActive(true);
     monster.selectionMarker.setVisible(false);
     this.enableMonsterInteraction(monster);
+    const autoProgress = getOrCreateAutoProgressState(this.game.registry);
+    if (this.repeatAfterBattlePending && autoProgress.selectedMonsterId === monster.definition.id) {
+      if (autoProgress.autoRepeatEnabled && !this.summaryOpen && !this.battleTransitionStarted) {
+        this.repeatAfterBattlePending = false;
+        this.selectMonster(monster.definition.id, "REPEAT");
+      } else if (!autoProgress.autoRepeatEnabled) {
+        this.repeatAfterBattlePending = false;
+      }
+    }
   }
 
   private clearRespawnTimers(): void {
@@ -595,6 +672,7 @@ export class FieldScene extends Phaser.Scene {
     const hero = formation.ownedUnits.find((unit) => unit.unitRole === "MAIN_CHARACTER");
     const heroSlot = formation.slots.find((slot) => slot.rosterUnitId === hero?.rosterUnitId)?.slotIndex;
     const playerGold = getOrCreatePlayerGold(this.game.registry);
+    const autoProgress = getOrCreateAutoProgressState(this.game.registry);
     this.formationButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
     this.formationButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.shopButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
@@ -603,11 +681,156 @@ export class FieldScene extends Phaser.Scene {
     this.keySettingsButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.inventoryButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
     this.inventoryButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
+    this.repeatButton?.setFillStyle(autoProgress.autoRepeatEnabled ? 0x3b9b6f : 0x4b8b6d, 1);
+    this.repeatButtonLabel?.setText("Repeat: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF"));
+    this.saveDataButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
+    this.saveDataButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
     this.stateText.setText([
       "State: " + this.state + " · Target: " + (this.targetMonster?.definition.name ?? "None") + " · Gold: " + playerGold,
       "Formation: " + deployedCount + "/10 · Owned: " + formation.ownedUnits.length + "/13 · Hero Slot: " + (heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1),
       "Hero: " + (hero ? getHeroStatsLabel(this.game.registry, hero) : "Unavailable"),
+      "Repeat Hunt: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF") + " · Target: " + (autoProgress.selectedMonsterId ?? "None"),
       ...(this.formationMessage ? [this.formationMessage] : []),
     ]);
+  }
+
+  private addStage15Controls(): void {
+    this.repeatButton = this.add.rectangle(680, 510, 136, 28, 0x4b8b6d, 1)
+      .setStrokeStyle(1, 0x9ce4b0, 1)
+      .setInteractive({ useHandCursor: true });
+    this.repeatButtonLabel = this.add.text(680, 510, "", {
+      color: "#f3f8e9",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "10px",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+    this.repeatButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      if (pointer.button === 0) this.toggleRepeatHunt();
+    });
+    this.saveDataButton = this.add.rectangle(835, 510, 136, 28, 0x4b8b6d, 1)
+      .setStrokeStyle(1, 0x9ce4b0, 1)
+      .setInteractive({ useHandCursor: true });
+    this.saveDataButtonLabel = this.add.text(835, 510, "Save Data", {
+      color: "#f3f8e9",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "10px",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+    this.saveDataButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      if (pointer.button === 0) this.openSaveData();
+    });
+  }
+
+  private toggleRepeatHunt(): void {
+    const state = getOrCreateAutoProgressState(this.game.registry);
+    if (state.autoRepeatEnabled) {
+      setAutoRepeatEnabled(this.game.registry, false);
+      if (this.repeatMovementInProgress) {
+        this.state = "IDLE";
+        this.repeatMovementInProgress = false;
+      }
+      this.repeatAfterBattlePending = false;
+      this.formationMessage = "Repeat Hunt stopped.";
+      this.updateStatusText();
+      return;
+    }
+    const targetId = state.selectedMonsterId;
+    const target = targetId ? this.monsterViews.get(targetId) : undefined;
+    const formation = getOrCreateFormationState(this.game.registry);
+    if (!targetId || !target || !isValidFormationState(formation)) {
+      this.formationMessage = "Select a valid monster with a valid formation before enabling Repeat Hunt.";
+      this.updateStatusText();
+      return;
+    }
+    setAutoRepeatEnabled(this.game.registry, true);
+    this.game.registry.set(AUTO_HUNT_REGISTRY_KEY, true);
+    this.formationMessage = "Repeat Hunt enabled.";
+    if (target?.isAvailable) {
+      this.repeatAfterBattlePending = false;
+      this.selectMonster(targetId, "REPEAT");
+    } else {
+      this.repeatAfterBattlePending = true;
+      this.formationMessage = "Repeat Hunt is waiting for the selected monster to respawn.";
+    }
+    this.updateStatusText();
+  }
+
+  private pauseRepeatHuntForMenu(): void {
+    const state = getOrCreateAutoProgressState(this.game.registry);
+    if (state.autoRepeatEnabled) {
+      setAutoRepeatEnabled(this.game.registry, false);
+      this.formationMessage = "Repeat Hunt paused by menu.";
+    }
+    this.repeatAfterBattlePending = false;
+    this.repeatMovementInProgress = false;
+  }
+
+  private prepareMenuEntry(unavailableMessage: string): boolean {
+    if (this.state === "MOVING") {
+      if (!this.repeatMovementInProgress) {
+        this.formationMessage = unavailableMessage;
+        this.updateStatusText();
+        return false;
+      }
+      this.state = "IDLE";
+      this.repeatMovementInProgress = false;
+    }
+    this.pauseRepeatHuntForMenu();
+    return true;
+  }
+
+  private showOfflineSummary(summary: OfflineRewardSummary): void {
+    this.summaryOpen = true;
+    const overlay = this.add.container(0, 0).setDepth(100);
+    overlay.add(this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x08111d, 0.78));
+    overlay.add(this.add.rectangle(GAME_WIDTH / 2, 270, 660, 360, 0x1f2937, 1).setStrokeStyle(2, 0x9ce4b0, 1));
+    overlay.add(this.add.text(480, 105, "Offline Hunt Summary", {
+      color: "#f6e8ad", fontFamily: "Segoe UI, sans-serif", fontSize: "22px", fontStyle: "bold",
+    }).setOrigin(0.5));
+    const itemCounts = new Map<string, number>();
+    for (const itemDefinitionId of summary.itemDefinitionIds) {
+      const displayName = getItemDefinition(itemDefinitionId)?.displayName ?? itemDefinitionId;
+      itemCounts.set(displayName, (itemCounts.get(displayName) ?? 0) + 1);
+    }
+    const items = itemCounts.size > 0
+      ? [...itemCounts.entries()].map(([name, count]) => name + " x" + count).join(", ")
+      : "None";
+    overlay.add(this.add.text(190, 145, [
+      "Target: " + (summary.monsterName ?? "None"),
+      "Elapsed: " + Math.floor(summary.rawElapsedMs / 1000) + "s · Used: " + Math.floor(summary.eligibleMs / 1000) + "s",
+      "Cycles: " + summary.cycles + (summary.capped ? " · 8-hour cap applied" : ""),
+      "Gold: +" + summary.gold,
+      "EXP: +" + summary.directExperience + " direct · +" + summary.bonusExperience + " bonus",
+      "Items: " + items + (summary.itemCapApplied ? " · 100-item cap applied" : ""),
+      summary.recoveredMessage ?? "",
+    ], {
+      color: "#d9f2ff", fontFamily: "Segoe UI, sans-serif", fontSize: "13px", lineSpacing: 8,
+      wordWrap: { width: 580 },
+    }));
+    const continueButton = this.add.rectangle(480, 440, 180, 34, 0x4b8b6d, 1)
+      .setStrokeStyle(1, 0x9ce4b0, 1).setInteractive({ useHandCursor: true });
+    overlay.add(continueButton);
+    overlay.add(this.add.text(480, 440, "Continue", {
+      color: "#f3f8e9", fontFamily: "Segoe UI, sans-serif", fontSize: "12px", fontStyle: "bold",
+    }).setOrigin(0.5));
+    continueButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      if (pointer.button === 0) this.closeOfflineSummary();
+    });
+    this.summaryOverlay = overlay;
+  }
+
+  private closeOfflineSummary(): void {
+    this.summaryOverlay?.destroy(true);
+    this.summaryOverlay = null;
+    this.summaryOpen = false;
+    const state = getOrCreateAutoProgressState(this.game.registry);
+    if (state.autoRepeatEnabled && state.selectedMonsterId) {
+      const target = this.monsterViews.get(state.selectedMonsterId);
+      if (target?.isAvailable) this.selectMonster(state.selectedMonsterId, "REPEAT");
+    }
+    this.updateStatusText();
   }
 }

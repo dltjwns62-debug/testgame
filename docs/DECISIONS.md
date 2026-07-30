@@ -1,5 +1,35 @@
 # 프로젝트 결정 사항
 
+## 15단계 v3 검수 수정 결정
+
+- 결정: Repeat Hunt ON은 유효한 선택 몬스터와 Formation이면 첫 실제 승리 전에도 허용한다.
+- 결정: 오프라인 Gold·EXP·아이템 보상은 해당 몬스터의 실제 승리 기록이 있을 때만 해금한다.
+- 결정: hidden 진입 저장은 허용하되 pagehide와 beforeunload가 hidden 상태에서 `lastActiveAtMs`를 다시 갱신하지 않도록 한다.
+- 결정: 검증된 primary 저장 이후 temp 삭제 실패는 저장 성공과 cleanup warning으로 분리한다.
+- 결정: 오프라인 최소 시간은 누적 remainder가 아니라 현재 `rawElapsedMs` 기준으로 판정한다.
+- 상태: 확정
+
+## 15단계 v2 검수 수정 결정
+
+- 결정: Storage API는 `safeGetItem`, `safeSetItem`, `safeRemoveItem`을 통해서만 호출하고, 읽기 예외 시 메모리 기본값으로 시작한다.
+- 결정: 미래 schemaVersion의 primary/backup/temp 후보는 덮어쓰지 않고 `NEWER_VERSION_BLOCKED` 상태로 보존한다.
+- 결정: Repeat Hunt 자동 이동과 수동 우클릭 이동을 구분하며, 수동 이동은 Repeat Hunt 해제 시 유지한다.
+- 결정: `victoryCountsByMonsterId`와 실제 Repeat Hunt 승리 수를 분리한다.
+- 결정: 15단계 v2 상태는 `review_pending`이며 검수 태그는 `review-stage-15-v2`이다.
+- 상태: 확정
+
+## 15단계 저장과 오프라인 진행 결정 (검수 제출)
+
+- 결정: 저장은 서버가 아닌 브라우저 localStorage의 primary/backup/temp/recovery 키로 관리한다.
+- 결정: SaveEnvelope는 schemaVersion 1과 결정적 checksum을 사용하고, 미래 버전 저장은 자동 덮어쓰지 않는다.
+- 결정: BootstrapScene이 저장 복원과 방치 정산을 먼저 수행한 뒤 FieldScene을 시작한다.
+- 결정: 실제 저장 대상은 Formation, Gold, KeyBinding, Control Group, Inventory, Battle Auto Hunt와 AutoProgress의 허용 목록으로 제한한다.
+- 결정: Repeat Hunt는 실제 승리한 monsterId만 해금하며 Battle Auto Hunt와 별도 상태로 관리한다.
+- 결정: 방치 정산은 최소 60초·최대 8시간, 대상별 cycle, 출전 유닛 기준 EXP, cycle당 drop table 1회와 100개 아이템 cap을 사용한다.
+- 결정: 방치 보상은 다음 SaveEnvelope를 먼저 저장한 뒤 registry에 적용해 새로고침 중복 지급을 방지한다.
+- 결정: 사용자 수동 테스트는 요청에 따라 `skipped_by_user`로 기록하고, 16단계 안정화는 구현하지 않는다.
+- 상태: 확정
+
 ## 14단계 최종 승인 및 main 반영 결정
 
 - 결정: `review-stage-14-v2`와 승인 커밋 `c61bcf0c14b1520733b707a7acd62b3ed90eeccd`의 정적 코드 검수 통과를 승인한다.

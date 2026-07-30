@@ -1,14 +1,14 @@
 # 실행 및 테스트 기록
 
-## Stage 15 저장과 오프라인 진행 — v2 검수 대기
+## Stage 15 저장과 오프라인 진행 — v3 검수 대기
 
 - 현재 작업 브랜치: `stage-15-save-offline-progress`
-- 현재 검수 태그: `review-stage-15-v2`
+- 현재 검수 태그: `review-stage-15-v3`
 - 15단계 상태: 검수 대기 (`review_pending`)
 - 완료된 단계: 1단계~14단계
 - 다음 단계: 16단계 — 성능 및 안정화
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 재검수 대기 (`not_reviewed`)
+- ChatGPT 코드 검수: 재검수 대기 (`pending`)
 - `main` 반영: 미반영
 
 ### 15단계 자동 검사
@@ -40,6 +40,14 @@
 - 저장 실패 시 기존 `savedAtMs`와 `lastActiveAtMs`를 보존한다.
 - `document.visibilitychange`에서 hidden 저장·visible 복귀 정산을 중복 없이 처리한다.
 - 사용자 수동 테스트는 계속 `skipped_by_user`이며 통과로 기록하지 않는다.
+
+### v3 검수 수정 기록
+
+- Repeat Hunt ON: 첫 실제 승리 전에도 유효한 선택 몬스터와 Formation이면 활성화된다.
+- Offline Rewards: 해당 몬스터의 첫 실제 승리 전에는 잠금 상태로 보상을 지급하지 않는다.
+- hidden 진입 저장 후 pagehide/beforeunload 중복 저장: `lastActiveAtMs` 재갱신 없음.
+- temp cleanup 실패: 검증된 primary 저장 성공을 유지하고 cleanup warning으로 분리한다.
+- `rawElapsedMs`가 60초 미만이면 보상·cycle을 만들지 않고 기존 remainder를 유지한다.
 
 ## Stage 14 아이템·인벤토리·장비 — 최종 승인 및 main 반영
 

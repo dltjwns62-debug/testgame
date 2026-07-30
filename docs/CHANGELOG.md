@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-07-30 — 15단계 v3 검수 수정 재제출
+
+- Repeat Hunt를 첫 실제 승리 전에도 켤 수 있도록 하고, 오프라인 보상만 몬스터별 첫 승리 후 해금한다.
+- hidden 진입 저장 이후 pagehide/beforeunload 중복 저장으로 `lastActiveAtMs`가 갱신되지 않도록 수정했다.
+- 검증된 primary 저장 후 temp 삭제만 실패한 경우 저장 성공과 cleanup warning을 분리한다.
+- 오프라인 최소 60초 조건을 `rawElapsedMs` 기준으로 적용하고, 미만 시간은 remainder에 합산하지 않는다.
+- `review-stage-15-v1`과 `review-stage-15-v2`를 보존하고 `review-stage-15-v3`로 재제출한다.
+- 사용자 수동 테스트는 `skipped_by_user`로 유지하며 16단계는 시작하지 않는다.
+
 ## 2026-07-30 — 15단계 v2 검수 수정 재제출
 
 - 15단계 최초 검수에서 지적된 저장소 예외·미래 스키마 보존·저장 실패 메타데이터 문제를 수정했다.

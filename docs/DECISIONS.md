@@ -1,5 +1,14 @@
 # 프로젝트 결정 사항
 
+## 15단계 v3 검수 수정 결정
+
+- 결정: Repeat Hunt ON은 유효한 선택 몬스터와 Formation이면 첫 실제 승리 전에도 허용한다.
+- 결정: 오프라인 Gold·EXP·아이템 보상은 해당 몬스터의 실제 승리 기록이 있을 때만 해금한다.
+- 결정: hidden 진입 저장은 허용하되 pagehide와 beforeunload가 hidden 상태에서 `lastActiveAtMs`를 다시 갱신하지 않도록 한다.
+- 결정: 검증된 primary 저장 이후 temp 삭제 실패는 저장 성공과 cleanup warning으로 분리한다.
+- 결정: 오프라인 최소 시간은 누적 remainder가 아니라 현재 `rawElapsedMs` 기준으로 판정한다.
+- 상태: 확정
+
 ## 15단계 v2 검수 수정 결정
 
 - 결정: Storage API는 `safeGetItem`, `safeSetItem`, `safeRemoveItem`을 통해서만 호출하고, 읽기 예외 시 메모리 기본값으로 시작한다.

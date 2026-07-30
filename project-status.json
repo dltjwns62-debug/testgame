@@ -5,7 +5,7 @@
   "currentStage": 15,
   "currentStageName": "저장과 오프라인 진행",
   "stageStatus": "review_pending",
-  "activeTask": "15단계 v2 구현 완료 및 ChatGPT 재검수 대기",
+  "activeTask": "15단계 v3 구현 완료 및 ChatGPT 재검수 대기",
   "workingBranch": "stage-15-save-offline-progress",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
@@ -13,16 +13,16 @@
   "nextStageName": "성능 및 안정화",
   "reviewSubmission": {
     "branch": "stage-15-save-offline-progress",
-    "tag": "review-stage-15-v2",
-    "version": 2,
+    "tag": "review-stage-15-v3",
+    "version": 3,
     "submitted": true
   },
   "reviewHistory": [
     {
       "stage": 15,
       "branch": "stage-15-save-offline-progress",
-      "tag": "review-stage-15-v2",
-      "version": 2,
+      "tag": "review-stage-15-v3",
+      "version": 3,
       "submitted": true,
       "approved": false,
       "result": "review_pending",
@@ -30,7 +30,23 @@
       "reviewedAt": null,
       "commit": null,
       "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자 요청으로 수동 테스트 생략",
+      "mainBranchMerged": false
+    },
+    {
+      "stage": 15,
+      "branch": "stage-15-save-offline-progress",
+      "tag": "review-stage-15-v2",
+      "version": 2,
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-30T02:06:00+09:00",
+      "commit": "fada0faa64c6f116a0807de8b7752a6bc91ae89c",
+      "userRunTest": "skipped_by_user",
       "userRunTestReason": "사용자 요청에 따라 수동 테스트를 요구하지 않음",
+      "reason": "Repeat Hunt가 첫 실제 승리 전에 켜지지 않아 오프라인 보상 해금 조건과 결합되며, hidden 이후 pagehide가 lastActiveAtMs를 다시 갱신할 수 있고, primary 검증 완료 후 temp 삭제 실패를 전체 저장 실패로 처리하며, 최소 60초 조건에 rawElapsedMs가 아닌 remainder 합산값을 사용함",
       "mainBranchMerged": false
     },
     {
@@ -541,11 +557,11 @@
     "browserAutomation": "partial_passed",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "사용자 요청에 따라 15단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "not_reviewed"
+    "chatGptCodeReview": "pending"
   },
   "mainBranchMerged": false,
   "knownIssues": [
     "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
   ],
-  "lastUpdated": "2026-07-30T02:00:00+09:00"
+  "lastUpdated": "2026-07-30T16:30:43+09:00"
 }

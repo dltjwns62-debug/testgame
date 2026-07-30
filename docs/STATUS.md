@@ -2,18 +2,18 @@
 
 ## Stage 15 저장과 오프라인 진행 — 검수 대기
 
-- 현재 검수 태그: `review-stage-15-v2`
+- 현재 검수 태그: `review-stage-15-v3`
 - 작업 브랜치: `stage-15-save-offline-progress`
 - 전체 단계: 17단계
 - 현재 단계: 15단계 — 저장과 오프라인 진행
 - 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업: 15단계 검수 지적 수정 및 저장·복구·Repeat Hunt 상태 안정화
+- 현재 작업: 15단계 v2 검수 지적 수정 및 Repeat Hunt·오프라인 수명주기 안정화
 - 완료된 단계: 1단계~14단계
 - 검수 통과된 단계: 1단계~14단계
 - 다음 단계: 16단계 — 성능 및 안정화
 - `main` 정식 반영 여부: 미반영
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 재검수 대기 (`not_reviewed`)
+- ChatGPT 코드 검수: 재검수 대기 (`pending`)
 - 브라우저 자동화: Field·Save Data 화면과 Save Now·새로고침 복원 확인
 - 현재 알려진 문제: 기존 `favicon.ico` 404 비차단 경고
 
@@ -40,6 +40,14 @@
 - `main` 반영: 미반영
 
 마지막 갱신: 2026-07-30 02:00 (Asia/Seoul)
+
+### v3 검수 수정 요약
+
+- Repeat Hunt ON은 첫 실제 승리 전에도 허용하고, 오프라인 보상은 몬스터별 첫 승리 후에만 해금한다.
+- hidden 진입 저장과 pagehide/beforeunload 중복 저장을 분리해 `lastActiveAtMs` 재갱신을 방지한다.
+- primary 검증 성공 후 temp 삭제 실패는 저장 성공과 cleanup warning으로 분리한다.
+- 오프라인 최소 60초는 `rawElapsedMs` 기준으로 판정한다.
+- 현재 v3 상태: 검수 대기 (`review_pending`), ChatGPT 코드 검수 `pending`.
 
 ## Stage 14 아이템·인벤토리·장비 — 완료 (historical)
 

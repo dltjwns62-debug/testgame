@@ -1,5 +1,15 @@
 # 변경 이력
 
+## 2026-07-30 — 16단계 성능 및 안정화 제출
+
+- 1~15단계 회귀 범위를 유지하면서 저장·복구와 런타임 상태 경계를 검증·복구하도록 했다.
+- `StorageLike`·주입 가능한 시계, quota 안전 저장 메타데이터, 멱등 autosave disposer를 추가했다.
+- Field/Battle UI의 불필요한 매 프레임 텍스트 갱신을 제한하고 씬 delayed timer 정리를 보강했다.
+- 최근 런타임 오류 20개 기록, `?diagnostics=1` 전용 진단 오버레이, favicon과 Node 회귀 테스트를 추가했다.
+- `docs/ARCHITECTURE.md`와 `docs/STAGE16-AUDIT.md`를 추가했다.
+- 자동 검사는 `npm run typecheck`, `npm run test`, `npm run build`까지 통과했다. 사용자 수동 테스트는 `skipped_by_user`이며 17단계는 시작하지 않았다.
+- 검수 태그 `review-stage-16-v1`, 상태 `review_pending`, `main` 미반영으로 제출한다.
+
 ## 2026-07-30 — 15단계 검수 승인 및 main 반영 — 완료
 
 - `review-stage-15-v3`와 승인 커밋 `ca55144de6e6d2f72e941abb9a11b801c175355a`를 확인했다.

@@ -1,5 +1,15 @@
 # 프로젝트 결정 사항
 
+## 16단계 성능 및 안정화 제출 결정
+
+- 결정: 저장소와 시계는 `StorageLike`·`PersistenceEnvironment` 경계로 주입 가능하게 유지한다.
+- 결정: 런타임 상태 검증·복구는 프레임 루프가 아닌 Bootstrap, 씬 진입, 저장·복구, 전투 결과 경계에서 실행한다.
+- 결정: autosave와 scene delayed timer는 멱등 설치와 명시적 disposer를 사용해 중복 실행을 방지한다.
+- 결정: Field/Battle UI는 dirty flag 또는 약 100ms 주기로 갱신하고, 전투 시각 업데이트와 UI 텍스트 갱신을 분리한다.
+- 결정: diagnostics는 `?diagnostics=1`에서만 표시하며 게임 로직을 변경하지 않는다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`, ChatGPT 코드 검수는 `not_reviewed`, 17단계는 미시작으로 제출한다.
+- 상태: 확정
+
 ## 15단계 검수 승인 및 main 반영 결정
 
 - 결정: `review-stage-15-v3`의 승인 커밋 `ca55144de6e6d2f72e941abb9a11b801c175355a`를 `main`에 no-ff 병합한다.

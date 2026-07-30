@@ -2,22 +2,37 @@
   "projectName": "Test Game",
   "repository": "dltjwns62-debug/testgame",
   "totalStages": 17,
-  "currentStage": 15,
-  "currentStageName": "저장과 오프라인 진행",
-  "stageStatus": "completed",
-  "activeTask": "15단계 완료 — 16단계 성능 및 안정화 시작 명령 대기 중",
-  "workingBranch": "main",
+  "currentStage": 16,
+  "currentStageName": "성능 및 안정화",
+  "stageStatus": "review_pending",
+  "activeTask": "16단계 구현 완료 — 검수 대기",
+  "workingBranch": "stage-16-performance-stability",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-  "nextStage": 16,
-  "nextStageName": "성능 및 안정화",
+  "nextStage": 17,
+  "nextStageName": "온라인 확장을 위한 현재 경계 문서",
   "reviewSubmission": {
-    "branch": "stage-15-save-offline-progress",
-    "tag": "review-stage-15-v3",
-    "version": 3,
+    "branch": "stage-16-performance-stability",
+    "tag": "review-stage-16-v1",
+    "version": 1,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 16,
+      "branch": "stage-16-performance-stability",
+      "tag": "review-stage-16-v1",
+      "version": 1,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자 요청에 따라 수동 통합 테스트는 검수 대기 상태로 남김",
+      "mainBranchMerged": false,
+      "reason": "런타임 상태 검증, 저장소 경계 주입, 자동 저장 수명주기, Field/Battle UI 갱신 제한, 오류 기록, 진단 오버레이, favicon, 회귀 테스트를 추가하고 17단계는 구현하지 않음"
+    },
     {
       "stage": 15,
       "branch": "stage-15-save-offline-progress",
@@ -546,23 +561,23 @@
   },
   "review": {
     "required": true,
-    "approved": true,
-    "reviewer": "ChatGPT",
-    "reviewedAt": "2026-07-30T16:49:56+09:00"
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null
   },
   "testing": {
     "npmCi": "passed",
     "typecheck": "passed",
+    "test": "passed",
     "build": "passed",
+    "check": "passed",
     "devServer": "passed",
-    "browserAutomation": "partial_passed",
+    "browserAutomation": "not_run",
     "userRunTest": "skipped_by_user",
-    "userRunTestReason": "사용자 요청에 따라 15단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "approved"
+    "userRunTestReason": "사용자 요청에 따라 16단계 수동 테스트를 요구하지 않음",
+    "chatGptCodeReview": "not_reviewed"
   },
-  "mainBranchMerged": true,
-  "knownIssues": [
-    "favicon.ico가 없어 브라우저 콘솔에 비차단 404가 표시되며 게임 기능에는 영향이 없음"
-  ],
-  "lastUpdated": "2026-07-30T16:49:56+09:00"
+  "mainBranchMerged": false,
+  "knownIssues": [],
+  "lastUpdated": "2026-07-30T17:30:00+09:00"
 }

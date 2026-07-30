@@ -1,5 +1,45 @@
 # 실행 및 테스트 기록
 
+## Stage 16 성능 및 안정화 — 검수 대기
+
+- 작업 브랜치: `stage-16-performance-stability`
+- 검수 태그: `review-stage-16-v1`
+- 상태: `review_pending`
+- 완료된 단계: 1단계~15단계
+- 다음 단계: 17단계 — 온라인 확장을 위한 현재 경계 문서 (미시작)
+
+### 자동 검사
+
+- `npm ci`: 의존성 설치 완료
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run test`: 통과 (`passed`)
+- `npm run build`: 통과 (`passed`)
+- `npm run check`: 위 typecheck·test·build를 묶은 최종 검사
+- `npm run dev -- --host 127.0.0.1`: 서버 HTTP 200 확인 후 종료 (`passed`)
+- favicon 요청: `/favicon.svg` 명시 링크와 `public/favicon.svg` 제공
+
+### Stage 16 회귀 시나리오
+
+- 저장 primary/backup/temp 회전과 checksum 변조 거부
+- 메모리 저장소, throwing storage, quota 실패에서 게임 상태와 오류 메시지 보존
+- 60초 미만·정확히 60초·cycle 경계의 Repeat Hunt 방치 정산과 중복 claim 방지
+- Formation/Hero/deployed roster, control group, inventory equipment, Gold, level/EXP, Auto Hunt와 timestamp 경계 복구
+- Bootstrap/load/reset/scene restart에서 중복 autosave listener·timer·transition이 남지 않음
+- Field/Battle 전투 규칙과 1~15단계 UI·저장·장비·부대 지정 회귀
+
+### 수동·브라우저 검사 상태
+
+- 자동 브라우저 검사는 실행하지 않았으므로 성공으로 추정하지 않는다.
+- 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- 생략된 테스트는 통과로 간주하거나 표현하지 않는다.
+- ChatGPT 코드 검수: 검수 대기 (`not_reviewed`)
+
+## Stage 16 성능 점검 기준
+
+- Field/Battle 상태 텍스트는 매 프레임 갱신하지 않고 dirty flag 또는 약 100ms 주기를 사용한다.
+- diagnostics는 `?diagnostics=1`에서만 표시하고 약 500ms로 갱신한다.
+- 성능 목표는 기록·검증하되 60 FPS를 강제 완료 조건으로 허위 기록하지 않는다.
+
 ## Stage 15 저장과 오프라인 진행 — 완료
 
 - 현재 작업 브랜치: `main`

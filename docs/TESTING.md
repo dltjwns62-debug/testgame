@@ -21,20 +21,20 @@
 
 ### Stage 16 회귀 시나리오
 
-- 저장 primary/backup/temp 회전과 checksum 변조 거부
-- 메모리 저장소, throwing storage, quota 실패에서 게임 상태와 오류 메시지 보존
-- 60초 미만·정확히 60초·cycle 경계의 Repeat Hunt 방치 정산과 중복 claim 방지
-- Formation/Hero/deployed roster, control group, inventory equipment, Gold, level/EXP, Auto Hunt와 timestamp 경계 복구
-- Bootstrap/load/reset/scene restart에서 중복 autosave listener·timer·transition이 남지 않음
-- Recovery Try Again에서 기존 FATAL 이슈를 제거하고 씬을 정리한 뒤 Bootstrap 재검증을 수행함
-- Field/Battle 전투 규칙과 1~15단계 UI·저장·장비·부대 지정 회귀
+- 저장 후보 선택, Storage 예외, 오프라인 정산과 상태 정규화 순수 로직 테스트
+- autosave controller 설치·제거와 진단 카운터의 순수 경계 검사
+- Recovery 재시도 helper가 기존 FATAL을 제거하고 새 FATAL을 다시 감지하는지 검사
+- damage, progression, formation destination, MOVE helper 검사
 
 ### 수동·브라우저 검사 상태
 
 - 자동 브라우저 확인: Field Stage16 표기, `diagnostics=1` overlay, `diagnostics=0` 비표시, favicon HTTP 200, 콘솔 error/warning 없음 확인 (`partial_passed`)
-- Battle 화면의 전체 수동 전투 상호작용은 실행하지 않아 사용자 수동 테스트 대기로 남긴다.
-- Recovery Try Again 전체 브라우저 상호작용은 실행하지 않아 `not_run`으로 남긴다.
-- 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
+- 실제 Bootstrap FATAL 통합 UI: `not_run`
+- Recovery 버튼과 Scene 전환 전체 흐름: `not_run`
+- 메뉴 Scene 반복 전환: `not_run`
+- 전체 Battle 조작과 전투 규칙 회귀: `not_run`
+- Repeat Hunt 실전 반복과 장시간 방치: `not_run`
+- 사용자 수동 테스트: `skipped_by_user`
 - 생략된 테스트는 통과로 간주하거나 표현하지 않는다.
 - ChatGPT 코드 검수: 승인 (`approved`)
 - `main` 반영: 완료

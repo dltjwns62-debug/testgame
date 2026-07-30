@@ -38,8 +38,8 @@
 - `npm run dev`: 서버 정상 시작·HTTP 200 확인 후 종료 (`passed`)
 - 브라우저 확인: Stage 15 Field, Save Data, Save Now `SAVED`, 새로고침 후 Field 복원 확인
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 재검수 대기 (`not_reviewed`)
-- `main` 반영: 미반영
+- ChatGPT 코드 검수: 승인 (`approved`)
+- `main` 반영: 완료
 
 마지막 갱신: 2026-07-30 16:49 (Asia/Seoul)
 
@@ -57,7 +57,7 @@
 - hidden 진입 저장과 pagehide/beforeunload 중복 저장을 분리해 `lastActiveAtMs` 재갱신을 방지한다.
 - primary 검증 성공 후 temp 삭제 실패는 저장 성공과 cleanup warning으로 분리한다.
 - 오프라인 최소 60초는 `rawElapsedMs` 기준으로 판정한다.
-- 현재 v3 상태: 검수 대기 (`review_pending`), ChatGPT 코드 검수 `pending`.
+- v3 검수 결과: 승인 (`approved`), `main` 반영 및 `stage-15-completed` 생성 완료.
 
 ## Stage 14 아이템·인벤토리·장비 — 완료 (historical)
 

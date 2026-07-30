@@ -39,7 +39,7 @@
 - [x] 방치 Gold·EXP·결정적 아이템 드롭·100개 cap과 중복 정산 방지를 구현한다.
 - [x] SaveDataScene의 Save Now와 5초 이중 확인 Reset Save를 구현한다.
 - [ ] 실제 전투 승리 후 반복 사냥과 장시간 방치 통합 시나리오 — 사용자 수동 테스트 생략
-- [ ] ChatGPT 코드 검수 및 main 반영
+- [x] ChatGPT 코드 검수 승인 및 main 반영
 
 ### v2 검수 수정 기록
 
@@ -56,8 +56,6 @@
 - hidden 진입 저장 후 pagehide/beforeunload 중복 저장: `lastActiveAtMs` 재갱신 없음.
 - temp cleanup 실패: 검증된 primary 저장 성공을 유지하고 cleanup warning으로 분리한다.
 - `rawElapsedMs`가 60초 미만이면 보상·cycle을 만들지 않고 기존 remainder를 유지한다.
-
-## Stage 14 아이템·인벤토리·장비 — 최종 승인 및 main 반영
 
 ## Stage 14 아이템·인벤토리·장비 — 최종 승인 및 main 반영
 

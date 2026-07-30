@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-07-31 — 16단계 v3 검수 재제출
+
+- v2의 `changes_requested` 이력과 `review-stage-16-v2` 태그를 불변으로 보존한다.
+- Runtime Error handler 설치 순서를 고쳐 최초 registry 참조와 실제 이벤트 기록을 보장한다.
+- FATAL 상태에서 Battle Auto Hunt와 Repeat Hunt를 모두 끄고 보상·반복 진행을 차단한다.
+- RecoveryScene과 SaveDataScene의 Field/Recovery 반환 출처를 명시하고 Reset은 Bootstrap에서 재시작한다.
+- diagnostics에서 Field/Battle UI updates/sec를 분리하고 순수 Scene 전환 helper와 회귀 테스트를 추가했다.
+- 현재 제출 태그는 `review-stage-16-v3`, 상태는 `review_pending`, 사용자 테스트는 `skipped_by_user`, 17단계는 미시작이다.
+
 ## 2026-07-30 — 16단계 v2 검수 재제출
 
 - v1 검수의 `changes_requested` 결과와 원인, `review-stage-16-v1` 태그를 보존한다.

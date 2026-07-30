@@ -5,7 +5,7 @@
   "currentStage": 16,
   "currentStageName": "성능 및 안정화",
   "stageStatus": "review_pending",
-  "activeTask": "16단계 v2 구현 완료 및 ChatGPT 재검수 대기",
+  "activeTask": "16단계 v3 구현 완료 및 ChatGPT 재검수 대기",
   "workingBranch": "stage-16-performance-stability",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
@@ -13,11 +13,27 @@
   "nextStageName": "온라인 확장 준비",
   "reviewSubmission": {
     "branch": "stage-16-performance-stability",
-    "tag": "review-stage-16-v2",
-    "version": 2,
+    "tag": "review-stage-16-v3",
+    "version": 3,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 16,
+      "branch": "stage-16-performance-stability",
+      "tag": "review-stage-16-v3",
+      "version": 3,
+      "commit": "30cd3ede5aa7a90921ec03b22d3bdc3a3b237f51",
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자 수동 테스트는 skipped_by_user로 유지",
+      "mainBranchMerged": false,
+      "reason": "16단계 v2 검수 지적 사항을 반영해 오류 registry, FATAL 반복 중단, Recovery·SaveData 복귀, diagnostics 분리와 추가 회귀 테스트를 보완함"
+    },
     {
       "stage": 16,
       "branch": "stage-16-performance-stability",
@@ -28,7 +44,7 @@
       "result": "review_pending",
       "reviewer": null,
       "reviewedAt": null,
-      "commit": "efe88f5ccd4ad3c7904e670d3fdb92ec7b148bf3",
+      "commit": "f2e9e3c9fd0ed8e6f5e519d3bdf716414f6176a0",
       "userRunTest": "skipped_by_user",
       "userRunTestReason": "사용자 수동 테스트는 skipped_by_user로 유지",
       "mainBranchMerged": false,
@@ -596,5 +612,5 @@
   },
   "mainBranchMerged": false,
   "knownIssues": [],
-  "lastUpdated": "2026-07-30T23:53:23+09:00"
+  "lastUpdated": "2026-07-31T00:30:00+09:00"
 }

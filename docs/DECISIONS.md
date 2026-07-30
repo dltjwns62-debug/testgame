@@ -1,5 +1,14 @@
 # 프로젝트 결정 사항
 
+## 16단계 v3 검수 재제출 결정
+
+- 결정: v1·v2 검수 태그와 이력을 이동·삭제하지 않고 `review-stage-16-v3`를 새 제출 버전으로 사용한다.
+- 결정: Runtime Error handler는 clear 후 registry를 설정하고 named listener를 설치하며, 동일 target 재설치 시 최신 registry를 갱신한다.
+- 결정: FATAL 상태는 Battle Auto Hunt·Repeat Hunt·반복 pending을 중단하고 RecoveryScene으로 보낸다.
+- 결정: SaveDataScene은 `returnScene` 출처를 받아 Recovery와 Field에 각각 명시적으로 복귀하며 Reset 성공은 Bootstrap에서 재시작한다.
+- 결정: diagnostics UI update rate는 Field와 Battle을 별도 측정한다.
+- 상태: 확정
+
 ## 16단계 v2 검수 재제출 결정
 
 - 결정: v1의 수정 요청 이력과 `review-stage-16-v1` 태그는 불변으로 보존하고 `review-stage-16-v2`를 새 제출 버전으로 사용한다.

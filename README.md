@@ -1,8 +1,8 @@
 # Test Game
 
-## Stage 16 성능 및 안정화 — v2 검수 대기
+## Stage 16 성능 및 안정화 — v3 검수 대기
 
-현재 제출 단계는 16단계 **성능 및 안정화**다. 작업 브랜치는 `stage-16-performance-stability`, 검수 태그는 `review-stage-16-v2`, 상태는 `review_pending`이며 `main`에는 아직 병합하지 않았다. 1~15단계는 완료된 상태로 보존하고, 17단계 **온라인 확장 준비**는 아직 시작하지 않는다.
+현재 제출 단계는 16단계 **성능 및 안정화**다. 작업 브랜치는 `stage-16-performance-stability`, 검수 태그는 `review-stage-16-v3`, 상태는 `review_pending`이며 `main`에는 아직 병합하지 않았다. 1~15단계는 완료된 상태로 보존하고, 17단계 **온라인 확장 준비**는 아직 시작하지 않는다.
 
 이번 단계에서는 1~15단계 회귀 테스트, 주입 가능한 저장소·시계 경계, 런타임 상태 검증 및 복구, 자동 저장 수명주기 정리, Field/Battle UI 갱신 제한, diagnostics 오버레이, 최근 런타임 오류 기록, 저장 용량 메타데이터와 favicon을 추가했다. 사용자 수동 테스트는 사용자 요청에 따라 `skipped_by_user`로 유지하며 통과로 기록하지 않는다.
 
@@ -79,7 +79,7 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 현재 단계 이름: 성능 및 안정화
 - 현재 상태: 검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-16-performance-stability`
-- 검수 태그: `review-stage-16-v2`
+- 검수 태그: `review-stage-16-v3`
 - 완료 태그: `stage-15-completed`
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계
 - 다음 단계: 17단계 — 온라인 확장 준비

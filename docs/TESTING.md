@@ -1,17 +1,17 @@
 # 실행 및 테스트 기록
 
-## Stage 16 성능 및 안정화 — v2 검수 대기
+## Stage 16 성능 및 안정화 — v3 검수 대기
 
 - 작업 브랜치: `stage-16-performance-stability`
-- 검수 태그: `review-stage-16-v2`
+- 검수 태그: `review-stage-16-v3`
 - 상태: `review_pending`
 - 완료된 단계: 1단계~15단계
 - 다음 단계: 17단계 — 온라인 확장 준비 (미시작)
 
 ### 자동 검사
 
-- `tests/stage16.test.ts`: 27개 테스트
-- `npm ci`: 의존성 설치 완료
+- `tests/stage16.test.ts`: 30개 테스트
+- `npm ci`: 통과
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run test`: 통과 (`passed`)
 - `npm run build`: 통과 (`passed`)

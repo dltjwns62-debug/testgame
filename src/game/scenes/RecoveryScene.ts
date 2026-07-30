@@ -29,7 +29,10 @@ export class RecoveryScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.addButton(300, 360, "Try Again", () => this.scene.start("BootstrapScene"));
     this.addButton(480, 360, "Return to Field", () => this.returnToField());
-    this.addButton(660, 360, "Save Data", () => this.scene.start("SaveDataScene"));
+    this.addButton(660, 360, "Save Data", () => {
+      this.scene.pause("RecoveryScene");
+      this.scene.launch("SaveDataScene", { returnScene: "RecoveryScene" });
+    });
     const reset = this.addButton(480, 430, "Reset Save", () => this.resetSave());
     this.resetLabel = reset.getData("label") as Phaser.GameObjects.Text;
     this.add.text(GAME_WIDTH / 2, 480, "Reset Save keeps the existing five-second confirmation rule.", {
@@ -55,9 +58,9 @@ export class RecoveryScene extends Phaser.Scene {
     clearRuntimeStateIssues(this.game.registry);
     this.scene.stop("RecoveryScene");
     this.scene.stop("BattleScene");
-    const field = this.scene.get("FieldScene");
-    field.scene.resume();
-    field.scene.start("FieldScene", { persistenceMessage: "Recovered to a safe Field IDLE state." });
+    this.scene.stop("SaveDataScene");
+    this.scene.stop("FieldScene");
+    this.scene.start("FieldScene", { persistenceMessage: "Recovered to a safe Field IDLE state." });
   }
 
   private resetSave(): void {
@@ -72,7 +75,12 @@ export class RecoveryScene extends Phaser.Scene {
     this.resetConfirmUntil = 0;
     this.resetLabel.setText("Reset Save");
     this.messageText.setText(result.ok ? "Save reset. Try Again to boot with defaults." : result.message);
-    if (result.ok) this.scene.start("BootstrapScene");
+    if (result.ok) {
+      this.scene.stop("RecoveryScene");
+      this.scene.stop("SaveDataScene");
+      this.scene.stop("BattleScene");
+      this.scene.stop("FieldScene");
+      this.scene.start("BootstrapScene");
+    }
   }
 }
-

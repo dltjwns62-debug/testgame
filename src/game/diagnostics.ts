@@ -20,7 +20,8 @@ export function installDiagnosticsOverlay(game: Phaser.Game): void {
   let lastFrame = frameStart;
   const durations: number[] = [];
   let lastUiSampleAt = frameStart;
-  let lastUiCount = 0;
+  let lastFieldUiCount = 0;
+  let lastBattleUiCount = 0;
   let raf = 0;
   const sampleFrame = (now: number): void => {
     const duration = Math.max(0, now - lastFrame);
@@ -52,9 +53,11 @@ export function installDiagnosticsOverlay(game: Phaser.Game): void {
     const battleScene = activeScenes.find((scene) => scene.scene.key === "BattleScene") as unknown as { getDiagnosticsSnapshot?: () => { uiUpdates: number; managedTimers: number } } | undefined;
     const fieldSnapshot = field?.getDiagnosticsSnapshot?.() ?? { uiUpdates: 0, managedTimers: 0 };
     const battleSnapshot = battleScene?.getDiagnosticsSnapshot?.() ?? { uiUpdates: 0, managedTimers: 0 };
-    const uiCount = fieldSnapshot.uiUpdates + battleSnapshot.uiUpdates;
-    const uiRate = (uiCount - lastUiCount) * 1000 / Math.max(1, performance.now() - lastUiSampleAt);
-    lastUiCount = uiCount;
+    const sampleDuration = Math.max(1, performance.now() - lastUiSampleAt);
+    const fieldUiRate = (fieldSnapshot.uiUpdates - lastFieldUiCount) * 1000 / sampleDuration;
+    const battleUiRate = (battleSnapshot.uiUpdates - lastBattleUiCount) * 1000 / sampleDuration;
+    lastFieldUiCount = fieldSnapshot.uiUpdates;
+    lastBattleUiCount = battleSnapshot.uiUpdates;
     lastUiSampleAt = performance.now();
     overlay.textContent = [
       "Test Game diagnostics",
@@ -65,7 +68,8 @@ export function installDiagnosticsOverlay(game: Phaser.Game): void {
       `Managed timers: ${fieldSnapshot.managedTimers + battleSnapshot.managedTimers}`,
       `Last save: ${meta?.lastSaveSource ?? "none"} · ${meta?.lastSaveBytes ?? 0} bytes`,
       `Persistence: ${String((registry.get(PERSISTENCE_META_REGISTRY_KEY) as { status?: unknown } | undefined)?.status ?? "unknown")}`,
-      `UI updates/sec: ${uiRate.toFixed(1)} · storage writes: ${autosave.storageWriteCount}`,
+      `Field UI updates/sec: ${fieldUiRate.toFixed(1)} · Battle UI updates/sec: ${battleUiRate.toFixed(1)}`,
+      `Storage writes: ${autosave.storageWriteCount}`,
       `Runtime issues: ${issues?.length ?? 0} · errors: ${errors?.length ?? 0}`,
     ].join("\n");
     frames = 0;

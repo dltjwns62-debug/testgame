@@ -6,6 +6,7 @@ import {
   createDefaultSavePayload,
   hasFutureSchema,
   loadEnvelopeCandidates,
+  mergePersistenceMetaAfterSave,
   parseSaveEnvelope,
   savePayloadSafely,
   safeGetItem,
@@ -20,7 +21,10 @@ import { normalizeInventoryStateForOwnedUnits, calculatePhysicalDamage } from ".
 import { addExperience, calculateBattleEndBonusExperience, normalizeProgressionState, PROGRESSION_CONFIG } from "../src/game/progression";
 import { createFormationDestinations, moveToward } from "../src/game/rtsBattleUtils";
 import type { RTSBattleUnit } from "../src/game/rtsBattleTypes";
-import { installGlobalRuntimeErrorHandlers, clearRuntimeErrorHandlers } from "../src/game/runtimeErrors";
+import { installGlobalRuntimeErrorHandlers, clearRuntimeErrorHandlers, getRecentRuntimeErrors } from "../src/game/runtimeErrors";
+import { hasFatalRuntimeStateIssue, recordFatalRuntimeStateIssue } from "../src/game/runtimeStateValidation";
+import { getResetRestartScene, getSaveDataReturnScene } from "../src/game/sceneNavigation";
+import { AUTO_HUNT_REGISTRY_KEY, AUTO_PROGRESS_REGISTRY_KEY, RUNTIME_ERRORS_REGISTRY_KEY, RUNTIME_STATE_ISSUES_REGISTRY_KEY } from "../src/game/constants";
 
 class MemoryStorage {
   private readonly values = new Map<string, string>();
@@ -156,6 +160,21 @@ test("temp cleanup failure does not turn a verified save into failure", () => {
   assert.match(result.cleanupWarning ?? "", /cleanup failed/);
 });
 
+test("save failure metadata preserves prior timestamps and diagnostics", () => {
+  const failed = savePayloadSafely(createDefaultSavePayload(), "new", 2000, 2000, "test", new QuotaStorage());
+  const prior = {
+    saveId: "old", schemaVersion: 1, savedAtMs: 1000, lastActiveAtMs: 900,
+    status: "SAVED" as const, message: "old", autoSaveEnabled: true, newerVersionBlocked: false,
+    lastSaveBytes: 42, lastSaveDurationMs: 3, lastSaveSource: "manual",
+  };
+  const merged = mergePersistenceMetaAfterSave(prior, failed, "autosave");
+  assert.equal(merged.savedAtMs, 1000);
+  assert.equal(merged.lastActiveAtMs, 900);
+  assert.equal(merged.lastSaveBytes, 42);
+  assert.equal(merged.lastSaveSource, "manual");
+  assert.equal(merged.status, "SAVE_FAILED");
+});
+
 test("offline progress keeps the minimum duration boundary and deterministic claim", () => {
   const payload = offlinePayload();
   const below = calculateOfflineRewardPlan(payload, "save-a", 0, 59_999);
@@ -289,14 +308,21 @@ test("MOVE helper arrives at destination and preserves finite position", () => {
 
 test("runtime error handlers install once, remove named listeners, and reinstall", () => {
   const listeners = new Map<string, Set<(event: Event) => void>>();
+  const registryWrites: Array<{ key: string; value: unknown }> = [];
   const target = {
     addEventListener(type: string, listener: (event: Event) => void): void {
       const set = listeners.get(type) ?? new Set(); set.add(listener); listeners.set(type, set);
     },
     removeEventListener(type: string, listener: (event: Event) => void): void { listeners.get(type)?.delete(listener); },
+    dispatch(type: string, event: Event): void { listeners.get(type)?.forEach((listener) => listener(event)); },
   };
-  const registry = { set: () => undefined };
+  const registry = { set: (key: string, value: unknown) => registryWrites.push({ key, value }) };
   installGlobalRuntimeErrorHandlers(registry, target);
+  target.dispatch("error", { error: new Error("boom"), message: "boom" } as unknown as Event);
+  target.dispatch("unhandledrejection", { reason: "rejected" } as unknown as Event);
+  assert.equal(registryWrites.some((entry) => entry.key === RUNTIME_ERRORS_REGISTRY_KEY), true);
+  assert.equal(getRecentRuntimeErrors().some((entry) => entry.context === "window.error"), true);
+  assert.equal(getRecentRuntimeErrors().some((entry) => entry.context === "window.unhandledrejection"), true);
   installGlobalRuntimeErrorHandlers(registry, target);
   assert.equal(listeners.get("error")?.size, 1);
   assert.equal(listeners.get("unhandledrejection")?.size, 1);
@@ -306,6 +332,29 @@ test("runtime error handlers install once, remove named listeners, and reinstall
   installGlobalRuntimeErrorHandlers(registry, target);
   assert.equal(listeners.get("error")?.size, 1);
   clearRuntimeErrorHandlers();
+});
+
+test("FATAL runtime state disables Battle Auto Hunt and Repeat Hunt while recoverable issues do not", () => {
+  const values = new Map<string, unknown>([
+    [AUTO_HUNT_REGISTRY_KEY, true],
+    [AUTO_PROGRESS_REGISTRY_KEY, normalizeAutoProgressState({ autoRepeatEnabled: true, selectedMonsterId: "slime-1" })],
+  ]);
+  const registry = {
+    get: (key: string) => values.get(key),
+    set: (key: string, value: unknown) => values.set(key, value),
+  };
+  const fatal = recordFatalRuntimeStateIssue(registry as never, "battle.invalid", "battle", "Battle state cannot be repaired.");
+  assert.equal(hasFatalRuntimeStateIssue([fatal]), true);
+  assert.equal(values.get(AUTO_HUNT_REGISTRY_KEY), false);
+  assert.equal((values.get(AUTO_PROGRESS_REGISTRY_KEY) as { autoRepeatEnabled: boolean }).autoRepeatEnabled, false);
+  assert.equal((values.get(RUNTIME_STATE_ISSUES_REGISTRY_KEY) as Array<{ severity: string }>)[0].severity, "FATAL");
+});
+
+test("Save Data return and reset destinations are decided by pure helpers", () => {
+  assert.equal(getSaveDataReturnScene({ returnScene: "RecoveryScene" }), "RecoveryScene");
+  assert.equal(getSaveDataReturnScene({ returnScene: "FieldScene" }), "FieldScene");
+  assert.equal(getSaveDataReturnScene(undefined), "FieldScene");
+  assert.equal(getResetRestartScene(), "BootstrapScene");
 });
 
 test("memory storage remains usable as a small persistence substitute", () => {

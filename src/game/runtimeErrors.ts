@@ -56,9 +56,13 @@ export function installGlobalRuntimeErrorHandlers(
   registry: { set(key: string, value: unknown): unknown },
   eventTarget: RuntimeErrorEventTarget | null = typeof window === "undefined" ? null : window,
 ): void {
-  installedRegistry = registry;
-  if (!eventTarget || installedWindow === eventTarget) return;
+  if (eventTarget && installedWindow === eventTarget) {
+    installedRegistry = registry;
+    return;
+  }
   clearRuntimeErrorHandlers();
+  installedRegistry = registry;
+  if (!eventTarget) return;
   errorHandler = (event: Event) => {
     const candidate = event as ErrorEvent;
     recordRuntimeError("window.error", candidate.error ?? candidate.message, true);

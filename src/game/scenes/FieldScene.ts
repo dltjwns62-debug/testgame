@@ -444,6 +444,11 @@ export class FieldScene extends Phaser.Scene {
     }
 
     const autoProgress = getOrCreateAutoProgressState(this.game.registry);
+    if (hasFatalRuntimeStateIssue(inspectRuntimeState(this.game.registry))) {
+      setAutoRepeatEnabled(this.game.registry, false);
+      this.repeatAfterBattlePending = false;
+      this.repeatMovementInProgress = false;
+    }
     const shouldRepeat = outcome === "VICTORY" && autoProgress.autoRepeatEnabled &&
       autoProgress.selectedMonsterId !== null;
     if (!shouldRepeat && autoProgress.autoRepeatEnabled) {
@@ -555,7 +560,7 @@ export class FieldScene extends Phaser.Scene {
     }
     if (!this.prepareMenuEntry("Save Data is unavailable while the player is moving.")) return;
     this.scene.pause();
-    this.scene.launch("SaveDataScene");
+    this.scene.launch("SaveDataScene", { returnScene: "FieldScene" });
   }
 
   public returnFromSaveData(savedMessage?: string): void {

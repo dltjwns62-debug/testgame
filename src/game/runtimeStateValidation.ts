@@ -117,6 +117,9 @@ export function recordFatalRuntimeStateIssue(
   const fatal = issue(id, "FATAL", path, message, false);
   registry.set(RUNTIME_STATE_ISSUES_REGISTRY_KEY, [fatal]);
   registry.set(AUTO_HUNT_REGISTRY_KEY, false);
+  const autoProgress = normalizeAutoProgressState(registry.get(AUTO_PROGRESS_REGISTRY_KEY));
+  autoProgress.autoRepeatEnabled = false;
+  setAutoProgressState(registry, autoProgress);
   return fatal;
 }
 

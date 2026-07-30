@@ -438,13 +438,32 @@ function writeEnvelope(storage: StorageLike | null, key: string, envelope: SaveE
   return safeSetItem(storage, key, JSON.stringify(envelope));
 }
 
-type SafeSaveResult = {
+export type SafeSaveResult = {
   ok: boolean;
   envelope: SaveEnvelope;
   cleanupWarning?: string;
   bytes: number;
   durationMs: number;
 };
+
+export function mergePersistenceMetaAfterSave(
+  meta: PersistenceMeta,
+  result: SafeSaveResult,
+  source: string,
+): PersistenceMeta {
+  return {
+    ...meta,
+    savedAtMs: result.ok ? result.envelope.savedAtMs : meta.savedAtMs,
+    lastActiveAtMs: result.ok ? result.envelope.lastActiveAtMs : meta.lastActiveAtMs,
+    status: result.ok ? "SAVED" : "SAVE_FAILED",
+    message: result.ok
+      ? result.cleanupWarning ?? "Saved."
+      : "Save failed; the game continues in memory.",
+    lastSaveBytes: result.ok ? result.bytes : meta.lastSaveBytes,
+    lastSaveDurationMs: result.ok ? result.durationMs : meta.lastSaveDurationMs,
+    lastSaveSource: result.ok ? source : meta.lastSaveSource,
+  };
+}
 
 function byteSize(value: string): number {
   if (typeof TextEncoder !== "undefined") return new TextEncoder().encode(value).byteLength;
@@ -514,18 +533,7 @@ export function saveRegistryState(registry: Phaser.Data.DataManager, nowMs = get
   }
   const payload = payloadFromRegistry(registry);
   const result = savePayloadSafely(payload, meta.saveId, nowMs, nowMs, source);
-  const nextMeta = {
-    ...meta,
-    savedAtMs: result.ok ? result.envelope.savedAtMs : meta.savedAtMs,
-    lastActiveAtMs: result.ok ? result.envelope.lastActiveAtMs : meta.lastActiveAtMs,
-    status: result.ok ? "SAVED" as const : "SAVE_FAILED" as const,
-    message: result.ok
-      ? result.cleanupWarning ?? "Saved."
-      : "Save failed; the game continues in memory.",
-    lastSaveBytes: result.ok ? result.bytes : meta.lastSaveBytes,
-    lastSaveDurationMs: result.ok ? result.durationMs : meta.lastSaveDurationMs,
-    lastSaveSource: result.ok ? source : meta.lastSaveSource,
-  };
+  const nextMeta = mergePersistenceMetaAfterSave(meta, result, source);
   setPersistenceMeta(registry, nextMeta);
   return { ok: result.ok, meta: nextMeta, message: nextMeta.message };
 }

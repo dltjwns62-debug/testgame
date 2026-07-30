@@ -5,19 +5,35 @@
   "currentStage": 16,
   "currentStageName": "성능 및 안정화",
   "stageStatus": "review_pending",
-  "activeTask": "16단계 구현 완료 — 검수 대기",
+  "activeTask": "16단계 v2 구현 완료 및 ChatGPT 재검수 대기",
   "workingBranch": "stage-16-performance-stability",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
   "nextStage": 17,
-  "nextStageName": "온라인 확장을 위한 현재 경계 문서",
+  "nextStageName": "온라인 확장 준비",
   "reviewSubmission": {
     "branch": "stage-16-performance-stability",
-    "tag": "review-stage-16-v1",
-    "version": 1,
+    "tag": "review-stage-16-v2",
+    "version": 2,
     "submitted": true
   },
   "reviewHistory": [
+    {
+      "stage": 16,
+      "branch": "stage-16-performance-stability",
+      "tag": "review-stage-16-v2",
+      "version": 2,
+      "submitted": true,
+      "approved": false,
+      "result": "review_pending",
+      "reviewer": null,
+      "reviewedAt": null,
+      "commit": "efe88f5ccd4ad3c7904e670d3fdb92ec7b148bf3",
+      "userRunTest": "skipped_by_user",
+      "userRunTestReason": "사용자 수동 테스트는 skipped_by_user로 유지",
+      "mainBranchMerged": false,
+      "reason": "16단계 v1 검수 지적 사항을 반영해 안정성 회귀 범위, FATAL 복구, summary lifecycle, Stage16 표기, 전투 visual/UI 분리와 diagnostics를 보완함"
+    },
     {
       "stage": 16,
       "branch": "stage-16-performance-stability",
@@ -25,13 +41,14 @@
       "version": 1,
       "submitted": true,
       "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-30T23:13:00+09:00",
+      "commit": "80984a2caf9ec83a1894eaba135e3f5eebd7caef",
       "userRunTest": "skipped_by_user",
       "userRunTestReason": "사용자 요청에 따라 수동 통합 테스트는 검수 대기 상태로 남김",
       "mainBranchMerged": false,
-      "reason": "런타임 상태 검증, 저장소 경계 주입, 자동 저장 수명주기, Field/Battle UI 갱신 제한, 오류 기록, 진단 오버레이, favicon, 회귀 테스트를 추가하고 17단계는 구현하지 않음"
+      "reason": "필수 회귀 테스트가 4개에 그치고, 전역 오류 handler가 실제로 제거되지 않으며, Field가 offline summary를 매 프레임 destructive read하고, Field/Battle의 과거 Stage 표기와 Battle visual 상태의 매 프레임 전체 갱신, diagnostics 및 FATAL 복구 경로가 불완전함"
     },
     {
       "stage": 15,
@@ -572,12 +589,12 @@
     "build": "passed",
     "check": "passed",
     "devServer": "passed",
-    "browserAutomation": "not_run",
+    "browserAutomation": "partial_passed",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "사용자 요청에 따라 16단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "not_reviewed"
+    "chatGptCodeReview": "pending"
   },
   "mainBranchMerged": false,
   "knownIssues": [],
-  "lastUpdated": "2026-07-30T17:30:00+09:00"
+  "lastUpdated": "2026-07-30T23:53:23+09:00"
 }

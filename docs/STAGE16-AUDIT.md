@@ -1,6 +1,6 @@
 # Stage 16 안정성 감사
 
-기준 브랜치: `main` (`048426888d27264c0ce997f580b96a70f9857da9`)
+기준 브랜치: `main` (`cb04c9ddca566a866d3c0745725719b1041a7b28`)
 
 작업 브랜치: `stage-16-performance-stability`
 
@@ -32,3 +32,13 @@
 - persistence adapter 밖으로 직접 Storage 접근을 확장하지 않는다.
 - 성능 측정은 동일 환경 비교용으로만 기록하며 무조건적인 60 FPS 완료 판정은 하지 않는다.
 - 게임 규칙, 보상 공식, 전투 결과 구조, Stage 17 서버·온라인 기능은 변경하지 않는다.
+
+## v2 검수 보완 결과
+
+- 저장 후보 선택은 primary → backup → temp 순서의 adapter 함수로 분리했고 27개 Node 회귀 테스트가 실제 소스 함수를 검증한다.
+- `runtimeErrors.ts`는 named error/rejection handler와 설치 대상 window를 보관하며 `clearRuntimeErrorHandlers()`가 실제 listener를 제거한다.
+- 복구 후에도 FATAL issue가 남으면 Bootstrap/Battle의 진입을 차단하고 RuntimeError를 기록한 뒤 RecoveryScene의 Try Again, Return to Field, Save Data, 5초 Reset Save 경로를 제공한다.
+- offline summary는 Bootstrap의 최초 전달 또는 registry `changedata` named handler로 한 번만 소비하며 Field update에서는 registry를 읽거나 삭제하지 않는다.
+- 활성 Scene의 제목과 부제는 Stage 16으로 정정했다. Stage 17 온라인 기능은 미구현이다.
+- Battle transform/HP 갱신과 alive/selection/range state visual 갱신을 분리하고, UI는 100ms 제한·동일 문자열 생략·slot map 재사용을 적용했다.
+- diagnostics는 `diagnostics=1`에서만 표시하고 평균/p95 frame time, 활성 유닛, autosave/timer counter, persistence, UI update rate, storage write count를 보여준다.

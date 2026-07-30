@@ -1,15 +1,16 @@
 # 실행 및 테스트 기록
 
-## Stage 16 성능 및 안정화 — 검수 대기
+## Stage 16 성능 및 안정화 — v2 검수 대기
 
 - 작업 브랜치: `stage-16-performance-stability`
-- 검수 태그: `review-stage-16-v1`
+- 검수 태그: `review-stage-16-v2`
 - 상태: `review_pending`
 - 완료된 단계: 1단계~15단계
-- 다음 단계: 17단계 — 온라인 확장을 위한 현재 경계 문서 (미시작)
+- 다음 단계: 17단계 — 온라인 확장 준비 (미시작)
 
 ### 자동 검사
 
+- `tests/stage16.test.ts`: 27개 테스트
 - `npm ci`: 의존성 설치 완료
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run test`: 통과 (`passed`)
@@ -29,10 +30,11 @@
 
 ### 수동·브라우저 검사 상태
 
-- 자동 브라우저 검사는 실행하지 않았으므로 성공으로 추정하지 않는다.
+- 자동 브라우저 확인: Field Stage16 표기, `diagnostics=1` overlay, `diagnostics=0` 비표시, favicon HTTP 200, 콘솔 error/warning 없음 확인 (`partial_passed`)
+- Battle 화면의 전체 수동 전투 상호작용은 실행하지 않아 사용자 수동 테스트 대기로 남긴다.
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
 - 생략된 테스트는 통과로 간주하거나 표현하지 않는다.
-- ChatGPT 코드 검수: 검수 대기 (`not_reviewed`)
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
 
 ## Stage 16 성능 점검 기준
 

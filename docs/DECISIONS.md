@@ -1,5 +1,15 @@
 # 프로젝트 결정 사항
 
+## 16단계 v2 검수 재제출 결정
+
+- 결정: v1의 수정 요청 이력과 `review-stage-16-v1` 태그는 불변으로 보존하고 `review-stage-16-v2`를 새 제출 버전으로 사용한다.
+- 결정: 회귀 테스트는 Node `node:test`와 `tsx`만 사용하고 Phaser 전체를 복제하지 않는다.
+- 결정: 전역 오류 handler는 named reference를 저장해 실제 removeEventListener와 재설치를 지원한다.
+- 결정: 복구 불가능한 FATAL 상태는 전투·보상 적용을 차단하고 RecoveryScene의 Try Again·Return to Field·Save Data·Reset Save로 보낸다.
+- 결정: Field offline summary는 Bootstrap 전달 또는 registry changedata 단발 이벤트로만 소비한다.
+- 결정: 모든 활성 화면의 현재 단계 표기는 Stage 16으로 맞추고 Stage 17 온라인 기능은 구현하지 않는다.
+- 상태: 확정
+
 ## 16단계 성능 및 안정화 제출 결정
 
 - 결정: 저장소와 시계는 `StorageLike`·`PersistenceEnvironment` 경계로 주입 가능하게 유지한다.

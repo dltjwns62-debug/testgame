@@ -1,5 +1,15 @@
 # 변경 이력
 
+## 2026-07-30 — 16단계 v2 검수 재제출
+
+- v1 검수의 `changes_requested` 결과와 원인, `review-stage-16-v1` 태그를 보존한다.
+- 회귀 테스트를 27개로 확대해 SaveEnvelope·복구·오프라인 진행·정규화·전투 순수 로직을 실제 소스 함수로 검증한다.
+- 전역 runtime error listener를 named handler로 관리하고 실제 제거·재설치를 지원한다.
+- FATAL 상태를 기록하고 전투 진입·보상 적용을 차단하며 RecoveryScene으로 안전 복구한다.
+- Field offline summary를 매 프레임 destructive read하지 않고 registry named changedata handler로 한 번만 전달한다.
+- 모든 활성 Scene의 화면 표기를 Stage 16으로 정정하고 Battle visual/UI 갱신과 diagnostics 카운터를 보완한다.
+- 현재 제출 태그는 `review-stage-16-v2`, 상태는 `review_pending`, 사용자 테스트는 `skipped_by_user`, 17단계는 미시작이다.
+
 ## 2026-07-30 — 16단계 성능 및 안정화 제출
 
 - 1~15단계 회귀 범위를 유지하면서 저장·복구와 런타임 상태 경계를 검증·복구하도록 했다.

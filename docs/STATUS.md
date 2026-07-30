@@ -1,20 +1,20 @@
 # 현재 개발 상태
 
-## Stage 16 성능 및 안정화 — 검수 대기
+## Stage 16 성능 및 안정화 — v2 검수 대기
 
 - 전체 단계: 17단계
 - 현재 단계: 16단계 — 성능 및 안정화
 - 현재 단계 상태: 검수 대기 (`review_pending`)
 - 현재 작업 브랜치: `stage-16-performance-stability`
-- 현재 검수 태그: `review-stage-16-v1`
+- 현재 검수 태그: `review-stage-16-v2`
 - 완료된 단계: 1단계~15단계
 - 검수 통과된 단계: 1단계~15단계
-- 다음 단계: 17단계 — 온라인 확장을 위한 현재 경계 문서
+- 다음 단계: 17단계 — 온라인 확장 준비
 - `main` 정식 반영 여부: 미반영
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 검수 대기 (`not_reviewed`)
-- 현재 작업: 1~15단계 회귀 안전성, 런타임 경계, 수명주기와 성능 안정화 제출
-- 현재 알려진 문제: 자동 브라우저 검사는 실행하지 않았으며 사용자 수동 테스트가 남아 있음
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
+- 현재 작업: 16단계 v2 검수 지적 반영 및 재제출
+- 현재 알려진 문제: 없음. 브라우저 검사는 Field·diagnostics·favicon 범위만 확인했고 Battle 수동 상호작용은 미실행
 
 ### 16단계 구현 요약
 
@@ -27,11 +27,13 @@
 
 ### 16단계 검증 기록
 
-- `npm ci`: 실행 예정/의존성 설치 완료
+- `npm ci`: 통과 (`passed`)
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run test`: 통과 (`passed`)
 - `npm run build`: 통과 (`passed`)
 - `npm run check`: 통과 (`passed`)
+- 개발 서버: root·favicon HTTP 200 확인 후 종료 (`passed`)
+- 브라우저 자동 확인: Field Stage16, `diagnostics=1/0`, favicon, 콘솔 error/warning 없음 확인 (`partial_passed`)
 - 사용자 수동 테스트: 사용자 요청으로 생략 (`skipped_by_user`), 통과로 기록하지 않음
 - ChatGPT 코드 검수: 검수 대기 (`not_reviewed`)
 

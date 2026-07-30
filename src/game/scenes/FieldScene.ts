@@ -20,7 +20,6 @@ import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import { formatProgression } from "../progression";
 import {
   getOrCreateAutoProgressState,
-  hasActualVictory,
   recordActualMonsterVictory,
   setAutoRepeatEnabled,
   setSelectedAutoRepeatMonster,
@@ -738,15 +737,16 @@ export class FieldScene extends Phaser.Scene {
       return;
     }
     const targetId = state.selectedMonsterId;
-    if (!targetId || !hasActualVictory(state, targetId)) {
-      this.formationMessage = "Defeat the selected monster once to unlock Repeat Hunt.";
+    const target = targetId ? this.monsterViews.get(targetId) : undefined;
+    const formation = getOrCreateFormationState(this.game.registry);
+    if (!targetId || !target || !isValidFormationState(formation)) {
+      this.formationMessage = "Select a valid monster with a valid formation before enabling Repeat Hunt.";
       this.updateStatusText();
       return;
     }
     setAutoRepeatEnabled(this.game.registry, true);
     this.game.registry.set(AUTO_HUNT_REGISTRY_KEY, true);
     this.formationMessage = "Repeat Hunt enabled.";
-    const target = this.monsterViews.get(targetId);
     if (target?.isAvailable) {
       this.repeatAfterBattlePending = false;
       this.selectMonster(targetId, "REPEAT");

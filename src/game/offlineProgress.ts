@@ -119,7 +119,7 @@ export function calculateOfflineRewardPlan(
     return { nextPayload, nextLastActiveAtMs: safeCurrentTime, summary: defaultSummary };
   }
   if ((autoProgress.victoryCountsByMonsterId[monster.id] ?? 0) < 1) {
-    defaultSummary.reason = "Repeat Hunt is locked until this monster is defeated once.";
+    defaultSummary.reason = "Offline rewards are locked until this monster is defeated once.";
     autoProgress.offlineClaimSequence += 1;
     return { nextPayload, nextLastActiveAtMs: safeCurrentTime, summary: defaultSummary };
   }
@@ -141,9 +141,12 @@ export function calculateOfflineRewardPlan(
   }
 
   const cappedElapsedMs = Math.min(rawElapsedMs, OFFLINE_MAX_DURATION_MS);
-  const eligibleMs = cappedElapsedMs + autoProgress.offlineRemainderMs;
+  const meetsMinimumDuration = rawElapsedMs >= OFFLINE_MIN_DURATION_MS;
+  const eligibleMs = meetsMinimumDuration
+    ? cappedElapsedMs + autoProgress.offlineRemainderMs
+    : 0;
   const cycleDurationMs = OFFLINE_CYCLE_DURATION_MS[monster.id] ?? 0;
-  const cycles = cycleDurationMs > 0 && eligibleMs >= OFFLINE_MIN_DURATION_MS
+  const cycles = cycleDurationMs > 0 && meetsMinimumDuration
     ? Math.floor(eligibleMs / cycleDurationMs)
     : 0;
   const directPoolPerCycle = RTS_ENEMY_COUNT * monster.experienceReward;
@@ -203,7 +206,9 @@ export function calculateOfflineRewardPlan(
     nextPayload.inventory.nextItemInstanceSequence += 1;
   }
   autoProgress.totalOfflineCycles = Math.min(Number.MAX_SAFE_INTEGER, autoProgress.totalOfflineCycles + cycles);
-  autoProgress.offlineRemainderMs = cycleDurationMs > 0 ? eligibleMs % cycleDurationMs : 0;
+  if (meetsMinimumDuration) {
+    autoProgress.offlineRemainderMs = cycleDurationMs > 0 ? eligibleMs % cycleDurationMs : 0;
+  }
   autoProgress.offlineClaimSequence = Math.min(Number.MAX_SAFE_INTEGER, autoProgress.offlineClaimSequence + 1);
   return {
     nextPayload,

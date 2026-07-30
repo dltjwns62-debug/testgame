@@ -349,12 +349,18 @@ function writeEnvelope(storage: Storage | null, key: string, envelope: SaveEnvel
   return safeSetItem(storage, key, JSON.stringify(envelope));
 }
 
+type SafeSaveResult = {
+  ok: boolean;
+  envelope: SaveEnvelope;
+  cleanupWarning?: string;
+};
+
 function savePayloadSafely(
   payload: SavePayload,
   saveId: string,
   savedAtMs: number,
   lastActiveAtMs: number,
-): { ok: boolean; envelope: SaveEnvelope } {
+): SafeSaveResult {
   const envelope = buildEnvelope(payload, saveId, savedAtMs, lastActiveAtMs);
   const storage = getStorage();
   if (!storage) {
@@ -383,10 +389,9 @@ function savePayloadSafely(
     if (!savedPrimaryRead.ok || !readValidEnvelope(savedPrimaryRead.value)) {
       return { ok: false, envelope };
     }
-    if (!safeRemoveItem(storage, SAVE_TEMP_KEY)) {
-      return { ok: false, envelope };
-    }
-    return { ok: true, envelope };
+    return safeRemoveItem(storage, SAVE_TEMP_KEY)
+      ? { ok: true, envelope }
+      : { ok: true, envelope, cleanupWarning: "Temporary save cleanup failed; the verified primary save remains active." };
   } catch {
     return { ok: false, envelope };
   }
@@ -410,7 +415,9 @@ export function saveRegistryState(registry: Phaser.Data.DataManager, nowMs = Dat
     savedAtMs: result.ok ? result.envelope.savedAtMs : meta.savedAtMs,
     lastActiveAtMs: result.ok ? result.envelope.lastActiveAtMs : meta.lastActiveAtMs,
     status: result.ok ? "SAVED" as const : "SAVE_FAILED" as const,
-    message: result.ok ? "Saved." : "Save failed; the game continues in memory.",
+    message: result.ok
+      ? result.cleanupWarning ?? "Saved."
+      : "Save failed; the game continues in memory.",
   };
   setPersistenceMeta(registry, nextMeta);
   return { ok: result.ok, meta: nextMeta, message: nextMeta.message };
@@ -484,7 +491,9 @@ export function loadGame(registry: Phaser.Data.DataManager, nowMs = Date.now()):
     savedAtMs: nowMs,
     lastActiveAtMs: plan.nextLastActiveAtMs,
     status: recovered ? sourceKey === SAVE_BACKUP_KEY ? "RECOVERED_BACKUP" as const : "RECOVERED_TEMP" as const : "SAVED" as const,
-    message: recovered ? `${sourceKey === SAVE_BACKUP_KEY ? "Backup" : "Temp"} save recovered.` : "Save loaded.",
+    message: recovered
+      ? `${sourceKey === SAVE_BACKUP_KEY ? "Backup" : "Temp"} save recovered.`
+      : saved.cleanupWarning ?? "Save loaded.",
     newerVersionBlocked: false,
   };
   setPersistenceMeta(registry, meta);
@@ -578,7 +587,8 @@ export function installAutoSave(registry: Phaser.Data.DataManager): void {
       if (!controller.hidden && getPersistenceMeta(registry).autoSaveEnabled) saveRegistryState(registry);
     }, AUTO_SAVE_INTERVAL_MS);
   };
-  const saveOnceForLifecycle = (): void => {
+  const saveOnceForLifecycle = (allowWhenHidden = false): void => {
+    if (controller.hidden && !allowWhenHidden) return;
     const now = Date.now();
     if (now - controller.lastLifecycleSaveAt < 1000) return;
     controller.lastLifecycleSaveAt = now;
@@ -589,8 +599,8 @@ export function installAutoSave(registry: Phaser.Data.DataManager): void {
   });
   startInterval();
   if (typeof window !== "undefined") {
-    window.addEventListener("pagehide", saveOnceForLifecycle);
-    window.addEventListener("beforeunload", saveOnceForLifecycle);
+    window.addEventListener("pagehide", () => saveOnceForLifecycle());
+    window.addEventListener("beforeunload", () => saveOnceForLifecycle());
   }
   if (typeof document !== "undefined") {
     document.addEventListener("visibilitychange", () => {
@@ -600,7 +610,7 @@ export function installAutoSave(registry: Phaser.Data.DataManager): void {
         if (pending) clearTimeout(pending);
         saveTimers.delete(registry);
         stopInterval();
-        saveOnceForLifecycle();
+        saveOnceForLifecycle(true);
         return;
       }
       if (!controller.hidden) return;

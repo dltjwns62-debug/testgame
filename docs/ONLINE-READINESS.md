@@ -1,4 +1,6 @@
-# Stage 17 온라인 확장 준비
+# Stage 17 온라인 확장 준비 — 완료
+
+검수 태그 `review-stage-17-v5`가 승인되어 `main`에 반영됐고 완료 태그 `stage-17-completed`로 고정됐다. 이 문서는 실제 온라인 서비스가 아니라 향후 확장을 위한 계약·검증·adapter 경계의 완료 상태를 기록한다.
 
 Stage 17은 실제 온라인 서비스를 배포하는 단계가 아니다. 기존 localStorage 게임을 그대로 유지하면서, 미래 서버 연결을 위한 TypeScript 계약·검증·adapter 경계를 준비한다.
 

@@ -1,6 +1,6 @@
 # 현재 구조와 확장 경계
 
-16단계 성능 및 안정화는 `review-stage-16-v4` 검수를 승인받아 `main`에 반영했으며, 완료 스냅샷은 `stage-16-completed` 태그로 고정한다. 17단계 온라인 확장은 아직 구현하지 않는다.
+16단계 성능 및 안정화는 `review-stage-16-v4` 검수를 승인받아 `main`에 반영했으며, 완료 스냅샷은 `stage-16-completed` 태그로 고정한다. 17단계 온라인 확장 준비도 `review-stage-17-v5` 검수 승인 후 `main`에 반영했고 `stage-17-completed`로 고정한다.
 
 ## Scene/UI 계층
 
@@ -39,4 +39,4 @@ Field, Battle, Formation, Shop, Keys, Inventory, Save Data, Recovery Scene은 �
 
 ## Stage 17 확장 경계
 
-서버 authoritative 상태, API endpoint, 인증, 데이터베이스, 저장 충돌 해결, 프로토콜·실시간 네트워크, 계정·멀티플레이어의 실제 서비스는 아직 구현하지 않는다. Stage 17은 이 경계를 문서화하고 Disabled/Mock adapter 후보를 검토한다.
+서버 authoritative 상태의 실제 서비스, API endpoint 운영, 인증, 데이터베이스, 실시간 네트워크, 계정·멀티플레이어는 구현하지 않는다. Stage 17은 이 경계를 문서화하고 Disabled/Mock adapter와 확장 계약을 완료했다.

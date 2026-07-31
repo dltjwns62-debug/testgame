@@ -4,15 +4,15 @@
   "totalStages": 17,
   "currentStage": 17,
   "currentStageName": "온라인 확장 준비",
-  "stageStatus": "review_pending",
-  "activeTask": "17단계 v5 검수 수정 완료 및 ChatGPT 재검수 대기",
-  "workingBranch": "stage-17-online-expansion-readiness",
-  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+  "stageStatus": "completed",
+  "activeTask": "전체 17단계 완료 — 추가 개발 명령 대기",
+  "workingBranch": "main",
+  "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+  "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
   "nextStage": null,
   "nextStageName": null,
   "finalStage": true,
-  "projectCompletion": "pending_review",
+  "projectCompletion": "completed",
   "reviewSubmission": {
     "branch": "stage-17-online-expansion-readiness",
     "tag": "review-stage-17-v5",
@@ -25,15 +25,15 @@
       "branch": "stage-17-online-expansion-readiness",
       "tag": "review-stage-17-v5",
       "version": 5,
-      "commit": null,
+      "commit": "e8c9ed4517b22ee6a13d3122c8eb513104b2fa3a",
       "submitted": true,
-      "approved": false,
-      "result": "review_pending",
-      "reviewer": null,
-      "reviewedAt": null,
+      "approved": true,
+      "result": "approved",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-31T17:48:00+09:00",
       "userRunTest": "skipped_by_user",
-      "mainBranchMerged": false,
-      "reason": "RESOLVED snapshot 반환 통합 경로와 gateway가 signal을 무시하는 경우의 즉시 cancellation 경계를 보완하고, 기존 protocol·roster·OpenAPI 검증을 유지함"
+      "mainBranchMerged": true,
+      "reason": "서버 authoritative conflict 정책, operation queue와 retry/backoff, revision conflict 보존, coordinator 수명주기·즉시 cancellation·protocol/revision 검증, RESOLVED snapshot 반환, DTO·snapshot 검증, Disabled/Mock Gateway, OpenAPI·보안 계약과 총 81개 자동검사가 정적 코드 검수를 통과함"
     },
     {
       "stage": 17,
@@ -687,9 +687,9 @@
   },
   "review": {
     "required": true,
-    "approved": false,
-    "reviewer": null,
-    "reviewedAt": null
+    "approved": true,
+    "reviewer": "ChatGPT",
+    "reviewedAt": "2026-07-31T17:48:00+09:00"
   },
   "testing": {
     "npmCi": "passed",
@@ -702,9 +702,9 @@
     "onlineStatusScene": "not_run",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "사용자 요청에 따라 17단계 수동 테스트를 요구하지 않음",
-    "chatGptCodeReview": "pending"
+    "chatGptCodeReview": "approved"
   },
-  "mainBranchMerged": false,
+  "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-07-31T16:56:07+09:00"
+  "lastUpdated": "2026-07-31T18:02:15+09:00"
 }

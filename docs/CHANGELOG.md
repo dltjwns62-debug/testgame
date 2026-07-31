@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-07-31 — 17단계 검수 승인 및 전체 로드맵 완료 — 완료
+
+- 불변 검수 태그 `review-stage-17-v5`와 승인 커밋 `e8c9ed4517b22ee6a13d3122c8eb513104b2fa3a`를 확인했다.
+- 승인된 작업을 `main`에 no-ff 병합하고 전체 17단계를 `completed`로 확정했다.
+- 완료 문서 커밋에 annotated 태그 `stage-17-completed`를 생성했다.
+- Stage 17 자동 검사 81개와 개발 서버·기본 DISABLED/Mock 화면 범위 검증을 완료했다.
+- 실제 서버·계정·네트워크·멀티플레이어는 구현하지 않았고 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+- Stage 18은 존재하지 않으며 추가 개발 명령을 대기한다.
+
 ## 2026-07-31 — 17단계 v4 검수 수정 및 v5 재제출 — 검수 대기
 
 - coordinator sync가 `RESOLVED` conflict 결과를 raw server snapshot 대신 반환하는 통합 테스트를 추가했다.

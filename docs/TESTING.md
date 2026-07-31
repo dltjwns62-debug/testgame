@@ -1,11 +1,12 @@
 # 실행 및 테스트 기록
 
-## Stage 17 온라인 확장 준비 — v5 검수 대기
+## Stage 17 온라인 확장 준비 — 최종 승인 및 main 반영
 
-- 작업 브랜치: `stage-17-online-expansion-readiness`
+- 작업 브랜치: `main`
 - 검수 태그: `review-stage-17-v5`
-- 상태: `review_pending`
-- 완료된 단계: 1단계~16단계
+- 완료 태그: `stage-17-completed`
+- 상태: `completed`
+- 완료된 단계: 1단계~17단계
 - 다음 단계: 없음 — 전체 로드맵의 마지막 단계
 
 ### 자동 검사
@@ -44,7 +45,7 @@
 - gateway 응답 protocol mismatch의 실제 Scene UI 흐름: `not_run`
 - 사용자 수동 테스트: `skipped_by_user`
 - 생략·미실행 항목은 통과로 간주하거나 표현하지 않는다.
-- ChatGPT 코드 검수: `pending`
+- ChatGPT 코드 검수: `approved`
 
 ## Stage 16 성능 및 안정화 — 최종 승인 및 main 반영
 
@@ -52,7 +53,7 @@
 - 검수 태그: `review-stage-16-v4`
 - 상태: `completed`
 - 완료된 단계: 1단계~16단계
-- 다음 단계: 17단계 — 온라인 확장 준비 (미시작)
+- 다음 단계: 없음 — 17단계가 전체 로드맵의 마지막 단계이며 완료됨
 
 ### 자동 검사
 

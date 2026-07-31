@@ -1,4 +1,6 @@
-# Online Protocol v1
+# Online Protocol v1 — Stage 17 완료 계약
+
+Stage 17은 이 protocol v1 계약과 로컬 검증 경계를 완료했다. 실제 서버·계정·네트워크 전송은 구현하지 않았으며 기본 게임은 local-only `DISABLED` mode로 동작한다.
 
 ## Snapshot
 

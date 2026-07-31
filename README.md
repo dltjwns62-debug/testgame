@@ -1,20 +1,20 @@
 # Test Game
 
-## Stage 17 온라인 확장 준비 — v5 검수 대기
+## Stage 17 온라인 확장 준비 — 완료
 
-현재 단계는 17단계 **온라인 확장 준비**다. 작업 브랜치는 `stage-17-online-expansion-readiness`, 검수 태그는 `review-stage-17-v5`, 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 1~16단계는 완료 상태로 보존하고, 이번 단계는 실제 서버·계정·클라우드 없이 미래 연결 계약만 준비한다.
+현재 단계는 17단계 **온라인 확장 준비**다. 승인 태그 `review-stage-17-v5`를 `main`에 반영했고 완료 태그 `stage-17-completed`로 고정했다. 현재 안정 기준 브랜치는 `main`이며 전체 17단계 프로젝트가 완료됐다.
 
 v5에서는 coordinator 통합 경로가 RESOLVED snapshot을 실제 sync 결과로 반환하는지 검증하고, dispose/disconnect가 gateway가 signal을 무시해도 내부 abort Promise를 즉시 종료하도록 보완했다. 모든 gateway response의 protocolVersion을 검증하고, 잘못된 roster 배열과 OpenAPI request 필드·operation enum을 거부한다. 실제 Online Status Scene 전체 조작은 자동 통과로 기록하지 않는다.
 
 `OnlinePlayerSnapshot`, protocol v1, `OnlineGateway`, Disabled/Mock adapter, operation queue, conflict resolution, sync coordinator, Online Status Scene과 API·위협 모델 문서는 실제 서버 없이 유지한다. 기본 모드는 `DISABLED`이며 `?onlineMock=1`에서만 메모리 Mock 모드를 사용할 수 있다. 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
 
-v1·v2·v3·v4 검수는 `changes_requested`로 보존하고 기존 태그는 이동하지 않는다. 현재 v5도 검수 대기이며 실제 서버·계정·네트워크·멀티플레이어는 구현하지 않았다.
+v1·v2·v3·v4 검수는 `changes_requested` 이력과 불변 태그로 보존하고, v5는 ChatGPT 코드 검수를 승인받아 `main`에 반영했다. 실제 서버·계정·네트워크·멀티플레이어는 구현하지 않았다.
 
 Stage 17 관련 문서: [온라인 준비](docs/ONLINE-READINESS.md), [프로토콜](docs/ONLINE-PROTOCOL.md), [위협 모델](docs/THREAT-MODEL.md), [API 계약](docs/online-api.openapi.json), [테스트 기록](docs/TESTING.md), [현재 상태](docs/STATUS.md).
 
 ## Stage 16 성능 및 안정화 — 완료
 
-16단계 **성능 및 안정화**는 `review-stage-16-v4` 검수를 승인받아 `main`에 반영했고 `stage-16-completed`로 완료 처리했다. 현재 안정 기준 브랜치는 `main`이며, 17단계 **온라인 확장 준비**는 아직 시작하지 않는다.
+16단계 **성능 및 안정화**는 `review-stage-16-v4` 검수를 승인받아 `main`에 반영했고 `stage-16-completed`로 완료 처리했다. 17단계 **온라인 확장 준비**도 승인 태그 `review-stage-17-v5`와 `stage-17-completed`로 완료 처리했다.
 
 이번 단계에서는 1~15단계 회귀 테스트, 주입 가능한 저장소·시계 경계, 런타임 상태 검증 및 복구, 자동 저장 수명주기 정리, Field/Battle UI 갱신 제한, diagnostics 오버레이, 최근 런타임 오류 기록, 저장 용량 메타데이터와 favicon을 추가했다. v4에서는 Recovery의 Try Again이 기존 FATAL 이슈를 명시적으로 제거하고 전체 씬을 정리한 뒤 Bootstrap에서 재검증하도록 보완했다. 사용자 수동 테스트는 사용자 요청에 따라 `skipped_by_user`로 유지하며 통과로 기록하지 않는다.
 
@@ -87,14 +87,14 @@ Only an actually active MOVE command keeps priority over assistance. Completed o
 - 프로젝트 이름: Test Game
 - 장르: 자동사냥 방치형 웹게임
 - 전체 개발 단계: 17단계
-- 현재 단계: 16단계
-- 현재 단계 이름: 성능 및 안정화
-- 현재 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-16-performance-stability`
-- 검수 태그: `review-stage-16-v3`
-- 완료 태그: `stage-15-completed`
-- 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계
-- 다음 단계: 17단계 — 온라인 확장 준비
+- 현재 단계: 17단계
+- 현재 단계 이름: 온라인 확장 준비
+- 현재 상태: 완료 (`completed`)
+- 현재 작업 브랜치: `main`
+- 검수 태그: `review-stage-17-v5`
+- 완료 태그: `stage-17-completed`
+- 완료된 단계: 1단계~17단계
+- 다음 단계: 없음 — 전체 로드맵 완료
 
 7단계 10대10 RTS 핵심 전투와 8단계 Auto Hunt·지역 동료 지원 기능은 검수와 사용자 실행 테스트를 통과해 `main`에 반영됐다.
 

@@ -1,5 +1,14 @@
 # 프로젝트 결정 사항
 
+## 17단계 검수 승인 및 전체 로드맵 완료 결정
+
+- 결정: `review-stage-17-v5`와 승인 커밋 `e8c9ed4517b22ee6a13d3122c8eb513104b2fa3a`를 승인하고 `main`에 반영한다.
+- 결정: 전체 17단계를 `completed`로 확정하고 완료 스냅샷을 `stage-17-completed`로 고정한다.
+- 결정: 실제 서버·계정·네트워크·멀티플레이어는 구현하지 않으며, 온라인 protocol·validation·Disabled/Mock adapter 경계만 완료한다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`, 실제 온라인 통합 범위는 `not_run`으로 유지한다.
+- 결정: Stage 18은 로드맵에 포함하지 않고 추가 개발 명령을 대기한다.
+- 상태: 확정
+
 ## 17단계 v5 검수 재제출 결정
 
 - 결정: coordinator sync의 `NO_CONFLICT`는 server snapshot을, `RESOLVED`는 resolver snapshot을 반환하고 `MANUAL_REQUIRED`는 conflict 상태와 server snapshot을 유지한다.

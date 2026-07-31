@@ -3,6 +3,7 @@ import {
   acknowledgePendingOperations,
   enqueuePendingOperation,
   getOrCreatePendingOperationQueue,
+  normalizePendingOperationQueue,
   peekPendingOperationBatch,
   rejectPendingOperation,
   retryPendingOperation,
@@ -11,7 +12,7 @@ import {
 } from "./onlineQueue";
 import { resolveOnlineConflict } from "./onlineConflictResolution";
 import { createOnlineSnapshotFromRegistry } from "./onlineSnapshot";
-import { getOrCreateOnlineSessionState, setOnlineSessionState, updateOnlineSessionState } from "./onlineRegistry";
+import { getOrCreateOnlineSessionState, normalizeOnlineSessionState, ONLINE_QUEUE_REGISTRY_KEY, ONLINE_SESSION_REGISTRY_KEY, updateOnlineSessionState } from "./onlineRegistry";
 import { ONLINE_PROTOCOL_VERSION, type ClientOperationEnvelope, type OnlineGateway, type OnlinePlayerSnapshot, type OnlineResult, type OnlineSessionState } from "./onlineTypes";
 
 export type OnlineCoordinatorOptions = {
@@ -44,15 +45,23 @@ export class OnlineSyncCoordinator {
     this.timeoutMs = typeof nowOrOptions === "function" ? 10_000 : Math.max(1, nowOrOptions.timeoutMs ?? 10_000);
   }
 
-  public getState(): OnlineSessionState { return getOrCreateOnlineSessionState(this.registry); }
-  public getQueue(): PendingOperationQueueState { return getOrCreatePendingOperationQueue(this.registry); }
+  public getState(): OnlineSessionState {
+    return this.disposed
+      ? normalizeOnlineSessionState(this.registry.get(ONLINE_SESSION_REGISTRY_KEY))
+      : getOrCreateOnlineSessionState(this.registry);
+  }
+  public getQueue(): PendingOperationQueueState {
+    return this.disposed
+      ? normalizePendingOperationQueue(this.registry.get(ONLINE_QUEUE_REGISTRY_KEY))
+      : getOrCreatePendingOperationQueue(this.registry);
+  }
   public getGateway(): OnlineGateway { return this.gateway; }
   public isDisposed(): boolean { return this.disposed; }
   public isBusy(): boolean { return this.bootstrapInProgress || this.syncInProgress; }
 
   public enqueue(operation: ClientOperationEnvelope): OnlineResult<PendingOperationQueueState> {
-    const state = this.getState();
     if (this.disposed) return { ok: false, error: { code: "CANCELLED", message: "Online coordinator has been disposed.", retryable: false } };
+    const state = this.getState();
     if (!state.mockMode && state.status === "DISABLED") return { ok: false, error: { code: "ONLINE_DISABLED", message: "Online queue is disabled in local-only mode.", retryable: false } };
     const result = enqueuePendingOperation(this.getQueue(), operation, this.nowMs());
     if (result.ok) {
@@ -96,8 +105,8 @@ export class OnlineSyncCoordinator {
     return !this.disposed && generation === this.requestGeneration;
   }
 
-  private updateIfCurrent(generation: number, patch: Partial<OnlineSessionState>): OnlineSessionState {
-    if (!this.isCurrent(generation)) return this.getState();
+  private updateIfCurrent(generation: number, patch: Partial<OnlineSessionState>): OnlineSessionState | null {
+    if (!this.isCurrent(generation)) return null;
     return updateOnlineSessionState(this.registry, patch);
   }
 
@@ -109,8 +118,8 @@ export class OnlineSyncCoordinator {
   }
 
   public async bootstrap(snapshot?: OnlinePlayerSnapshot, signal?: AbortSignal): Promise<OnlineCoordinatorResult> {
-    const state = this.getState();
     if (this.disposed) return this.cancellationError();
+    const state = this.getState();
     if (this.bootstrapInProgress || this.syncInProgress) return { ok: false, error: { code: "SERVER_REJECTED", message: "Another online request is already in progress.", retryable: true } };
     if (!state.mockMode && state.status === "DISABLED") return { ok: false, error: { code: "ONLINE_DISABLED", message: "Online mode is disabled; local gameplay remains active.", retryable: false } };
     this.bootstrapInProgress = true;
@@ -132,6 +141,7 @@ export class OnlineSyncCoordinator {
       const revision = this.revisionGuard(generation, result.value.serverRevision);
       if (!revision.ok) return revision;
       const next = this.updateIfCurrent(generation, { status: "ONLINE", sessionId: result.value.sessionId, accountId: result.value.accountId, serverRevision: result.value.serverRevision, lastSyncedAtMs: this.nowMs(), lastErrorCode: null, lastErrorMessage: null });
+      if (!next) return this.cancellationError();
       return { ok: true, value: { state: next, snapshot: result.value.snapshot } };
     } finally {
       this.bootstrapInProgress = false;
@@ -139,8 +149,8 @@ export class OnlineSyncCoordinator {
   }
 
   public async sync(snapshot?: OnlinePlayerSnapshot, signal?: AbortSignal): Promise<OnlineCoordinatorResult> {
-    const initial = this.getState();
     if (this.disposed) return this.cancellationError();
+    const initial = this.getState();
     if (this.bootstrapInProgress || this.syncInProgress) return { ok: false, error: { code: "SERVER_REJECTED", message: "Another online request is already in progress.", retryable: true } };
     if (!initial.mockMode && initial.status === "DISABLED") return { ok: false, error: { code: "ONLINE_DISABLED", message: "Online mode is disabled; local gameplay remains active.", retryable: false } };
     this.syncInProgress = true;
@@ -155,10 +165,16 @@ export class OnlineSyncCoordinator {
         if (!pushed.ok) {
           const guarded = pushed.error.serverRevision !== undefined ? this.revisionGuard(generation, pushed.error.serverRevision) : { ok: true as const, value: true as const };
           if (!guarded.ok) return guarded;
+          if (pushed.error.code === "REVISION_CONFLICT") {
+            const conflictRevision = Math.max(serverRevision, pushed.error.serverRevision ?? serverRevision);
+            const conflictState = this.updateIfCurrent(generation, { status: "CONFLICT", lastErrorCode: pushed.error.code, lastErrorMessage: pushed.error.message, serverRevision: conflictRevision, pendingOperationCount: this.getQueue().records.length });
+            if (!conflictState) return this.cancellationError();
+            return pushed;
+          }
           let nextQueue = this.getQueue();
-          for (const record of batch) nextQueue = retryPendingOperation(nextQueue, record.operation.operationId, pushed.error, { nowMs: this.nowMs() });
+          for (const record of batch) nextQueue = retryPendingOperation(nextQueue, record.operation.operationId, pushed.error, { nowMs: this.nowMs(), retryAfterMs: pushed.error.retryAfterMs });
           setPendingOperationQueue(this.registry, nextQueue);
-          this.updateIfCurrent(generation, { status: pushed.error.code === "REVISION_CONFLICT" ? "CONFLICT" : "DEGRADED", lastErrorCode: pushed.error.code, lastErrorMessage: pushed.error.message, serverRevision: pushed.error.serverRevision ?? serverRevision, pendingOperationCount: nextQueue.records.length });
+          this.updateIfCurrent(generation, { status: "DEGRADED", lastErrorCode: pushed.error.code, lastErrorMessage: pushed.error.message, serverRevision: pushed.error.serverRevision ?? serverRevision, pendingOperationCount: nextQueue.records.length });
           return pushed;
         }
         const revision = this.revisionGuard(generation, pushed.value.serverRevision);
@@ -171,7 +187,7 @@ export class OnlineSyncCoordinator {
         }
         setPendingOperationQueue(this.registry, nextQueue);
         serverRevision = pushed.value.serverRevision;
-        state = this.updateIfCurrent(generation, { pendingOperationCount: nextQueue.records.length, serverRevision });
+          state = this.updateIfCurrent(generation, { pendingOperationCount: nextQueue.records.length, serverRevision }) ?? state;
       }
       const pulled = await this.runRequest(generation, signal, (requestSignal) => this.gateway.pullSnapshot({ protocolVersion: ONLINE_PROTOCOL_VERSION, sessionId: state.sessionId, expectedServerRevision: serverRevision }, requestSignal));
       if (!pulled.ok) {
@@ -186,10 +202,12 @@ export class OnlineSyncCoordinator {
         const resolved = resolveOnlineConflict(snapshot, pulled.value.snapshot);
         if (resolved.status === "MANUAL_REQUIRED") {
           const conflictState = this.updateIfCurrent(generation, { status: "CONFLICT", serverRevision: pulled.value.serverRevision, lastErrorCode: "REVISION_CONFLICT", lastErrorMessage: "A snapshot conflict requires a manual decision." });
+          if (!conflictState) return this.cancellationError();
           return { ok: true, value: { state: conflictState, snapshot: pulled.value.snapshot } };
         }
       }
       const next = this.updateIfCurrent(generation, { status: "ONLINE", serverRevision: pulled.value.serverRevision, lastSyncedAtMs: this.nowMs(), lastErrorCode: null, lastErrorMessage: null, pendingOperationCount: this.getQueue().records.length });
+      if (!next) return this.cancellationError();
       return { ok: true, value: { state: next, snapshot: pulled.value.snapshot } };
     } finally {
       this.syncInProgress = false;
@@ -198,8 +216,12 @@ export class OnlineSyncCoordinator {
 
   public async disconnect(): Promise<void> {
     if (this.disposed) return;
+    const generation = ++this.requestGeneration;
+    this.activeController?.abort();
     await this.gateway.disconnect();
-    this.updateIfCurrent(this.requestGeneration, { status: this.getState().mockMode ? "OFFLINE" : "DISABLED", sessionId: null });
+    if (!this.isCurrent(generation)) return;
+    const state = this.getState();
+    this.updateIfCurrent(generation, { status: state.mockMode ? "OFFLINE" : "DISABLED", sessionId: null });
   }
 
   public async dispose(): Promise<void> {

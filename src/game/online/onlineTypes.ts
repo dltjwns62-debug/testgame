@@ -47,6 +47,7 @@ export type OnlineError = {
   message: string;
   retryable: boolean;
   serverRevision?: ServerRevision;
+  retryAfterMs?: number;
 };
 
 export type OnlineSessionState = {
@@ -92,7 +93,27 @@ export type OnlineOperationType =
   | "FORMATION_UPDATE"
   | "CLIENT_PREFERENCE_UPDATE";
 
-export type ClientOperationEnvelope = {
+export type BattleResultSubmissionPayload = {
+  battleId: string;
+  sourceWorldMonsterId: string;
+  rosterUnitIds: string[];
+  startedAtMs: number;
+  endedAtMs: number;
+  victory: boolean;
+  resultDigest: string;
+  clientBuildId: string;
+};
+
+export type OfflineRewardClaimPayload = {
+  claimSequence: number;
+  previousServerRevision: number;
+  elapsedFromMs: number;
+  elapsedToMs: number;
+  selectedMonsterId: string | null;
+  deployedRosterUnitIds: string[];
+};
+
+export type ClientOperationEnvelope<TPayload = unknown> = {
   protocolVersion: number;
   operationId: OperationId;
   deviceId: DeviceId;
@@ -101,7 +122,15 @@ export type ClientOperationEnvelope = {
   baseServerRevision: ServerRevision;
   type: OnlineOperationType;
   payloadHash: string;
-  payload: unknown;
+  payload: TPayload;
+};
+
+export type BattleResultSubmissionOperation = ClientOperationEnvelope<BattleResultSubmissionPayload> & {
+  type: "BATTLE_RESULT_SUBMISSION";
+};
+
+export type OfflineRewardClaimOperation = ClientOperationEnvelope<OfflineRewardClaimPayload> & {
+  type: "OFFLINE_REWARD_CLAIM";
 };
 
 export type OnlineResult<T> =
@@ -117,6 +146,7 @@ export type BootstrapRequest = {
 };
 
 export type BootstrapResponse = {
+  protocolVersion: number;
   sessionId: SessionId;
   accountId: AccountId | null;
   serverRevision: ServerRevision;
@@ -130,6 +160,7 @@ export type PullSnapshotRequest = {
 };
 
 export type PullSnapshotResponse = {
+  protocolVersion: number;
   serverRevision: ServerRevision;
   snapshot: OnlinePlayerSnapshot | null;
 };
@@ -142,6 +173,7 @@ export type PushOperationsRequest = {
 };
 
 export type PushOperationsResponse = {
+  protocolVersion: number;
   serverRevision: ServerRevision;
   acknowledgedOperationIds: OperationId[];
   duplicateOperationIds: OperationId[];

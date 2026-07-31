@@ -38,13 +38,13 @@ export class MockOnlineGateway implements OnlineGateway {
       this.serverSnapshot = normalizeOnlineSnapshot(request.snapshot);
       this.serverRevision = 1;
     }
-    return { ok: true, value: { sessionId: this.sessionId, accountId: this.accountId, serverRevision: this.serverRevision, snapshot: this.serverSnapshot } };
+    return { ok: true, value: { protocolVersion: ONLINE_PROTOCOL_VERSION, sessionId: this.sessionId, accountId: this.accountId, serverRevision: this.serverRevision, snapshot: this.serverSnapshot } };
   }
 
   public async pullSnapshot(request: PullSnapshotRequest, signal?: AbortSignal): Promise<OnlineResult<PullSnapshotResponse>> {
     if (signal?.aborted) return { ok: false, error: { code: "CANCELLED", message: "Mock pull was cancelled.", retryable: false } };
     if (request.protocolVersion !== ONLINE_PROTOCOL_VERSION) return { ok: false, error: error("VALIDATION_FAILED", "Mock protocol version is invalid.") };
-    return { ok: true, value: { serverRevision: this.serverRevision, snapshot: this.serverSnapshot } };
+    return { ok: true, value: { protocolVersion: ONLINE_PROTOCOL_VERSION, serverRevision: this.serverRevision, snapshot: this.serverSnapshot } };
   }
 
   public async pushOperations(request: PushOperationsRequest, signal?: AbortSignal): Promise<OnlineResult<PushOperationsResponse>> {
@@ -83,7 +83,7 @@ export class MockOnlineGateway implements OnlineGateway {
       acknowledgedOperationIds.push(operation.operationId);
       this.serverRevision += 1;
     }
-    return { ok: true, value: { serverRevision: this.serverRevision, acknowledgedOperationIds, duplicateOperationIds, rejectedOperationIds, rejectedReasons, snapshot: this.serverSnapshot } };
+    return { ok: true, value: { protocolVersion: ONLINE_PROTOCOL_VERSION, serverRevision: this.serverRevision, acknowledgedOperationIds, duplicateOperationIds, rejectedOperationIds, rejectedReasons, snapshot: this.serverSnapshot } };
   }
 
   public async disconnect(): Promise<void> {

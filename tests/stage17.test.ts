@@ -5,7 +5,7 @@ import { calculateSnapshotHash, normalizeOnlineSnapshot, validateOnlineSnapshot,
 import { ONLINE_PROTOCOL_VERSION, type BootstrapResponse, type OnlineGateway, type OnlineResult, type PullSnapshotResponse, type PushOperationsResponse } from "../src/game/online/onlineTypes";
 import { DisabledOnlineGateway } from "../src/game/online/disabledOnlineGateway";
 import { MockOnlineGateway } from "../src/game/online/mockOnlineGateway";
-import { createClientOperation, createSnapshotCheckpointOperation, hashOperationPayload } from "../src/game/online/onlineOperations";
+import { createBattleResultSubmissionOperation, createClientOperation, createOfflineRewardClaimOperation, createSnapshotCheckpointOperation, hashOperationPayload } from "../src/game/online/onlineOperations";
 import { MAX_PENDING_OPERATION_BYTES, MAX_RETRY_COUNT, acknowledgePendingOperations, calculateRetryDelayMs, createEmptyPendingOperationQueue, enqueuePendingOperation, loadPendingOperationQueue, normalizePendingOperationQueue, peekPendingOperationBatch, rejectPendingOperation, retryPendingOperation, serializePendingOperationQueue, deserializePendingOperationQueue } from "../src/game/online/onlineQueue";
 import { MAX_OPERATION_PAYLOAD_BYTES, containsSensitiveOnlineValue, validateClientOperation, validateOnlineProtocolVersion } from "../src/game/online/onlineValidation";
 import { resolveOnlineConflict } from "../src/game/online/onlineConflictResolution";
@@ -14,8 +14,9 @@ import { OnlineSyncCoordinator } from "../src/game/online/onlineSyncCoordinator"
 
 class Registry {
   private readonly values = new Map<string, unknown>();
+  public setCallCount = 0;
   public get(key: string): unknown { return this.values.get(key); }
-  public set(key: string, value: unknown): void { this.values.set(key, value); }
+  public set(key: string, value: unknown): void { this.setCallCount += 1; this.values.set(key, value); }
 }
 
 class DeferredGateway implements OnlineGateway {
@@ -180,13 +181,15 @@ test("coordinator blocks concurrent bootstrap/sync and dispose aborts stale call
   const second = await coordinator.bootstrap(snapshot());
   assert.equal(second.ok, false);
   if (!second.ok) assert.equal(second.error.code, "SERVER_REJECTED");
+  registry.setCallCount = 0;
   const beforeDispose = JSON.stringify(registry.get("testgame.onlineSession"));
   await coordinator.dispose();
-  gateway.bootstrapResolve?.({ ok: true, value: { sessionId: "late", accountId: null, serverRevision: 1, snapshot: null } });
+  gateway.bootstrapResolve?.({ ok: true, value: { protocolVersion: 1, sessionId: "late", accountId: null, serverRevision: 1, snapshot: null } });
   const result = await first;
   assert.equal(result.ok, false);
   if (!result.ok) assert.equal(result.error.code, "CANCELLED");
   assert.equal(JSON.stringify(registry.get("testgame.onlineSession")), beforeDispose);
+  assert.equal(registry.setCallCount, 0);
   assert.equal(gateway.bootstrapCalls, 1);
 });
 
@@ -204,9 +207,9 @@ test("coordinator ignores a lower server revision and disabled mode does not cal
   const registry = new Registry();
   registry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "ONLINE", serverRevision: 2 });
   const gateway: OnlineGateway = {
-    bootstrap: async () => ({ ok: true, value: { sessionId: "s", accountId: null, serverRevision: 2, snapshot: null } }),
-    pushOperations: async () => ({ ok: true, value: { serverRevision: 2, acknowledgedOperationIds: [], duplicateOperationIds: [], rejectedOperationIds: [], rejectedReasons: {}, snapshot: null } }),
-    pullSnapshot: async () => ({ ok: true, value: { serverRevision: 1, snapshot: null } }),
+    bootstrap: async () => ({ ok: true, value: { protocolVersion: 1, sessionId: "s", accountId: null, serverRevision: 2, snapshot: null } }),
+    pushOperations: async () => ({ ok: true, value: { protocolVersion: 1, serverRevision: 2, acknowledgedOperationIds: [], duplicateOperationIds: [], rejectedOperationIds: [], rejectedReasons: {}, snapshot: null } }),
+    pullSnapshot: async () => ({ ok: true, value: { protocolVersion: 1, serverRevision: 1, snapshot: null } }),
     disconnect: async () => Promise.resolve(),
   };
   const coordinator = new OnlineSyncCoordinator(registry as never, gateway);
@@ -408,4 +411,153 @@ test("OpenAPI contract exposes six versioned paths without a server URL", async 
   assert.equal(contract.openapi, "3.0.3");
   assert.deepEqual(contract.servers, []);
   assert.deepEqual(Object.keys(contract.paths).sort(), ["/v1/battles/submit", "/v1/health", "/v1/offline/claim", "/v1/session/bootstrap", "/v1/sync/pull", "/v1/sync/push"]);
+});
+
+test("conflict resolution keeps server-owned units, progression, gold, and inventory", () => {
+  const base = snapshot();
+  const server = normalizeOnlineSnapshot({ ...base, baseServerRevision: 3, playerGold: 50 })!;
+  const shopUnit = { rosterUnitId: "owned-swordsman", unitDefinitionId: "mercenary-swordsman", unitRole: "MERCENARY" as const, displayName: "Swordsman", level: 1, experience: 0 };
+  const localOwnedUnits = base.formation.ownedUnits.map((unit, index) => index === 0 ? { ...unit, level: 5, experience: 100 } : unit).concat(shopUnit);
+  const local = normalizeOnlineSnapshot({
+    ...base,
+    baseServerRevision: 3,
+    playerGold: 999,
+    formation: { ownedUnits: localOwnedUnits, slots: base.formation.slots.map((slot, index) => index === 1 ? { ...slot, rosterUnitId: null } : slot) },
+    inventory: { ...base.inventory, nextItemInstanceSequence: 99 },
+    controlGroups: { groups: base.controlGroups.groups.map((group, index) => index === 0 ? [shopUnit.rosterUnitId] : group) as typeof base.controlGroups.groups },
+  })!;
+  const result = resolveOnlineConflict(local, server);
+  assert.equal(result.status, "RESOLVED");
+  if (result.status === "RESOLVED") {
+    assert.deepEqual(result.snapshot.ownedRoster, server.ownedRoster);
+    assert.deepEqual(result.snapshot.progression, server.progression);
+    assert.equal(result.snapshot.playerGold, server.playerGold);
+    assert.deepEqual(result.snapshot.inventory, server.inventory);
+    assert.equal(result.snapshot.formation.slots[1].rosterUnitId, null);
+    assert.equal(result.snapshot.controlGroups.groups[0].includes(shopUnit.rosterUnitId), false);
+    assert.equal(validateOnlineSnapshot(result.snapshot).ok, true);
+  }
+});
+
+test("revision conflict preserves pending records and does not increment retry count", async () => {
+  const registry = new Registry();
+  registry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "ONLINE", sessionId: "mock", serverRevision: 1 });
+  const gateway: OnlineGateway = {
+    bootstrap: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pullSnapshot: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pushOperations: async () => ({ ok: false, error: { code: "REVISION_CONFLICT", message: "stale", retryable: false, serverRevision: 4 } }),
+    disconnect: async () => Promise.resolve(),
+  };
+  const coordinator = new OnlineSyncCoordinator(registry as never, gateway, { nowMs: () => 1000 });
+  const value = snapshot();
+  const first = coordinator.enqueue(createClientOperation("CLIENT_PREFERENCE_UPDATE", { value: 1 }, { deviceId: value.deviceId, clientInstanceId: value.clientInstanceId, baseServerRevision: 1, operationId: "conflict-1" }));
+  const second = coordinator.enqueue(createClientOperation("CLIENT_PREFERENCE_UPDATE", { value: 2 }, { deviceId: value.deviceId, clientInstanceId: value.clientInstanceId, baseServerRevision: 1, operationId: "conflict-2" }));
+  assert.equal(first.ok, true);
+  assert.equal(second.ok, true);
+  const result = await coordinator.sync(value);
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.equal(result.error.code, "REVISION_CONFLICT");
+  assert.equal(coordinator.getState().status, "CONFLICT");
+  assert.equal(coordinator.getState().serverRevision, 4);
+  assert.deepEqual(coordinator.getQueue().records.map((record) => [record.operation.operationId, record.status, record.retryCount]), [["conflict-1", "PENDING", 0], ["conflict-2", "PENDING", 0]]);
+});
+
+test("disconnect aborts an active request and prevents a late ONLINE state", async () => {
+  const registry = new Registry();
+  registry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "OFFLINE" });
+  const gateway = new DeferredGateway();
+  const coordinator = new OnlineSyncCoordinator(registry as never, gateway, { timeoutMs: 5000 });
+  const pending = coordinator.bootstrap(snapshot());
+  await Promise.resolve();
+  await coordinator.disconnect();
+  gateway.bootstrapResolve?.({ ok: true, value: { protocolVersion: 1, sessionId: "late", accountId: null, serverRevision: 1, snapshot: null } });
+  const result = await pending;
+  assert.equal(result.ok, false);
+  assert.equal(coordinator.getState().status, "OFFLINE");
+});
+
+test("rate limit retry-after reaches the queue next attempt time", async () => {
+  const registry = new Registry();
+  registry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "ONLINE", sessionId: "mock", serverRevision: 1 });
+  const gateway: OnlineGateway = {
+    bootstrap: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pullSnapshot: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pushOperations: async () => ({ ok: false, error: { code: "RATE_LIMITED", message: "slow down", retryable: true, retryAfterMs: 45000 } }),
+    disconnect: async () => Promise.resolve(),
+  };
+  const coordinator = new OnlineSyncCoordinator(registry as never, gateway, { nowMs: () => 1000 });
+  const value = snapshot();
+  coordinator.enqueue(createClientOperation("CLIENT_PREFERENCE_UPDATE", { value: 1 }, { deviceId: value.deviceId, clientInstanceId: value.clientInstanceId, baseServerRevision: 1, operationId: "rate-limit" }));
+  await coordinator.sync(value);
+  const record = coordinator.getQueue().records[0];
+  assert.equal(record.status, "RETRY_WAIT");
+  assert.equal(record.nextAttemptAtMs, 46000);
+});
+
+test("nested and array reward authority fields are rejected", () => {
+  const context = { deviceId: "device", clientInstanceId: "client", baseServerRevision: 0 };
+  assert.equal(validateClientOperation(createClientOperation("BATTLE_RESULT_SUBMISSION", { result: { finalGold: 1 } }, { ...context, operationId: "nested-gold" })).ok, false);
+  assert.equal(validateClientOperation(createClientOperation("OFFLINE_REWARD_CLAIM", [{ rewardExperience: 1 }], { ...context, operationId: "array-exp" })).ok, false);
+});
+
+test("valid battle and offline DTO payloads are accepted", () => {
+  const context = { deviceId: "device", clientInstanceId: "client", baseServerRevision: 0, createdAtMs: 1 };
+  const battle = createBattleResultSubmissionOperation({ battleId: "battle-1", sourceWorldMonsterId: "slime-1", rosterUnitIds: ["ally-main-character"], startedAtMs: 1, endedAtMs: 2, victory: true, resultDigest: "digest", clientBuildId: "dev" }, { ...context, operationId: "battle-dto" });
+  const offline = createOfflineRewardClaimOperation({ claimSequence: 1, previousServerRevision: 0, elapsedFromMs: 1, elapsedToMs: 2, selectedMonsterId: "slime-1", deployedRosterUnitIds: ["ally-main-character"] }, { ...context, operationId: "offline-dto" });
+  assert.equal(validateClientOperation(battle).ok, true);
+  assert.equal(validateClientOperation(offline).ok, true);
+});
+
+test("unknown snapshot fields are rejected and invalid conflict inputs remain manual", () => {
+  const local = snapshot();
+  const server = snapshot();
+  assert.equal(validateOnlineSnapshot({ ...local, futureField: true }).ok, false);
+  const result = resolveOnlineConflict({ ...local, futureField: true } as typeof local, server);
+  assert.equal(result.status, "MANUAL_REQUIRED");
+});
+
+test("malformed and duplicate queue records return corruption without dropping valid neighbors", () => {
+  const value = snapshot();
+  const first = createClientOperation("CLIENT_PREFERENCE_UPDATE", { value: 1 }, { deviceId: value.deviceId, clientInstanceId: value.clientInstanceId, baseServerRevision: 0, operationId: "malformed-first" });
+  const second = createClientOperation("CLIENT_PREFERENCE_UPDATE", { value: 2 }, { deviceId: value.deviceId, clientInstanceId: value.clientInstanceId, baseServerRevision: 0, operationId: "malformed-second" });
+  const record = (operation: typeof first) => ({ operation, status: "PENDING", retryCount: 0, nextAttemptAtMs: 0, lastErrorCode: null, lastErrorMessage: null });
+  const malformed = loadPendingOperationQueue(JSON.stringify({ records: [record(first), { bad: true }, record(second)] }), 0);
+  assert.equal(malformed.ok, false);
+  assert.equal(malformed.queue.records.length, 1);
+  const duplicate = loadPendingOperationQueue(JSON.stringify({ records: [record(first), record(first)] }), 0);
+  assert.equal(duplicate.ok, false);
+  assert.equal(duplicate.queue.records.length, 1);
+});
+
+test("OpenAPI response schemas match protocol fields and forbid type null", async () => {
+  const contract = JSON.parse(await (await import("node:fs/promises")).readFile("docs/online-api.openapi.json", "utf8")) as {
+    components: { schemas: Record<string, { required?: string[]; properties?: Record<string, unknown> }>; parameters: Record<string, unknown>; responses: Record<string, unknown> };
+    paths: Record<string, Record<string, { parameters?: unknown[]; responses?: Record<string, unknown> }> >;
+  };
+  const schemas = contract.components.schemas;
+  assert.equal(JSON.stringify(contract).includes('"type":"null"'), false);
+  for (const name of ["BootstrapResponse", "PullSnapshotResponse", "PushOperationsResponse"]) assert.ok(schemas[name].required?.includes("protocolVersion"));
+  assert.ok(schemas.PushOperationsResponse.required?.includes("rejectedReasons"));
+  assert.ok(schemas.PushOperationsResponse.required?.includes("snapshot"));
+  const refs: string[] = [];
+  const collectRefs = (value: unknown): void => {
+    if (!value || typeof value !== "object") return;
+    if ("$ref" in value && typeof (value as { $ref?: unknown }).$ref === "string") refs.push((value as { $ref: string }).$ref);
+    Object.values(value).forEach(collectRefs);
+  };
+  collectRefs(contract);
+  for (const ref of refs) {
+    const parts = ref.replace(/^#\//, "").split("/");
+    const section = parts[0];
+    const name = parts[2];
+    const component = contract.components as unknown as Record<string, Record<string, unknown>>;
+    assert.ok(section === "components" && name && component[parts[1]]?.[name]);
+  }
+  for (const path of ["/v1/sync/push", "/v1/battles/submit", "/v1/offline/claim"]) {
+    const operation = contract.paths[path].post;
+    assert.ok(JSON.stringify(operation.parameters).includes("IdempotencyKey"));
+    for (const code of ["400", "401", "409", "413", "429", "500"]) assert.ok(operation.responses?.[code]);
+  }
+  assert.equal(JSON.stringify(contract).includes("secret"), false);
+  assert.equal(JSON.stringify(contract).includes("token"), false);
 });

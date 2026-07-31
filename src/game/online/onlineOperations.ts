@@ -1,4 +1,4 @@
-import { ONLINE_PROTOCOL_VERSION, type ClientOperationEnvelope, type DeviceId, type ClientInstanceId, type OperationId, type OnlineOperationType, type OnlinePlayerSnapshot, type ServerRevision } from "./onlineTypes";
+import { ONLINE_PROTOCOL_VERSION, type BattleResultSubmissionOperation, type BattleResultSubmissionPayload, type ClientOperationEnvelope, type DeviceId, type ClientInstanceId, type OfflineRewardClaimOperation, type OfflineRewardClaimPayload, type OperationId, type OnlineOperationType, type OnlinePlayerSnapshot, type ServerRevision } from "./onlineTypes";
 
 function stableStringify(value: unknown): string {
   if (value === null || typeof value !== "object") return JSON.stringify(value) ?? "null";
@@ -43,10 +43,10 @@ export function createSnapshotCheckpointOperation(snapshot: OnlinePlayerSnapshot
   return createClientOperation("SNAPSHOT_CHECKPOINT", { snapshot }, context);
 }
 
-export function createBattleResultSubmissionOperation(payload: unknown, context: Parameters<typeof createClientOperation>[2]): ClientOperationEnvelope {
-  return createClientOperation("BATTLE_RESULT_SUBMISSION", payload, context);
+export function createBattleResultSubmissionOperation(payload: BattleResultSubmissionPayload, context: Parameters<typeof createClientOperation>[2]): BattleResultSubmissionOperation {
+  return createClientOperation("BATTLE_RESULT_SUBMISSION", payload, context) as BattleResultSubmissionOperation;
 }
 
-export function createOfflineRewardClaimOperation(payload: unknown, context: Parameters<typeof createClientOperation>[2]): ClientOperationEnvelope {
-  return createClientOperation("OFFLINE_REWARD_CLAIM", payload, context);
+export function createOfflineRewardClaimOperation(payload: OfflineRewardClaimPayload, context: Parameters<typeof createClientOperation>[2]): OfflineRewardClaimOperation {
+  return createClientOperation("OFFLINE_REWARD_CLAIM", payload, context) as OfflineRewardClaimOperation;
 }

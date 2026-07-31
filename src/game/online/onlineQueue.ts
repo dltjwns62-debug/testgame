@@ -9,6 +9,12 @@ export const INITIAL_RETRY_DELAY_MS = 1_000;
 export const MAX_RETRY_DELAY_MS = 300_000;
 export const MAX_RETRY_COUNT = 8;
 
+const ONLINE_ERROR_CODES = new Set<OnlineErrorCode>([
+  "ONLINE_DISABLED", "NETWORK_UNAVAILABLE", "AUTH_REQUIRED", "AUTH_EXPIRED", "PROTOCOL_MISMATCH",
+  "FUTURE_PROTOCOL_VERSION", "VALIDATION_FAILED", "REVISION_CONFLICT", "DUPLICATE_OPERATION",
+  "RATE_LIMITED", "SERVER_REJECTED", "SERVER_ERROR", "QUEUE_CORRUPTED", "QUEUE_LIMIT_EXCEEDED", "CANCELLED", "TIMEOUT",
+]);
+
 export type PendingOperationStatus = "PENDING" | "RETRY_WAIT" | "REJECTED";
 
 export type PendingOperationRecord = {
@@ -58,6 +64,18 @@ function toRecord(value: unknown, nowMs: number): PendingOperationRecord | null 
     lastErrorCode: typeof candidate.lastErrorCode === "string" ? candidate.lastErrorCode as OnlineErrorCode : null,
     lastErrorMessage: typeof candidate.lastErrorMessage === "string" ? candidate.lastErrorMessage : null,
   };
+}
+
+function toStrictRecord(value: unknown, nowMs: number): PendingOperationRecord | null {
+  if (!value || typeof value !== "object") return null;
+  const candidate = value as Partial<PendingOperationRecord>;
+  if (candidate.status !== "PENDING" && candidate.status !== "RETRY_WAIT" && candidate.status !== "REJECTED") return null;
+  if (!Number.isSafeInteger(candidate.retryCount) || (candidate.retryCount as number) < 0 || (candidate.retryCount as number) > MAX_RETRY_COUNT ||
+    !Number.isSafeInteger(candidate.nextAttemptAtMs) || (candidate.nextAttemptAtMs as number) < 0 ||
+    (candidate.lastErrorCode !== null && !ONLINE_ERROR_CODES.has(candidate.lastErrorCode as OnlineErrorCode)) ||
+    (candidate.lastErrorMessage !== null && typeof candidate.lastErrorMessage !== "string")) return null;
+  const record = toRecord(value, nowMs);
+  return record && record.status === candidate.status && record.retryCount === candidate.retryCount && record.nextAttemptAtMs === candidate.nextAttemptAtMs ? record : null;
 }
 
 export function normalizePendingOperationQueue(value: unknown, nowMs = Date.now()): PendingOperationQueueState {
@@ -165,7 +183,42 @@ export function serializePendingOperationQueue(queue: PendingOperationQueueState
 export function loadPendingOperationQueue(raw: string | null, nowMs = Date.now()): QueueLoadResult {
   if (!raw) return { ok: true, queue: createEmptyPendingOperationQueue() };
   try {
-    const queue = normalizePendingOperationQueue(JSON.parse(raw), nowMs);
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return { ok: false, queue: createEmptyPendingOperationQueue(), error: { code: "QUEUE_CORRUPTED", message: "Pending operation queue shape is corrupted.", retryable: false } };
+    }
+    const candidate = parsed as { records?: unknown; operations?: unknown };
+    const records: PendingOperationRecord[] = [];
+    const seen = new Set<string>();
+    if (Object.prototype.hasOwnProperty.call(candidate, "records")) {
+      if (!Array.isArray(candidate.records)) {
+        return { ok: false, queue: createEmptyPendingOperationQueue(), error: { code: "QUEUE_CORRUPTED", message: "Pending operation records are corrupted.", retryable: false } };
+      }
+      for (const rawRecord of candidate.records) {
+        const record = toStrictRecord(rawRecord, nowMs);
+        if (!record || seen.has(record.operation.operationId)) {
+          return { ok: false, queue: { records }, error: { code: "QUEUE_CORRUPTED", message: "Pending operation record is malformed or duplicated.", retryable: false } };
+        }
+        seen.add(record.operation.operationId);
+        records.push(record);
+      }
+    } else if (Object.prototype.hasOwnProperty.call(candidate, "operations")) {
+      if (!Array.isArray(candidate.operations)) {
+        return { ok: false, queue: createEmptyPendingOperationQueue(), error: { code: "QUEUE_CORRUPTED", message: "Legacy pending operations are corrupted.", retryable: false } };
+      }
+      for (const operation of candidate.operations) {
+        if (!validateClientOperation(operation).ok) {
+          return { ok: false, queue: { records }, error: { code: "QUEUE_CORRUPTED", message: "Legacy pending operation is malformed.", retryable: false } };
+        }
+        const typed = operation as ClientOperationEnvelope;
+        if (seen.has(typed.operationId)) {
+          return { ok: false, queue: { records }, error: { code: "QUEUE_CORRUPTED", message: "Legacy pending operations contain a duplicate.", retryable: false } };
+        }
+        seen.add(typed.operationId);
+        records.push({ operation: typed, status: "PENDING", retryCount: 0, nextAttemptAtMs: nowMs, lastErrorCode: null, lastErrorMessage: null });
+      }
+    }
+    const queue = { records };
     const limitError = validatePendingOperationQueueLimits(queue);
     return limitError ? { ok: false, queue, error: limitError } : { ok: true, queue };
   } catch {

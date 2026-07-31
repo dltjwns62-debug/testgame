@@ -1,5 +1,46 @@
 # 변경 이력
 
+## 2026-07-31 — 17단계 v4 검수 수정 및 v5 재제출 — 검수 대기
+
+- coordinator sync가 `RESOLVED` conflict 결과를 raw server snapshot 대신 반환하는 통합 테스트를 추가했다.
+- gateway가 abort signal을 무시하는 경우에도 dispose/disconnect 요청이 즉시 `CANCELLED`로 끝나는 경계 검사를 보완했다.
+- 기존 v1·v2·v3·v4 검수 태그와 이력은 보존하고 새 제출 태그는 `review-stage-17-v5`다.
+- 자동 검사는 총 81개가 통과했으며 실제 Online Status 전체 조작·서버·계정·네트워크는 `not_run`, 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+
+## 2026-07-31 — 17단계 v3 검수 수정 및 v4 재제출 — 검수 대기
+
+- coordinator가 `RESOLVED` conflict snapshot을 sync 결과로 반환하고, `MANUAL_REQUIRED` 외에는 선택된 snapshot을 전달하도록 수정했다.
+- 내부 AbortController abort가 pending Promise를 즉시 `CANCELLED`로 끝내고 timeout·listener cleanup을 보장하도록 보완했다.
+- bootstrap/push/pull gateway response의 protocolVersion을 검증하고, roster 배열 중복·빈 값·최대 인원을 검증한다.
+- OpenAPI Pull/Push의 nullable sessionId·required 필드와 operation enum을 TypeScript 계약에 맞췄다.
+- `review-stage-17-v1`·v2·v3은 수정 요청 이력과 불변 태그로 보존하고, 현재 제출 태그는 `review-stage-17-v4`다.
+- Online Status 전체 조작·실제 네트워크·계정·사용자 수동 테스트는 각각 `not_run`·`skipped_by_user`로 유지한다.
+
+## 2026-07-31 — 17단계 v2 검수 수정 및 v3 재제출 — 검수 대기
+
+- 서버 authoritative 충돌 병합에서 owned roster·progression·Gold·Inventory·보상 진행은 서버 값을 유지하고 로컬 슬롯·유효 Control Group·설정만 제한적으로 반영하도록 수정했다.
+- revision conflict 시 pending queue를 PENDING 상태와 retryCount 그대로 보존하고, dispose/disconnect 이후 registry write와 늦은 ONLINE 복귀를 차단했다.
+- Retry-After 전달, Battle/Offline 명시 DTO와 중첩 reward field 차단, unknown snapshot·malformed queue 검증, OpenAPI와 TypeScript response 일치를 보완했다.
+- `review-stage-17-v1`과 `review-stage-17-v2`는 `changes_requested` 이력과 불변 태그로 보존하고, 현재 제출 태그는 `review-stage-17-v3`다.
+- Online Status Scene 전체 브라우저 조작은 `not_run`, 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+
+## 2026-07-31 — 17단계 v1 검수 수정 및 v2 재제출 — 검수 대기
+
+- v1 정적 검수에서 요청된 queue record/retry/backoff/rejection 보존과 cap 초과 데이터 보존을 보완했다.
+- coordinator AbortController·dispose·stale response·server revision 보호와 Disabled mode 무호출 경계를 보완했다.
+- canonical snapshot·operation payload 검증, Online Status async lifecycle, OpenAPI 3.0.3 계약과 자동 테스트 범위를 보완했다.
+- `review-stage-17-v1`은 `changes_requested` 이력과 불변 태그로 보존하고, 현재 제출 태그는 `review-stage-17-v2`다.
+- 실제 서버·계정·네트워크는 구현하지 않았으며 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+
+## 2026-07-31 — 17단계 온라인 확장 준비 제출 — 검수 대기
+
+- 16단계 완료 main에서 `stage-17-online-expansion-readiness` 작업 브랜치를 생성했다.
+- protocol v1, OnlinePlayerSnapshot, Disabled/Mock Gateway, operation queue, conflict resolver와 sync coordinator를 추가했다.
+- Online Status Scene을 추가했으며 기본 모드는 Disabled, `?onlineMock=1`만 메모리 Mock으로 동작한다.
+- OpenAPI 계약, threat model, provider 비교 문서를 추가했지만 실제 서버·계정·네트워크·클라우드·멀티플레이어는 구현하지 않았다.
+- Stage 17 자동 테스트와 기존 회귀 테스트를 실행하고 사용자 테스트는 `skipped_by_user`로 유지한다.
+- 새 검수 태그는 `review-stage-17-v1`이며 main에는 아직 반영하지 않았다.
+
 ## 2026-07-31 — 16단계 v4 검수 승인 및 main 반영 — 완료
 
 - `review-stage-16-v4` 승인과 승인 커밋 `474467a9908dede7990906bd4a5b113c91139d54`를 확인했다.

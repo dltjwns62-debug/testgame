@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 16 scope note: the submitted work is limited to 1~15 regression coverage, injected persistence boundaries, runtime state validation and repair at scene/save boundaries, idempotent autosave lifecycle cleanup, throttled Field/Battle UI updates, diagnostics, runtime error recording, quota metadata, favicon delivery, safe Recovery Try Again restart, and automatic regression tests. It does not implement online expansion, accounts, cloud sync, multiplayer, service workers, or stage 17.
+Stage 17 scope note: the submitted v5 work is limited to online protocol v1 contracts, server-authoritative conflict boundaries, local OnlinePlayerSnapshot and DTO validation, Disabled/Mock gateways, operation idempotency and record-based pending queue with retry/backoff/rejection preservation, revision-guarded sync coordinator lifecycle and cancellation, Retry-After propagation, gateway response protocol validation, OpenAPI/TypeScript request-response alignment, Online Status UI lifecycle documentation, threat model, and automatic tests. It does not implement a real server, HTTP/WebSocket transport, accounts, OAuth, cloud sync, multiplayer, chat, commerce, deployment, or Stage 18.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -34,13 +34,15 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 28. 저장 로직은 `StorageLike`와 주입 가능한 시계를 사용하며, quota/스토리지 실패 시 검증된 primary·backup을 훼손하지 않고 성공으로 기록하지 않는다.
 29. 자동 저장과 씬 타이머·이벤트는 멱등적으로 설치하고 shutdown 시 disposer로 정리한다.
 30. diagnostics 오버레이는 `?diagnostics=1`에서만 표시하고 게임 규칙을 변경하지 않는다.
+31. 온라인 queue는 cap 초과·거부 record를 자동 삭제하거나 조용히 잘라내지 않으며, coordinator dispose 이후 stale callback으로 registry/UI를 갱신하지 않는다.
+32. 검수 제출은 현재 버전 태그만 갱신하고 과거 검수 태그와 이력을 보존한다.
 
 ## 현재 단계 기준
 
 - 전체 단계: 17단계
-- 현재 단계: 16단계 — 성능 및 안정화
-- 현재 단계 상태: 검수 대기 (`review_pending`)
-- 현재 작업 브랜치: `stage-16-performance-stability`
+- 현재 단계: 17단계 — 온라인 확장 준비
+- 현재 단계 상태: 구현 완료·검수 대기 (`review_pending`)
+- 현재 작업 브랜치: `stage-17-online-expansion-readiness`
 - 1단계 승인 태그: `review-stage-01-v1`
 - 2단계 최초 검수 태그: `review-stage-02-v1` — 수정 요청
 - 2단계 승인 태그: `review-stage-02-v2`
@@ -81,12 +83,14 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 16단계 v2 검수 태그: `review-stage-16-v2` — 수정 요청
 - 16단계 현재 검수 태그: `review-stage-16-v4` (승인)
 - 16단계 완료 태그: `stage-16-completed`
+- 17단계 최초 검수 태그: `review-stage-17-v1` — 수정 요청
+- 17단계 현재 검수 태그: `review-stage-17-v5`
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
-- ChatGPT 코드 검수: 승인 (`approved`)
+- ChatGPT 코드 검수: 검수 대기 (`pending`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계, 16단계
 - 검수 통과된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계, 16단계
-- 다음 단계: 17단계 — 온라인 확장 준비
+- 다음 단계: 없음 — 전체 로드맵의 마지막 단계
 
-완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 16단계까지 완료됐고, 16단계는 `stage-16-completed` 태그로 고정한다. 17단계 온라인 확장은 별도 시작 명령 전까지 구현하지 않는다.
+완료된 단계는 `main`에 반영된 상태를 기준으로 한다. 1단계부터 16단계까지 완료됐고, 16단계는 `stage-16-completed` 태그로 고정한다. 17단계는 작업 브랜치에서 검수 대기 상태로 제출하며 `main` 병합 전에는 완료로 기록하지 않는다.
 
 8단계에서는 BattleScene 내부 Auto Hunt ON/OFF, 수동 명령 우선순위, 지역 동료 지원, 근접 사거리와 선택 공격 범위 표시를 구현했다. 9단계에서는 유닛 정의 기반 Skill Mercenary 스킬과 주둔 지역 자동 방어를 구현했다. 10단계에서는 `FormationState`, 보유 유닛과 1~10명의 배치 roster 분리, FormationScene, Hero 필수 편성, 슬롯 교체·제거·초기화와 선택 상태 제어를 구현했다. 11단계에서는 registry Gold, 고정 상점 3종, 한 번만 구매 가능한 용병, 최대 13명 보유 검증, Bench 보존과 ShopScene을 다뤘다. 12단계에서는 session registry에 유지되는 10개 부대, 사용자 지정 키 설정, BattleScene·FieldScene 연동, 점유된 일반 용병 슬롯 승계, Auto Hunt OFF 고정 기준점 지역 방어와 자동 귀환 제거를 다뤘다. 13단계에서는 rosterUnitId 기반 경험치·레벨·최대 HP·공격력 성장과 전투 종료 경험치 보너스를 구현했다. 14단계에서는 ItemInstance 기반 인벤토리, 장비 슬롯, 드롭, 무기 호환, 방어력 피해 감소와 InventoryScene을 구현했다. 15단계에서는 localStorage 저장·복구, Repeat Hunt와 방치 보상을 구현하며 16단계 안정화는 구현하지 않는다.

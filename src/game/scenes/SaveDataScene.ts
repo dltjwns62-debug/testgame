@@ -25,7 +25,7 @@ export class SaveDataScene extends Phaser.Scene {
     this.returnScene = getSaveDataReturnScene(data);
     repairRuntimeStateAtBoundary(this.game.registry);
     this.drawBackground();
-    this.add.text(32, 20, "Stage 16: Save Data & Stability", {
+    this.add.text(32, 20, "Stage 17: Save Data & Online Readiness", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",

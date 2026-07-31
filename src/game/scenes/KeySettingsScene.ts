@@ -100,7 +100,7 @@ export class KeySettingsScene extends Phaser.Scene {
   }
 
   private addHeader(): void {
-    this.add.text(32, 16, "Stage 16: Key Settings & Stability", {
+    this.add.text(32, 16, "Stage 17: Key Settings & Local Runtime", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",

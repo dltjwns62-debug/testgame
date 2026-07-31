@@ -1,5 +1,55 @@
 # 프로젝트 결정 사항
 
+## 17단계 v5 검수 재제출 결정
+
+- 결정: coordinator sync의 `NO_CONFLICT`는 server snapshot을, `RESOLVED`는 resolver snapshot을 반환하고 `MANUAL_REQUIRED`는 conflict 상태와 server snapshot을 유지한다.
+- 결정: 내부 AbortController cancellation은 gateway가 signal을 무시해도 dispose/disconnect에서 즉시 요청 결과를 종료하며, stale callback은 registry를 갱신하지 않는다.
+- 결정: coordinator 통합 경계와 즉시 cancellation 경계를 자동 테스트로 검증하고, 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+- 결정: v1·v2·v3·v4 태그와 이력은 보존하고 `review-stage-17-v5`를 새 제출 태그로 사용한다.
+- 상태: 확정
+
+## 17단계 v4 검수 재제출 결정
+
+- 결정: `resolveOnlineConflict`의 `RESOLVED` 결과 snapshot은 coordinator sync 반환값으로 전달하고, 서버 snapshot을 무조건 반환하지 않는다.
+- 결정: coordinator 내부 AbortController abort는 cancellation Promise를 즉시 해결하며, timeout은 `TIMEOUT`을 유지하고 모든 listener를 정리한다.
+- 결정: bootstrap·push·pull response는 protocolVersion 1만 적용하고, 미래·누락·잘못된 버전은 local state와 queue를 적용하지 않고 `ERROR`로 기록한다.
+- 결정: Battle/Offline roster ID 배열은 비어 있지 않고 중복·빈 문자열이 없으며 최대 10개인 경우만 허용한다.
+- 결정: OpenAPI 3.0.3 request required 배열과 nullable sessionId, operation enum은 TypeScript request 계약과 일치시킨다.
+- 결정: v1·v2·v3 태그와 이력은 보존하고 `review-stage-17-v4`를 새 제출 태그로 사용한다.
+- 상태: 확정
+
+## 17단계 v3 검수 재제출 결정
+
+- 결정: 서버 authoritative 영역은 formation.ownedUnits, ownedRoster, progression, Gold, Inventory/equipment와 AutoProgress의 victory count·offline claim sequence·reward 상태로 고정한다.
+- 결정: 같은 base revision에서도 클라이언트는 Formation slots, 서버 owned ID로 필터된 Control Group, Key Binding, Battle Auto Hunt와 서버가 인정한 Repeat Hunt preference만 유지한다.
+- 결정: REVISION_CONFLICT는 자동 retry나 reject를 하지 않고 queue record를 PENDING 그대로 보존하며 session만 CONFLICT로 전환한다.
+- 결정: coordinator의 stale/disposed 경로는 registry helper를 호출하지 않고, disconnect는 active request를 무효화해 늦은 ONLINE 복귀를 막는다.
+- 결정: Retry-After는 안전한 0 이상 정수만 backoff에 반영하고, Battle/Offline operation은 명시 DTO와 중첩 reward authority field 검증을 통과해야 한다.
+- 결정: Online Status Scene 전체 버튼·shutdown·재진입 흐름은 직접 실행하지 않았으므로 `not_run`으로 기록한다.
+- 결정: `review-stage-17-v1`·`review-stage-17-v2`와 이력은 보존하고 `review-stage-17-v3`를 새 제출 태그로 사용한다.
+- 상태: 확정
+
+## 17단계 v2 검수 재제출 결정
+
+- 결정: `review-stage-17-v1`의 수정 요청 이력과 태그는 이동·삭제하지 않고 `review-stage-17-v2`를 새 제출 태그로 사용한다.
+- 결정: pending operation은 operation 배열이 아니라 상태·재시도 횟수·다음 시각·거부 사유를 가진 record로 보존하며, ACK와 duplicate ACK만 제거한다.
+- 결정: queue cap 초과와 corrupted JSON은 기존 유효 record를 조용히 삭제하지 않고 오류 결과와 보존된 queue를 반환한다.
+- 결정: coordinator는 요청별 AbortController와 generation/revision guard를 사용하고 dispose 이후 registry/UI callback을 차단한다.
+- 결정: snapshot과 operation은 canonical consistency, payload hash, payload 크기, 민감·transient 필드를 검증하며 실제 보상 결과는 client authoritative 값으로 받지 않는다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`, 실제 서버·계정·네트워크 검사는 `not_run`, ChatGPT 코드 검수는 `pending`으로 유지한다.
+- 상태: 확정
+
+## 17단계 온라인 확장 준비 결정
+
+- 결정: 실제 서버 없이 protocol v1, snapshot, gateway, operation queue, conflict와 sync 경계만 준비한다.
+- 결정: 기본 런타임은 `DisabledOnlineGateway`로 유지하고 실제 네트워크 요청을 하지 않는다.
+- 결정: `?onlineMock=1`은 테스트·개발 전용 메모리 `MockOnlineGateway`이며 실제 서버나 계정을 모사하지 않는다.
+- 결정: `OnlinePlayerSnapshot`은 기존 SaveEnvelope와 분리하고 transient battle/runtime/auth 데이터를 포함하지 않는다.
+- 결정: 미래 server authoritative 영역은 Gold, progression, inventory, owned roster, reward claim이며 client preference는 별도 conflict 정책으로 다룬다.
+- 결정: 실제 provider, HTTP/WebSocket, OAuth, DB, 클라우드, PvP와 멀티플레이어는 후속 범위로 남긴다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`, 실제 네트워크·계정 검사는 `not_run`으로 기록한다.
+- 상태: 확정
+
 ## 16단계 v4 검수 승인 및 main 반영 결정
 
 - 결정: `review-stage-16-v4`와 승인 커밋 `474467a9908dede7990906bd4a5b113c91139d54`를 승인한다.

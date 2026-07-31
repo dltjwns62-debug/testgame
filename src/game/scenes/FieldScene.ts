@@ -75,6 +75,8 @@ export class FieldScene extends Phaser.Scene {
   private repeatButtonLabel!: Phaser.GameObjects.Text;
   private saveDataButton!: Phaser.GameObjects.Rectangle;
   private saveDataButtonLabel!: Phaser.GameObjects.Text;
+  private onlineStatusButton!: Phaser.GameObjects.Rectangle;
+  private onlineStatusButtonLabel!: Phaser.GameObjects.Text;
   private formationMessage: string | null = null;
   private repeatAfterBattlePending = false;
   private repeatMovementInProgress = false;
@@ -121,6 +123,7 @@ export class FieldScene extends Phaser.Scene {
     this.addKeySettingsButton();
     this.addInventoryButton();
     this.addStage15Controls();
+    this.addOnlineStatusButton();
     this.player = this.addPlayer();
 
     MONSTERS.forEach((monster) => this.addMonster(monster));
@@ -177,14 +180,14 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStageNotice(): void {
-    this.add.text(48, 36, "Stage 16: Performance & Stability", {
+    this.add.text(48, 36, "Stage 17: Online Expansion Readiness", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "24px",
       fontStyle: "bold",
     });
 
-    this.add.text(50, 66, "Stable runtime, safe saves, and efficient UI updates.", {
+    this.add.text(50, 66, "Local-first online contracts with no real server connection.", {
       color: "#c4e4d0",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "16px",
@@ -571,6 +574,22 @@ export class FieldScene extends Phaser.Scene {
     this.updateStatusText();
   }
 
+  public openOnlineStatus(): void {
+    if (this.battleTransitionStarted || this.state === "BATTLE") return;
+    if (!this.prepareMenuEntry("Online Status is unavailable while the player is moving.")) return;
+    this.formationMessage = null;
+    this.scene.pause();
+    this.scene.launch("OnlineStatusScene");
+  }
+
+  public returnFromOnlineStatus(savedMessage?: string): void {
+    this.scene.stop("OnlineStatusScene");
+    this.scene.resume();
+    this.state = "IDLE";
+    this.formationMessage = savedMessage ?? null;
+    this.updateStatusText();
+  }
+
   public restartAfterReset(message: string): void {
     this.summaryOverlay?.destroy(true);
     this.summaryOverlay = null;
@@ -776,6 +795,22 @@ export class FieldScene extends Phaser.Scene {
     this.saveDataButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       pointer.event?.stopPropagation();
       if (pointer.button === 0) this.openSaveData();
+    });
+  }
+
+  private addOnlineStatusButton(): void {
+    this.onlineStatusButton = this.add.rectangle(500, 510, 130, 28, 0x4b8b6d, 1)
+      .setStrokeStyle(1, 0x9ce4b0, 1)
+      .setInteractive({ useHandCursor: true });
+    this.onlineStatusButtonLabel = this.add.text(500, 510, "Online Status", {
+      color: "#f3f8e9",
+      fontFamily: "Segoe UI, sans-serif",
+      fontSize: "10px",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+    this.onlineStatusButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      pointer.event?.stopPropagation();
+      if (pointer.button === 0) this.openOnlineStatus();
     });
   }
 

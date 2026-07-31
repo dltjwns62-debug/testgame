@@ -1,5 +1,19 @@
 # Test Game 개발 로드맵
 
+## Stage 17 온라인 확장 준비 — `review_pending` (v5 재제출)
+
+- 전체 단계: 17단계
+- 현재 단계: 17단계 — 온라인 확장 준비
+- 작업 브랜치: `stage-17-online-expansion-readiness`
+- 검수 태그: `review-stage-17-v5`
+- 목표: 실제 서버 없이 미래 온라인 연결을 위한 protocol, snapshot, gateway, operation, conflict와 보안 경계를 준비한다.
+- 주요 구현 항목: `OnlinePlayerSnapshot`, protocol v1, server-authoritative conflict policy, Disabled/Mock Gateway, record-based pending operation queue와 retry/backoff/rejection, revision conflict 보존, canonical snapshot·Battle/Offline DTO validation, resolved snapshot 반환과 coordinator 통합 검증, abort cancellation, gateway protocol validation, OpenAPI·TypeScript request/response contract·threat model 문서.
+- 완료 조건: 기존 local game 유지; 실제 네트워크 없는 Disabled/Mock adapter; protocol/snapshot/queue/conflict/sync 자동 테스트; `npm ci`, `npm run typecheck`, `npm run test`, `npm run build`, `npm run check` 통과; 개발 서버 HTTP 200; 검수 대기 브랜치와 불변 태그 push.
+- 이 단계에서 구현하지 않을 항목: 실제 서버·fetch/WebSocket·계정·OAuth·클라우드 저장·DB·PvP·멀티플레이어·거래·채팅·결제·운영 페이지·provider 확정.
+- 사용자 실행 테스트: 사용자 요청에 따라 `skipped_by_user`로 유지한다.
+
+17단계는 실제 온라인 서비스를 제공하지 않으며, `main` 병합과 프로젝트 전체 완료는 검수 승인 후에만 처리한다. v1·v2·v3·v4 검수의 `changes_requested` 이력과 태그는 보존하고, 보완본을 `review-stage-17-v5`로 재제출한다.
+
 ## Stage 16 성능 및 안정화 — `completed`
 
 - 전체 단계: 17단계

@@ -50,6 +50,8 @@ import {
   type KeyBindingState,
 } from "../keyBindings";
 import { createEnemyIds, getAllyUnitDefinition, getEnemyDefinition } from "../rtsBattleDefinitions";
+import { createVisualTextures, getSlimeTextureKey, getUnitTextureKey } from "../ui/visuals";
+import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 import type {
   BattleOutcome,
   BattlePosition,
@@ -222,6 +224,7 @@ export class BattleScene extends Phaser.Scene {
 
   public create(data: unknown): void {
     repairRuntimeStateAtBoundary(this.game.registry);
+    createVisualTextures(this);
     this.resetBattle(data);
     this.drawBackground();
     this.addHeader();
@@ -494,9 +497,10 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 235, 920, 340, 0x1f2937, 1);
-    this.add.rectangle(GAME_WIDTH / 2, 438, 920, 92, 0x172033, 1);
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.accent);
+    addPanel(this, GAME_WIDTH / 2, 235, 920, 340, UI_THEME.colors.panel, 0.97);
+    this.add.rectangle(GAME_WIDTH / 2, 438, 920, 92, UI_THEME.colors.inkSoft, 0.98)
+      .setStrokeStyle(1, UI_THEME.colors.panelBorder, 0.52);
     this.add.line(0, 0, 22, 420, 938, 420, 0x6ec6a7, 0.65).setOrigin(0);
   }
 
@@ -785,7 +789,6 @@ export class BattleScene extends Phaser.Scene {
   private addBattleUnits(): void {
     for (const unit of this.units.values()) {
       const radius = unit.collisionRadius;
-      const color = unit.team === "ALLY" ? unit.color : this.enemyColor;
       const container = this.add.container(unit.position.x, unit.position.y);
       const guardReachRing = this.add.arc(
         unit.guardPosition.x,
@@ -802,9 +805,10 @@ export class BattleScene extends Phaser.Scene {
       attackReachRing.setStrokeStyle(1, 0x67e8f9, 0.42).setVisible(false);
       const selectionRing = this.add.arc(0, 0, radius + 7, 0, 360, false, 0xf7d154, 0);
       selectionRing.setStrokeStyle(2, 0xf7d154, 1).setVisible(false);
-      const body = this.add.circle(0, 0, radius, color);
-      const banner = this.add.rectangle(0, radius - 1, radius * 1.55, 6, color);
-      const eyes = [this.add.circle(-4, -2, 2, 0x172033), this.add.circle(4, -2, 2, 0x172033)];
+      const textureKey = unit.team === "ALLY"
+        ? getUnitTextureKey(getAllyUnitDefinition(unit.definitionId))
+        : getSlimeTextureKey(this.sourceWorldMonsterId);
+      const token = this.add.image(0, 0, textureKey).setDisplaySize(radius * 3.25, radius * 3.25);
       const label = this.add.text(0, radius + 8, this.getUnitLabel(unit), {
         color: unit.team === "ALLY" ? "#d9f2ff" : "#ffd2d2",
         fontFamily: "Segoe UI, sans-serif",
@@ -814,7 +818,7 @@ export class BattleScene extends Phaser.Scene {
       const healthBack = this.add.rectangle(0, -radius - 7, 32, 4, 0x0b1220).setOrigin(0.5);
       const healthFill = this.add.rectangle(0, -radius - 7, 32, 4, unit.team === "ALLY" ? 0x66d18f : 0xef7185).setOrigin(0, 0.5);
       healthFill.x = -16;
-      container.add([attackReachRing, selectionRing, body, banner, ...eyes, label, healthBack, healthFill]);
+      container.add([attackReachRing, selectionRing, token, label, healthBack, healthFill]);
       const interactionZone = this.add.zone(unit.position.x, unit.position.y, radius * 2 + 12, radius * 2 + 12);
       interactionZone.setInteractive({ useHandCursor: true });
       interactionZone.on("pointerdown", (pointer: Phaser.Input.Pointer) => this.handleUnitPointerDown(unit.battleUnitId, pointer));

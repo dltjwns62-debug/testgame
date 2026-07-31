@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH } from "../constants";
 import { resetSaveData } from "../persistence";
 import { prepareRecoveryRetry } from "../runtimeStateValidation";
+import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 
 export class RecoveryScene extends Phaser.Scene {
   private messageText!: Phaser.GameObjects.Text;
@@ -16,8 +17,8 @@ export class RecoveryScene extends Phaser.Scene {
     const message = data && typeof data === "object" && typeof (data as { message?: unknown }).message === "string"
       ? (data as { message: string }).message
       : "The game state could not be repaired safely.";
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 270, 760, 330, 0x1f2937, 1).setStrokeStyle(2, 0xef9a9a, 1);
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.danger);
+    addPanel(this, GAME_WIDTH / 2, 270, 760, 330, UI_THEME.colors.panel, 0.97).setStrokeStyle(2, 0xef9a9a, 1);
     this.add.text(GAME_WIDTH / 2, 82, "Safe Recovery", {
       color: "#f3f8e9", fontFamily: "Segoe UI, sans-serif", fontSize: "28px", fontStyle: "bold",
     }).setOrigin(0.5);

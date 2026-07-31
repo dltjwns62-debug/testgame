@@ -24,6 +24,7 @@ import { formatProgression, normalizeProgressionState } from "../progression";
 import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { OwnedRosterUnit } from "../rtsBattleTypes";
 import type { FieldScene } from "./FieldScene";
+import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 
 type ItemRowVisual = {
   background: Phaser.GameObjects.Rectangle;
@@ -103,14 +104,14 @@ export class InventoryScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(145, 290, 250, 390, 0x1f2937, 1)
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.accent);
+    addPanel(this, 145, 290, 250, 390, UI_THEME.colors.panel, 0.97)
       .setStrokeStyle(1, 0x54748a, 1);
-    this.add.rectangle(480, 290, 300, 390, 0x1f2937, 1)
+    addPanel(this, 480, 290, 300, 390, UI_THEME.colors.panel, 0.97)
       .setStrokeStyle(1, 0x54748a, 1);
-    this.add.rectangle(805, 290, 300, 390, 0x1f2937, 1)
+    addPanel(this, 805, 290, 300, 390, UI_THEME.colors.panel, 0.97)
       .setStrokeStyle(1, 0x54748a, 1);
-    this.add.rectangle(GAME_WIDTH / 2, 515, GAME_WIDTH, 50, 0x172033, 1);
+    this.add.rectangle(GAME_WIDTH / 2, 515, GAME_WIDTH, 50, UI_THEME.colors.inkSoft, 1);
   }
 
   private addHeader(): void {

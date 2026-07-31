@@ -8,6 +8,7 @@ import {
 } from "../persistence";
 import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import { getResetRestartScene, getSaveDataReturnScene, type SaveDataReturnScene } from "../sceneNavigation";
+import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 
 export class SaveDataScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
@@ -61,10 +62,10 @@ export class SaveDataScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 280, 860, 330, 0x1f2937, 1)
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.goldValue);
+    addPanel(this, GAME_WIDTH / 2, 280, 860, 330, UI_THEME.colors.panel, 0.97)
       .setStrokeStyle(1, 0x54748a, 1);
-    this.add.rectangle(GAME_WIDTH / 2, 510, GAME_WIDTH, 40, 0x172033, 1);
+    this.add.rectangle(GAME_WIDTH / 2, 510, GAME_WIDTH, 40, UI_THEME.colors.inkSoft, 1);
   }
 
   private addButton(

@@ -8,6 +8,7 @@ import type { AllyUnitDefinition } from "../rtsBattleDefinitions";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { FieldScene } from "./FieldScene";
+import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 
 type OfferVisual = {
   button: Phaser.GameObjects.Rectangle;
@@ -37,9 +38,10 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 250, 920, 330, 0x1f2937, 1);
-    this.add.rectangle(GAME_WIDTH / 2, 492, 920, 70, 0x172033, 1);
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.goldValue);
+    addPanel(this, GAME_WIDTH / 2, 250, 920, 330, UI_THEME.colors.panel, 0.97);
+    this.add.rectangle(GAME_WIDTH / 2, 492, 920, 70, UI_THEME.colors.inkSoft, 0.98)
+      .setStrokeStyle(1, UI_THEME.colors.panelBorder, 0.52);
   }
 
   private addHeader(): void {

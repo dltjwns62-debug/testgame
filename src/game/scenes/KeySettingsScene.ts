@@ -19,6 +19,7 @@ import {
   type SkillBindingId,
 } from "../keyBindings";
 import type { FieldScene } from "./FieldScene";
+import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 
 type CaptureAction =
   | { kind: "GROUP"; groupIndex: ControlGroupIndex }
@@ -94,9 +95,10 @@ export class KeySettingsScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 275, 920, 400, 0x1f2937, 1);
-    this.add.rectangle(GAME_WIDTH / 2, 500, 920, 58, 0x172033, 1);
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.accent);
+    addPanel(this, GAME_WIDTH / 2, 275, 920, 400, UI_THEME.colors.panel, 0.97);
+    this.add.rectangle(GAME_WIDTH / 2, 500, 920, 58, UI_THEME.colors.inkSoft, 0.98)
+      .setStrokeStyle(1, UI_THEME.colors.panelBorder, 0.52);
   }
 
   private addHeader(): void {

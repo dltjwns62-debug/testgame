@@ -5,6 +5,7 @@ import { createRegistrySnapshotForOnlineSync, OnlineSyncCoordinator } from "../o
 import { createSnapshotCheckpointOperation } from "../online/onlineOperations";
 import { createDefaultOnlineSessionState, getOrCreateOnlineSessionState, setOnlineSessionState } from "../online/onlineRegistry";
 import { type MockOnlineGateway } from "../online/mockOnlineGateway";
+import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 
 export class OnlineStatusScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
@@ -30,8 +31,8 @@ export class OnlineStatusScene extends Phaser.Scene {
     setOnlineSessionState(this.game.registry, this.mockMode ? next : { ...createDefaultOnlineSessionState(false), deviceId: existing.deviceId, clientInstanceId: existing.clientInstanceId });
     if (!this.gateway || (this.gateway instanceof Object && this.mockMode !== this.gatewayIsMock())) this.gateway = createOnlineGateway(this.mockMode);
     this.coordinator = new OnlineSyncCoordinator(this.game.registry, this.gateway);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 280, 860, 360, 0x1f2937, 1).setStrokeStyle(1, 0x54748a, 1);
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.accent);
+    addPanel(this, GAME_WIDTH / 2, 280, 860, 360, UI_THEME.colors.panel, 0.97);
     this.add.text(48, 32, "Stage 17: Online Expansion Readiness", { color: "#f3f8e9", fontFamily: "Segoe UI, sans-serif", fontSize: "24px", fontStyle: "bold" });
     this.add.text(50, 68, "Disabled by default. Mock mode never contacts a real server.", { color: "#c4e4d0", fontFamily: "Segoe UI, sans-serif", fontSize: "13px" });
     this.statusText = this.add.text(64, 124, "", { color: "#d9f2ff", fontFamily: "Segoe UI, sans-serif", fontSize: "14px", lineSpacing: 8, wordWrap: { width: 820 } });

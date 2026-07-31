@@ -29,6 +29,8 @@ import { getAndClearOfflineSummary } from "../persistence";
 import { hasFatalRuntimeStateIssue, inspectRuntimeState, repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { OfflineRewardSummary } from "../offlineProgress";
 import type { BattleOutcome, OwnedRosterUnit, RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
+import { createVisualTextures, getSlimeTextureKey } from "../ui/visuals";
+import { addSceneBackdrop, addPanel, UI_THEME } from "../ui/theme";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
@@ -115,6 +117,7 @@ export class FieldScene extends Phaser.Scene {
     getOrCreatePlayerGold(this.game.registry);
     getOrCreateKeyBindingState(this.game.registry);
     getOrCreateInventoryState(this.game.registry);
+    createVisualTextures(this);
     this.drawField();
     this.addStageNotice();
     this.addStatusText();
@@ -162,7 +165,8 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private drawField(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x315f55);
+    addSceneBackdrop(this, 0x0e2430, 0x79d6bd);
+    addPanel(this, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 8, GAME_WIDTH - 42, GAME_HEIGHT - 112, 0x2f6f60, 0.96);
     this.add.rectangle(GAME_WIDTH / 2, 92, GAME_WIDTH - 48, 2, 0x6ec6a7, 0.45);
 
     const decorations = [
@@ -173,9 +177,13 @@ export class FieldScene extends Phaser.Scene {
     ];
 
     decorations.forEach(({ x, y, radius, color, alpha }) => {
-      this.add.circle(x, y, radius, color, alpha);
+      this.add.circle(x, y, radius, color, alpha).setStrokeStyle(2, 0x9ce4b0, 0.12);
     });
 
+    const fieldLines = this.add.graphics();
+    fieldLines.lineStyle(1, UI_THEME.colors.panelBorder, 0.12);
+    for (let x = 96; x < GAME_WIDTH; x += 96) fieldLines.lineBetween(x, 112, x, GAME_HEIGHT - 76);
+    for (let y = 144; y < GAME_HEIGHT - 76; y += 64) fieldLines.lineBetween(32, y, GAME_WIDTH - 32, y);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT - 58, GAME_WIDTH - 48, 2, 0x6ec6a7, 0.3);
   }
 
@@ -264,12 +272,11 @@ export class FieldScene extends Phaser.Scene {
     const player = this.add.container(PLAYER_POSITION.x, PLAYER_POSITION.y);
     player.setData("entityId", "player-1");
 
-    player.add(this.add.circle(0, 0, PLAYER_RADIUS, 0xf4d35e));
-    player.add(this.add.rectangle(0, 24, 34, 18, 0x34699a));
-    player.add(this.add.circle(-9, -5, 4, 0x12253a));
-    player.add(this.add.circle(9, -5, 4, 0x12253a));
+    const hero = this.add.image(0, 0, "visual-unit-hero").setDisplaySize(76, 76);
+    player.add(hero);
+    this.tweens.add({ targets: hero, y: -3, duration: 800, ease: "Sine.inOut", yoyo: true, repeat: -1 });
     player.add(this.add.text(0, 58, "Player", {
-      color: "#fff9db",
+      color: UI_THEME.colors.text,
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "18px",
       fontStyle: "bold",
@@ -297,12 +304,11 @@ export class FieldScene extends Phaser.Scene {
     selectionMarker.setVisible(false);
     monsterObject.add(selectionMarker);
 
-    monsterObject.add(this.add.circle(0, 0, MONSTER_RADIUS, monster.color));
-    monsterObject.add(this.add.rectangle(0, 20, 42, 12, monster.color));
-    monsterObject.add(this.add.circle(-9, -4, 4, 0x2a2340));
-    monsterObject.add(this.add.circle(9, -4, 4, 0x2a2340));
+    const slime = this.add.image(0, -2, getSlimeTextureKey(monster.id)).setDisplaySize(78, 78);
+    monsterObject.add(slime);
+    this.tweens.add({ targets: slime, y: -5, duration: 720 + monster.x % 120, ease: "Sine.inOut", yoyo: true, repeat: -1 });
     monsterObject.add(this.add.text(0, 54, monster.name, {
-      color: "#fff9db",
+      color: UI_THEME.colors.text,
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "17px",
       fontStyle: "bold",

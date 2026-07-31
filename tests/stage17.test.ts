@@ -183,9 +183,12 @@ test("coordinator blocks concurrent bootstrap/sync and dispose aborts stale call
   if (!second.ok) assert.equal(second.error.code, "SERVER_REJECTED");
   registry.setCallCount = 0;
   const beforeDispose = JSON.stringify(registry.get("testgame.onlineSession"));
+  const disposeStartedAt = Date.now();
   await coordinator.dispose();
   gateway.bootstrapResolve?.({ ok: true, value: { protocolVersion: 1, sessionId: "late", accountId: null, serverRevision: 1, snapshot: null } });
-  const result = await first;
+  const result = await Promise.race([first, new Promise<null>((resolve) => setTimeout(() => resolve(null), 100))]);
+  assert.notEqual(result, null);
+  assert.ok(Date.now() - disposeStartedAt < 1000);
   assert.equal(result.ok, false);
   if (!result.ok) assert.equal(result.error.code, "CANCELLED");
   assert.equal(JSON.stringify(registry.get("testgame.onlineSession")), beforeDispose);
@@ -439,6 +442,42 @@ test("conflict resolution keeps server-owned units, progression, gold, and inven
   }
 });
 
+test("coordinator sync returns the resolved snapshot instead of the raw server snapshot", async () => {
+  const base = snapshot();
+  const server = normalizeOnlineSnapshot({ ...base, baseServerRevision: 1, playerGold: 50 })!;
+  const local = normalizeOnlineSnapshot({
+    ...base,
+    baseServerRevision: 1,
+    playerGold: 999,
+    formation: { ...base.formation, slots: base.formation.slots.map((slot, index) => index === 1 ? { ...slot, rosterUnitId: null } : slot) },
+    keyBindings: { ...base.keyBindings, whirlwindCode: "KeyE" },
+  })!;
+  const registry = new Registry();
+  registry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "ONLINE", sessionId: "mock", serverRevision: 1 });
+  const gateway: OnlineGateway = {
+    bootstrap: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pullSnapshot: async () => ({ ok: true, value: { protocolVersion: 1, serverRevision: 1, snapshot: server } }),
+    pushOperations: async () => ({ ok: true, value: { protocolVersion: 1, serverRevision: 1, acknowledgedOperationIds: [], duplicateOperationIds: [], rejectedOperationIds: [], rejectedReasons: {}, snapshot: server } }),
+    disconnect: async () => Promise.resolve(),
+  };
+  const coordinator = new OnlineSyncCoordinator(registry as never, gateway);
+  const result = await coordinator.sync(local);
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.ok(result.value.snapshot);
+    assert.equal(result.value.snapshot.playerGold, 50);
+    assert.equal(result.value.snapshot.formation.slots[1].rosterUnitId, null);
+    assert.equal(result.value.snapshot.keyBindings.whirlwindCode, "KeyE");
+    assert.deepEqual(result.value.snapshot.ownedRoster, server.ownedRoster);
+    assert.deepEqual(result.value.snapshot.progression, server.progression);
+    assert.deepEqual(result.value.snapshot.inventory, server.inventory);
+    assert.equal(validateOnlineSnapshot(result.value.snapshot).ok, true);
+    assert.equal(calculateSnapshotHash(result.value.snapshot), result.value.snapshot.snapshotHash);
+    assert.notDeepEqual(result.value.snapshot, server);
+  }
+  await coordinator.dispose();
+});
+
 test("revision conflict preserves pending records and does not increment retry count", async () => {
   const registry = new Registry();
   registry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "ONLINE", sessionId: "mock", serverRevision: 1 });
@@ -471,7 +510,8 @@ test("disconnect aborts an active request and prevents a late ONLINE state", asy
   await Promise.resolve();
   await coordinator.disconnect();
   gateway.bootstrapResolve?.({ ok: true, value: { protocolVersion: 1, sessionId: "late", accountId: null, serverRevision: 1, snapshot: null } });
-  const result = await pending;
+  const result = await Promise.race([pending, new Promise<null>((resolve) => setTimeout(() => resolve(null), 100))]);
+  assert.notEqual(result, null);
   assert.equal(result.ok, false);
   assert.equal(coordinator.getState().status, "OFFLINE");
 });

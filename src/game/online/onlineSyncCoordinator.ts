@@ -217,6 +217,7 @@ export class OnlineSyncCoordinator {
       if (!protocol.ok) return protocol;
       const revision = this.revisionGuard(generation, pulled.value.serverRevision);
       if (!revision.ok) return revision;
+      let selectedSnapshot = pulled.value.snapshot;
       if (snapshot && pulled.value.snapshot) {
         const resolved = resolveOnlineConflict(snapshot, pulled.value.snapshot);
         if (resolved.status === "MANUAL_REQUIRED") {
@@ -224,10 +225,11 @@ export class OnlineSyncCoordinator {
           if (!conflictState) return this.cancellationError();
           return { ok: true, value: { state: conflictState, snapshot: pulled.value.snapshot } };
         }
+        selectedSnapshot = resolved.snapshot;
       }
       const next = this.updateIfCurrent(generation, { status: "ONLINE", serverRevision: pulled.value.serverRevision, lastSyncedAtMs: this.nowMs(), lastErrorCode: null, lastErrorMessage: null, pendingOperationCount: this.getQueue().records.length });
       if (!next) return this.cancellationError();
-      return { ok: true, value: { state: next, snapshot: pulled.value.snapshot } };
+      return { ok: true, value: { state: next, snapshot: selectedSnapshot } };
     } finally {
       this.syncInProgress = false;
     }

@@ -506,6 +506,8 @@ test("valid battle and offline DTO payloads are accepted", () => {
   const offline = createOfflineRewardClaimOperation({ claimSequence: 1, previousServerRevision: 0, elapsedFromMs: 1, elapsedToMs: 2, selectedMonsterId: "slime-1", deployedRosterUnitIds: ["ally-main-character"] }, { ...context, operationId: "offline-dto" });
   assert.equal(validateClientOperation(battle).ok, true);
   assert.equal(validateClientOperation(offline).ok, true);
+  assert.equal(validateClientOperation(createClientOperation("BATTLE_RESULT_SUBMISSION", { ...battle.payload, rosterUnitIds: [] }, { ...context, operationId: "empty-battle-roster" })).ok, false);
+  assert.equal(validateClientOperation(createClientOperation("OFFLINE_REWARD_CLAIM", { ...offline.payload, deployedRosterUnitIds: ["ally-main-character", "ally-main-character"] }, { ...context, operationId: "duplicate-offline-roster" })).ok, false);
 });
 
 test("unknown snapshot fields are rejected and invalid conflict inputs remain manual", () => {
@@ -558,6 +560,58 @@ test("OpenAPI response schemas match protocol fields and forbid type null", asyn
     assert.ok(JSON.stringify(operation.parameters).includes("IdempotencyKey"));
     for (const code of ["400", "401", "409", "413", "429", "500"]) assert.ok(operation.responses?.[code]);
   }
+  assert.deepEqual(schemas.PullRequest.required, ["protocolVersion", "sessionId", "expectedServerRevision"]);
+  assert.deepEqual(schemas.PushRequest.required, ["protocolVersion", "sessionId", "expectedServerRevision", "operations"]);
+  assert.equal((schemas.Operation.properties?.type as { enum?: string[] }).enum?.length, 7);
   assert.equal(JSON.stringify(contract).includes("secret"), false);
   assert.equal(JSON.stringify(contract).includes("token"), false);
+});
+
+test("gateway response protocol mismatches fail before applying response data", async () => {
+  const value = snapshot();
+  const bootstrapRegistry = new Registry();
+  bootstrapRegistry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "OFFLINE" });
+  const bootstrapGateway: OnlineGateway = {
+    bootstrap: async () => ({ ok: true, value: { protocolVersion: 2, sessionId: "future", accountId: null, serverRevision: 9, snapshot: value } }),
+    pullSnapshot: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pushOperations: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    disconnect: async () => Promise.resolve(),
+  };
+  const bootstrapCoordinator = new OnlineSyncCoordinator(bootstrapRegistry as never, bootstrapGateway);
+  const bootstrapResult = await bootstrapCoordinator.bootstrap(value);
+  assert.equal(bootstrapResult.ok, false);
+  if (!bootstrapResult.ok) assert.equal(bootstrapResult.error.code, "FUTURE_PROTOCOL_VERSION");
+  assert.equal(bootstrapCoordinator.getState().status, "ERROR");
+  assert.equal(bootstrapCoordinator.getState().serverRevision, null);
+
+  const response = { protocolVersion: 2, serverRevision: 1, acknowledgedOperationIds: ["ack"], duplicateOperationIds: [], rejectedOperationIds: [], rejectedReasons: {}, snapshot: value };
+  const pushRegistry = new Registry();
+  pushRegistry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "ONLINE", sessionId: "mock", serverRevision: 0 });
+  const pushGateway: OnlineGateway = {
+    bootstrap: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pullSnapshot: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pushOperations: async () => ({ ok: true, value: response }),
+    disconnect: async () => Promise.resolve(),
+  };
+  const pushCoordinator = new OnlineSyncCoordinator(pushRegistry as never, pushGateway);
+  pushCoordinator.enqueue(createClientOperation("CLIENT_PREFERENCE_UPDATE", { value: 1 }, { deviceId: value.deviceId, clientInstanceId: value.clientInstanceId, baseServerRevision: 0, operationId: "protocol-push" }));
+  const pushResult = await pushCoordinator.sync(value);
+  assert.equal(pushResult.ok, false);
+  if (!pushResult.ok) assert.equal(pushResult.error.code, "FUTURE_PROTOCOL_VERSION");
+  assert.equal(pushCoordinator.getState().serverRevision, 0);
+  assert.equal(pushCoordinator.getQueue().records[0].status, "PENDING");
+
+  const pullRegistry = new Registry();
+  pullRegistry.set("testgame.onlineSession", { ...createDefaultOnlineSessionState(true), mockMode: true, status: "ONLINE", sessionId: "mock", serverRevision: 0 });
+  const pullGateway: OnlineGateway = {
+    bootstrap: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    pullSnapshot: async () => ({ ok: true, value: { protocolVersion: 2, serverRevision: 4, snapshot: value } }),
+    pushOperations: async () => ({ ok: false, error: { code: "SERVER_ERROR", message: "unused", retryable: true } }),
+    disconnect: async () => Promise.resolve(),
+  };
+  const pullCoordinator = new OnlineSyncCoordinator(pullRegistry as never, pullGateway);
+  const pullResult = await pullCoordinator.sync(value);
+  assert.equal(pullResult.ok, false);
+  if (!pullResult.ok) assert.equal(pullResult.error.code, "FUTURE_PROTOCOL_VERSION");
+  assert.equal(pullCoordinator.getState().serverRevision, 0);
 });

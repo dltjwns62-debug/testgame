@@ -72,7 +72,14 @@ function hasExactKeys(value: unknown, keys: readonly string[]): value is Record<
 }
 
 function isNonEmptyStringArray(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every((entry) => typeof entry === "string" && entry.length > 0);
+  if (!Array.isArray(value) || value.length === 0 || value.length > 10) return false;
+  const ids = value as unknown[];
+  const seen = new Set<string>();
+  return ids.every((entry) => {
+    if (typeof entry !== "string" || entry.length === 0 || seen.has(entry)) return false;
+    seen.add(entry);
+    return true;
+  });
 }
 
 function isBattleResultSubmissionPayload(value: unknown): value is BattleResultSubmissionPayload {

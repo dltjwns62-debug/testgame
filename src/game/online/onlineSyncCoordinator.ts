@@ -14,6 +14,7 @@ import { resolveOnlineConflict } from "./onlineConflictResolution";
 import { createOnlineSnapshotFromRegistry } from "./onlineSnapshot";
 import { getOrCreateOnlineSessionState, normalizeOnlineSessionState, ONLINE_QUEUE_REGISTRY_KEY, ONLINE_SESSION_REGISTRY_KEY, updateOnlineSessionState } from "./onlineRegistry";
 import { ONLINE_PROTOCOL_VERSION, type ClientOperationEnvelope, type OnlineGateway, type OnlinePlayerSnapshot, type OnlineResult, type OnlineSessionState } from "./onlineTypes";
+import { validateOnlineProtocolVersion } from "./onlineValidation";
 
 export type OnlineCoordinatorOptions = {
   nowMs?: () => number;
@@ -82,12 +83,16 @@ export class OnlineSyncCoordinator {
     this.activeController = controller;
     let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
     let externalAbort: (() => void) | null = null;
+    let internalAbort: (() => void) | null = null;
+    let timedOut = false;
     const cancelled = new Promise<OnlineResult<T>>((resolve) => {
+      internalAbort = () => { if (!timedOut) resolve(this.cancellationError()); };
+      controller.signal.addEventListener("abort", internalAbort, { once: true });
       externalAbort = () => { controller.abort(); resolve(this.cancellationError()); };
       externalSignal?.addEventListener("abort", externalAbort, { once: true });
     });
     const timeout = new Promise<OnlineResult<T>>((resolve) => {
-      timeoutHandle = setTimeout(() => { controller.abort(); resolve({ ok: false, error: { code: "TIMEOUT", message: "Online request timed out.", retryable: true } }); }, this.timeoutMs);
+      timeoutHandle = setTimeout(() => { timedOut = true; controller.abort(); resolve({ ok: false, error: { code: "TIMEOUT", message: "Online request timed out.", retryable: true } }); }, this.timeoutMs);
     });
     try {
       const request = action(controller.signal).catch((): OnlineResult<T> => ({ ok: false as const, error: { code: "SERVER_ERROR", message: "Online gateway request failed.", retryable: true } }));
@@ -97,6 +102,7 @@ export class OnlineSyncCoordinator {
     } finally {
       if (timeoutHandle) clearTimeout(timeoutHandle);
       if (externalAbort) externalSignal?.removeEventListener("abort", externalAbort);
+      if (internalAbort) controller.signal.removeEventListener("abort", internalAbort);
       if (this.activeController === controller) this.activeController = null;
     }
   }
@@ -115,6 +121,13 @@ export class OnlineSyncCoordinator {
     const current = this.getState().serverRevision;
     if (current !== null && revision < current) return { ok: false, error: { code: "SERVER_REJECTED", message: "A stale server revision was ignored.", retryable: false, serverRevision: current } };
     return { ok: true, value: true };
+  }
+
+  private protocolGuard(generation: number, protocolVersion: unknown): OnlineResult<true> {
+    const validation = validateOnlineProtocolVersion(protocolVersion);
+    if (validation.ok) return { ok: true, value: true };
+    this.updateIfCurrent(generation, { status: "ERROR", lastErrorCode: validation.error.code, lastErrorMessage: validation.error.message });
+    return validation;
   }
 
   public async bootstrap(snapshot?: OnlinePlayerSnapshot, signal?: AbortSignal): Promise<OnlineCoordinatorResult> {
@@ -138,6 +151,8 @@ export class OnlineSyncCoordinator {
         this.updateIfCurrent(generation, { status: result.error.code === "ONLINE_DISABLED" ? "DISABLED" : result.error.code === "CANCELLED" ? "OFFLINE" : "OFFLINE", lastErrorCode: result.error.code, lastErrorMessage: result.error.message });
         return result;
       }
+      const protocol = this.protocolGuard(generation, result.value.protocolVersion);
+      if (!protocol.ok) return protocol;
       const revision = this.revisionGuard(generation, result.value.serverRevision);
       if (!revision.ok) return revision;
       const next = this.updateIfCurrent(generation, { status: "ONLINE", sessionId: result.value.sessionId, accountId: result.value.accountId, serverRevision: result.value.serverRevision, lastSyncedAtMs: this.nowMs(), lastErrorCode: null, lastErrorMessage: null });
@@ -177,6 +192,8 @@ export class OnlineSyncCoordinator {
           this.updateIfCurrent(generation, { status: "DEGRADED", lastErrorCode: pushed.error.code, lastErrorMessage: pushed.error.message, serverRevision: pushed.error.serverRevision ?? serverRevision, pendingOperationCount: nextQueue.records.length });
           return pushed;
         }
+        const protocol = this.protocolGuard(generation, pushed.value.protocolVersion);
+        if (!protocol.ok) return protocol;
         const revision = this.revisionGuard(generation, pushed.value.serverRevision);
         if (!revision.ok) return revision;
         const acknowledged = [...pushed.value.acknowledgedOperationIds, ...pushed.value.duplicateOperationIds];
@@ -196,6 +213,8 @@ export class OnlineSyncCoordinator {
         this.updateIfCurrent(generation, { status: pulled.error.code === "REVISION_CONFLICT" ? "CONFLICT" : "DEGRADED", lastErrorCode: pulled.error.code, lastErrorMessage: pulled.error.message, serverRevision: pulled.error.serverRevision ?? serverRevision });
         return pulled;
       }
+      const protocol = this.protocolGuard(generation, pulled.value.protocolVersion);
+      if (!protocol.ok) return protocol;
       const revision = this.revisionGuard(generation, pulled.value.serverRevision);
       if (!revision.ok) return revision;
       if (snapshot && pulled.value.snapshot) {

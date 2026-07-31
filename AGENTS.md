@@ -1,6 +1,6 @@
 # 개발 AI 작업 규칙
 
-Stage 17 scope note: the submitted v3 work is limited to online protocol v1 contracts, server-authoritative conflict boundaries, local OnlinePlayerSnapshot and DTO validation, Disabled/Mock gateways, operation idempotency and record-based pending queue with retry/backoff/rejection preservation, revision-guarded sync coordinator lifecycle, Retry-After propagation, OpenAPI/TypeScript contract alignment, Online Status UI lifecycle documentation, threat model, and automatic tests. It does not implement a real server, HTTP/WebSocket transport, accounts, OAuth, cloud sync, multiplayer, chat, commerce, deployment, or Stage 18.
+Stage 17 scope note: the submitted v4 work is limited to online protocol v1 contracts, server-authoritative conflict boundaries, local OnlinePlayerSnapshot and DTO validation, Disabled/Mock gateways, operation idempotency and record-based pending queue with retry/backoff/rejection preservation, revision-guarded sync coordinator lifecycle and cancellation, Retry-After propagation, gateway response protocol validation, OpenAPI/TypeScript request-response alignment, Online Status UI lifecycle documentation, threat model, and automatic tests. It does not implement a real server, HTTP/WebSocket transport, accounts, OAuth, cloud sync, multiplayer, chat, commerce, deployment, or Stage 18.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
@@ -84,7 +84,7 @@ Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 - 16단계 현재 검수 태그: `review-stage-16-v4` (승인)
 - 16단계 완료 태그: `stage-16-completed`
 - 17단계 최초 검수 태그: `review-stage-17-v1` — 수정 요청
-- 17단계 현재 검수 태그: `review-stage-17-v3`
+- 17단계 현재 검수 태그: `review-stage-17-v4`
 - 사용자 실행 테스트: 사용자 요청으로 생략 (`skipped_by_user`)
 - ChatGPT 코드 검수: 검수 대기 (`pending`)
 - 완료된 단계: 1단계, 2단계, 3단계, 4단계, 5단계, 6단계, 7단계, 8단계, 9단계, 10단계, 11단계, 12단계, 13단계, 14단계, 15단계, 16단계

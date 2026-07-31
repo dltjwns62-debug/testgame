@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-07-31 — 17단계 v3 검수 수정 및 v4 재제출 — 검수 대기
+
+- coordinator가 `RESOLVED` conflict snapshot을 sync 결과로 반환하고, `MANUAL_REQUIRED` 외에는 선택된 snapshot을 전달하도록 수정했다.
+- 내부 AbortController abort가 pending Promise를 즉시 `CANCELLED`로 끝내고 timeout·listener cleanup을 보장하도록 보완했다.
+- bootstrap/push/pull gateway response의 protocolVersion을 검증하고, roster 배열 중복·빈 값·최대 인원을 검증한다.
+- OpenAPI Pull/Push의 nullable sessionId·required 필드와 operation enum을 TypeScript 계약에 맞췄다.
+- `review-stage-17-v1`·v2·v3은 수정 요청 이력과 불변 태그로 보존하고, 현재 제출 태그는 `review-stage-17-v4`다.
+- Online Status 전체 조작·실제 네트워크·계정·사용자 수동 테스트는 각각 `not_run`·`skipped_by_user`로 유지한다.
+
 ## 2026-07-31 — 17단계 v2 검수 수정 및 v3 재제출 — 검수 대기
 
 - 서버 authoritative 충돌 병합에서 owned roster·progression·Gold·Inventory·보상 진행은 서버 값을 유지하고 로컬 슬롯·유효 Control Group·설정만 제한적으로 반영하도록 수정했다.

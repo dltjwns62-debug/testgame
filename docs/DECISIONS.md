@@ -1,5 +1,15 @@
 # 프로젝트 결정 사항
 
+## 17단계 v4 검수 재제출 결정
+
+- 결정: `resolveOnlineConflict`의 `RESOLVED` 결과 snapshot은 coordinator sync 반환값으로 전달하고, 서버 snapshot을 무조건 반환하지 않는다.
+- 결정: coordinator 내부 AbortController abort는 cancellation Promise를 즉시 해결하며, timeout은 `TIMEOUT`을 유지하고 모든 listener를 정리한다.
+- 결정: bootstrap·push·pull response는 protocolVersion 1만 적용하고, 미래·누락·잘못된 버전은 local state와 queue를 적용하지 않고 `ERROR`로 기록한다.
+- 결정: Battle/Offline roster ID 배열은 비어 있지 않고 중복·빈 문자열이 없으며 최대 10개인 경우만 허용한다.
+- 결정: OpenAPI 3.0.3 request required 배열과 nullable sessionId, operation enum은 TypeScript request 계약과 일치시킨다.
+- 결정: v1·v2·v3 태그와 이력은 보존하고 `review-stage-17-v4`를 새 제출 태그로 사용한다.
+- 상태: 확정
+
 ## 17단계 v3 검수 재제출 결정
 
 - 결정: 서버 authoritative 영역은 formation.ownedUnits, ownedRoster, progression, Gold, Inventory/equipment와 AutoProgress의 victory count·offline claim sequence·reward 상태로 고정한다.

@@ -1,16 +1,16 @@
 # 실행 및 테스트 기록
 
-## Stage 17 온라인 확장 준비 — v3 검수 대기
+## Stage 17 온라인 확장 준비 — v4 검수 대기
 
 - 작업 브랜치: `stage-17-online-expansion-readiness`
-- 검수 태그: `review-stage-17-v3`
+- 검수 태그: `review-stage-17-v4`
 - 상태: `review_pending`
 - 완료된 단계: 1단계~16단계
 - 다음 단계: 없음 — 전체 로드맵의 마지막 단계
 
 ### 자동 검사
 
-- `tests/stage17.test.ts`: protocol/snapshot, Disabled/Mock Gateway, operation queue, conflict resolver, sync coordinator, DTO/OpenAPI 경계 검사 (48개; 기존 Stage 16 31개 포함 총 79개)
+- `tests/stage17.test.ts`: protocol/snapshot, Disabled/Mock Gateway, operation queue, conflict resolver, sync coordinator, DTO/OpenAPI 경계 검사 (49개; 기존 Stage 16 31개 포함 총 80개)
 - `npm ci`: 통과 (`passed`)
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run test`: 통과 (`passed`)
@@ -30,6 +30,7 @@
 - canonical snapshot deep consistency, unknown field, operation DTO/type/hash/payload size/sensitive/final reward 검증
 - sync coordinator의 DISABLED/OFFLINE/ONLINE/SYNCING/CONFLICT 전환, 동시 실행 차단, abort·dispose·stale response·revision guard, REVISION_CONFLICT queue 보존과 Retry-After
 - OpenAPI 3.0.3과 TypeScript response 필드·nullable·$ref·오류 응답·Idempotency-Key 계약
+- coordinator RESOLVED snapshot 반환, 내부 abort cancellation, gateway response protocolVersion 검증, roster 중복·빈 배열·최대 인원 검증
 
 ### 미실행·수동 상태
 
@@ -39,6 +40,7 @@
 - 실제 브라우저 전체 전투·장시간 방치 통합: `not_run`
 - 실제 Online Status 전체 버튼 흐름·Scene shutdown async callback: `not_run`
 - Back 중 active request, Disconnect 후 재진입, mock gateway page-session 유지: `not_run`
+- gateway 응답 protocol mismatch의 실제 Scene UI 흐름: `not_run`
 - 사용자 수동 테스트: `skipped_by_user`
 - 생략·미실행 항목은 통과로 간주하거나 표현하지 않는다.
 - ChatGPT 코드 검수: `pending`

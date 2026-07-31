@@ -16,10 +16,11 @@ import {
 } from "../formationState";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import { calculateFinalUnitStats, getEquippedModifierTotals, getOrCreateInventoryState } from "../items";
-import { formatProgression } from "../progression";
+import { formatProgression, getExperienceToNextLevel } from "../progression";
 import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { FormationState, OwnedRosterUnit } from "../rtsBattleTypes";
-import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addPanel, addProgressBar, addSceneBackdrop, setProgressBar, UI_THEME, type ButtonVisual } from "../ui/theme";
+import { createVisualTextures, getUnitTextureKey } from "../ui/visuals";
 import type { FieldScene } from "./FieldScene";
 
 type FormationSlotVisual = {
@@ -42,9 +43,12 @@ export class FormationScene extends Phaser.Scene {
   private readonly slotVisuals = new Map<number, FormationSlotVisual>();
   private readonly ownedVisuals = new Map<string, OwnedUnitVisual>();
   private selectedInfoText!: Phaser.GameObjects.Text;
+  private selectedExpBar!: { fill: Phaser.GameObjects.Rectangle };
+  private selectedExpText!: Phaser.GameObjects.Text;
   private statusText!: Phaser.GameObjects.Text;
   private removeButton!: Phaser.GameObjects.Rectangle;
   private removeButtonLabel!: Phaser.GameObjects.Text;
+  private removeButtonVisual!: ButtonVisual;
 
   public constructor() {
     super("FormationScene");
@@ -61,6 +65,7 @@ export class FormationScene extends Phaser.Scene {
       this.game.registry,
       new Set(this.draft.ownedUnits.map((unit) => unit.rosterUnitId)),
     );
+    createVisualTextures(this);
     this.drawBackground();
     this.addHeader();
     this.addFormationSlots();
@@ -155,18 +160,19 @@ export class FormationScene extends Phaser.Scene {
           this.selectUnit(unit.rosterUnitId);
         }
       });
-      const nameText = this.add.text(x - 61, y - 16, unit.displayName, {
+      this.add.image(x - 51, y - 2, getUnitTextureKey(getAllyUnitDefinition(unit.unitDefinitionId))).setDisplaySize(28, 28);
+      const nameText = this.add.text(x - 31, y - 16, unit.displayName, {
         color: "#d9f2ff",
         fontFamily: "Segoe UI, sans-serif",
         fontSize: "10px",
         fontStyle: "bold",
       });
-      const stateText = this.add.text(x - 61, y + 1, "", {
+      const stateText = this.add.text(x - 31, y + 1, "", {
         color: "#b9cad7",
         fontFamily: "Segoe UI, sans-serif",
         fontSize: "7px",
         lineSpacing: 0,
-        wordWrap: { width: 124 },
+        wordWrap: { width: 94 },
       });
       this.ownedVisuals.set(unit.rosterUnitId, { background, nameText, stateText });
     });
@@ -185,26 +191,22 @@ export class FormationScene extends Phaser.Scene {
       fontSize: "11px",
       wordWrap: { width: 560 },
     });
+    this.add.text(570, 386, "Selected EXP", { color: UI_THEME.colors.muted, fontFamily: UI_THEME.fontFamily, fontSize: "10px", fontStyle: "bold" });
+    this.selectedExpBar = addProgressBar(this, 700, 402, 260, 0, UI_THEME.colors.accent, 8);
+    this.selectedExpText = this.add.text(570, 397, "No unit", { color: UI_THEME.colors.muted, fontFamily: UI_THEME.fontFamily, fontSize: "10px" });
 
     this.addButton(640, 430, 132, "Apply & Return", () => this.applyAndReturn(), 0x4b8b6d);
     this.addButton(786, 430, 92, "Cancel", () => this.cancelAndReturn(), 0x536078);
     this.addButton(890, 430, 104, "Reset Default", () => this.resetDefault(), 0x7b5e3b);
 
-    this.removeButton = this.add.rectangle(850, 483, 164, 28, 0x293044, 1)
-      .setStrokeStyle(1, 0x536078, 1)
-      .setInteractive({ useHandCursor: true });
-    this.removeButtonLabel = this.add.text(850, 483, "Remove from Formation", {
-      color: "#8795a8",
-      fontFamily: "Segoe UI, sans-serif",
+    this.removeButtonVisual = addCommonButton(this, 850, 483, 164, "Remove from Formation", () => this.removeSelectedUnit(), {
+      color: UI_THEME.colors.warning,
+      disabled: true,
       fontSize: "10px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    this.removeButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        this.removeSelectedUnit();
-      }
+      height: 28,
     });
+    this.removeButton = this.removeButtonVisual.background;
+    this.removeButtonLabel = this.removeButtonVisual.label;
   }
 
   private addButton(
@@ -215,21 +217,7 @@ export class FormationScene extends Phaser.Scene {
     callback: () => void,
     color: number,
   ): void {
-    const background = this.add.rectangle(x, y, width, 30, color, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 0.9)
-      .setInteractive({ useHandCursor: true });
-    background.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        callback();
-      }
-    });
-    this.add.text(x, y, label, {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "10px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
+    addCommonButton(this, x, y, width, label, callback, { color, fontSize: "10px", height: 30 });
   }
 
   private selectUnit(rosterUnitId: string): void {
@@ -399,6 +387,10 @@ export class FormationScene extends Phaser.Scene {
   private refreshUi(): void {
     const selected = this.getSelectedUnit();
     this.selectedInfoText.setText(selected ? `Selected: ${this.getUnitSummary(selected)}` : "Selected: None");
+    const expRequired = selected ? getExperienceToNextLevel(selected.level) : 1;
+    const expRatio = selected && selected.level < 99 ? selected.experience / expRequired : selected ? 1 : 0;
+    setProgressBar(this.selectedExpBar, 256, expRatio);
+    this.selectedExpText.setText(selected ? (selected.level >= 99 ? "MAX LEVEL" : `${selected.experience.toLocaleString()} / ${expRequired.toLocaleString()} EXP`) : "No unit");
     for (let slotIndex = 0; slotIndex < RTS_ALLY_COUNT; slotIndex += 1) {
       const visual = this.slotVisuals.get(slotIndex);
       if (!visual) {
@@ -427,7 +419,7 @@ export class FormationScene extends Phaser.Scene {
     }
 
     const canRemove = Boolean(selected && selected.unitRole !== "MAIN_CHARACTER" && this.findSlotForUnit(selected.rosterUnitId) !== null);
-    this.removeButton.setFillStyle(canRemove ? 0x7b5e3b : 0x293044, 1).setAlpha(canRemove ? 1 : 0.55);
+    this.removeButtonVisual.setEnabled(canRemove);
     this.removeButtonLabel.setColor(canRemove ? "#fff1d0" : "#8795a8");
   }
 

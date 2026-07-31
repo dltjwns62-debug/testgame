@@ -25,6 +25,10 @@ export const UI_THEME = {
 export type ButtonVisual = {
   background: Phaser.GameObjects.Rectangle;
   label: Phaser.GameObjects.Text;
+  setEnabled(enabled: boolean): void;
+  setBusy(busy: boolean): void;
+  setLabel(label: string): void;
+  destroy(): void;
 };
 
 export function addSceneBackdrop(
@@ -76,34 +80,67 @@ export function addButton(
   width: number,
   label: string,
   action: () => void,
-  options: { color?: number; disabled?: boolean; fontSize?: string } = {},
+  options: { color?: number; disabled?: boolean; fontSize?: string; height?: number } = {},
 ): ButtonVisual {
-  const disabled = options.disabled ?? false;
+  let enabled = !(options.disabled ?? false);
+  let busy = false;
+  let textValue = label;
+  const normalColor = options.color ?? UI_THEME.colors.success;
+  const height = options.height ?? 34;
   const background = scene.add.rectangle(
     x,
     y,
     width,
-    34,
-    disabled ? UI_THEME.colors.inkSoft : options.color ?? UI_THEME.colors.success,
-    disabled ? 0.72 : 1,
-  ).setStrokeStyle(1, disabled ? 0x496176 : UI_THEME.colors.successBorder, 0.95);
-  const text = scene.add.text(x, y, label, {
-    color: disabled ? "#7890a4" : UI_THEME.colors.text,
+    height,
+    normalColor,
+    1,
+  ).setStrokeStyle(1, enabled ? UI_THEME.colors.successBorder : 0x496176, 0.95);
+  const text = scene.add.text(x, y, textValue, {
+    color: enabled ? UI_THEME.colors.text : "#7890a4",
     fontFamily: UI_THEME.fontFamily,
     fontSize: options.fontSize ?? "11px",
     fontStyle: "bold",
     align: "center",
   }).setOrigin(0.5);
-  if (!disabled) {
-    background.setInteractive({ useHandCursor: true });
-    background.on("pointerover", () => background.setFillStyle(UI_THEME.colors.panelRaised, 1));
-    background.on("pointerout", () => background.setFillStyle(options.color ?? UI_THEME.colors.success, 1));
-    background.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) action();
-    });
-  }
-  return { background, label: text };
+  const render = (color = normalColor): void => {
+    const active = enabled && !busy;
+    background
+      .setFillStyle(active ? color : UI_THEME.colors.inkSoft, active ? 1 : 0.72)
+      .setStrokeStyle(1, active ? UI_THEME.colors.successBorder : 0x496176, 0.95);
+    text.setText(busy ? `${textValue} ···` : textValue).setColor(active ? UI_THEME.colors.text : "#7890a4");
+    if (active) background.setInteractive({ useHandCursor: true });
+    else background.disableInteractive();
+  };
+  const visual: ButtonVisual = {
+    background,
+    label: text,
+    setEnabled(nextEnabled: boolean): void {
+      enabled = nextEnabled;
+      render();
+    },
+    setBusy(nextBusy: boolean): void {
+      busy = nextBusy;
+      render();
+    },
+    setLabel(nextLabel: string): void {
+      textValue = nextLabel;
+      render();
+    },
+    destroy(): void {
+      background.destroy();
+      text.destroy();
+    },
+  };
+  background.on("pointerover", () => { if (enabled && !busy) render(UI_THEME.colors.panelRaised); });
+  background.on("pointerout", () => render());
+  background.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+    pointer.event?.stopPropagation();
+    if (pointer.button !== 0 || !enabled || busy) return;
+    render(UI_THEME.colors.warning);
+    action();
+  });
+  render();
+  return visual;
 }
 
 export function addProgressBar(

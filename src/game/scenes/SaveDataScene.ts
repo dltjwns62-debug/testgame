@@ -8,7 +8,7 @@ import {
 } from "../persistence";
 import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import { getResetRestartScene, getSaveDataReturnScene, type SaveDataReturnScene } from "../sceneNavigation";
-import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 
 export class SaveDataScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
@@ -75,21 +75,9 @@ export class SaveDataScene extends Phaser.Scene {
     label: string,
     action: () => void,
   ): Phaser.GameObjects.Rectangle {
-    const button = this.add.rectangle(x, y, width, 34, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 0.9)
-      .setInteractive({ useHandCursor: true });
-    const text = this.add.text(x, y, label, {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    button.setData("label", text);
-    button.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) action();
-    });
-    return button;
+    const visual = addCommonButton(this, x, y, width, label, action);
+    visual.background.setData("label", visual.label);
+    return visual.background;
   }
 
   private refreshUi(): void {

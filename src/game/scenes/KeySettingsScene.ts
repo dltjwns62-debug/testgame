@@ -19,7 +19,7 @@ import {
   type SkillBindingId,
 } from "../keyBindings";
 import type { FieldScene } from "./FieldScene";
-import { addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
 
 type CaptureAction =
   | { kind: "GROUP"; groupIndex: ControlGroupIndex }
@@ -224,21 +224,7 @@ export class KeySettingsScene extends Phaser.Scene {
     callback: () => void,
     color: number,
   ): void {
-    const button = this.add.rectangle(x, y, width, 30, color, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 0.9)
-      .setInteractive({ useHandCursor: true });
-    button.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        callback();
-      }
-    });
-    this.add.text(x, y, label, {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "10px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
+    addCommonButton(this, x, y, width, label, callback, { color, fontSize: "10px", height: 30 });
   }
 
   private beginGroupCapture(groupIndex: ControlGroupIndex): void {

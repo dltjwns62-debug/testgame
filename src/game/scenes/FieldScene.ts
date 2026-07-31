@@ -18,7 +18,7 @@ import { addPlayerGold, getOrCreatePlayerGold } from "../playerEconomy";
 import { getOrCreateKeyBindingState } from "../keyBindings";
 import { calculateFinalUnitStats, getEquippedModifierTotals, getItemDefinition, getOrCreateInventoryState } from "../items";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
-import { formatProgression } from "../progression";
+import { formatProgression, getExperienceToNextLevel } from "../progression";
 import {
   getOrCreateAutoProgressState,
   recordActualMonsterVictory,
@@ -30,7 +30,7 @@ import { hasFatalRuntimeStateIssue, inspectRuntimeState, repairRuntimeStateAtBou
 import type { OfflineRewardSummary } from "../offlineProgress";
 import type { BattleOutcome, OwnedRosterUnit, RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 import { createVisualTextures, getSlimeTextureKey } from "../ui/visuals";
-import { addSceneBackdrop, addPanel, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addProgressBar, addSceneBackdrop, addPanel, setProgressBar, UI_THEME } from "../ui/theme";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
@@ -59,6 +59,8 @@ function getHeroStatsLabel(
 
 export class FieldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Container;
+  private heroExpBar!: { fill: Phaser.GameObjects.Rectangle };
+  private heroExpText!: Phaser.GameObjects.Text;
   private readonly monsterViews = new Map<string, MonsterView>();
   private targetMonster: MonsterView | null = null;
   private state: FieldState = "IDLE";
@@ -215,57 +217,21 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addFormationButton(): void {
-    this.formationButton = this.add.rectangle(520, 66, 112, 28, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 1)
-      .setInteractive({ useHandCursor: true });
-    this.formationButtonLabel = this.add.text(520, 66, "Formation", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    this.formationButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        this.openFormation();
-      }
-    });
+    const visual = addCommonButton(this, 520, 66, 112, "Formation", () => this.openFormation(), { height: 28 });
+    this.formationButton = visual.background;
+    this.formationButtonLabel = visual.label;
   }
 
   private addShopButton(): void {
-    this.shopButton = this.add.rectangle(640, 66, 104, 28, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 1)
-      .setInteractive({ useHandCursor: true });
-    this.shopButtonLabel = this.add.text(640, 66, "Shop", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    this.shopButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        this.openShop();
-      }
-    });
+    const visual = addCommonButton(this, 640, 66, 104, "Shop", () => this.openShop(), { height: 28 });
+    this.shopButton = visual.background;
+    this.shopButtonLabel = visual.label;
   }
 
   private addKeySettingsButton(): void {
-    this.keySettingsButton = this.add.rectangle(750, 66, 96, 28, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 1)
-      .setInteractive({ useHandCursor: true });
-    this.keySettingsButtonLabel = this.add.text(750, 66, "Keys", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    this.keySettingsButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        this.openKeySettings();
-      }
-    });
+    const visual = addCommonButton(this, 750, 66, 96, "Keys", () => this.openKeySettings(), { height: 28 });
+    this.keySettingsButton = visual.background;
+    this.keySettingsButtonLabel = visual.label;
   }
 
   private addPlayer(): Phaser.GameObjects.Container {
@@ -282,6 +248,16 @@ export class FieldScene extends Phaser.Scene {
       fontStyle: "bold",
       align: "center",
     }).setOrigin(0.5));
+    const expBar = addProgressBar(this, 0, 73, 84, 0, UI_THEME.colors.accent, 6);
+    player.add([expBar.background, expBar.fill]);
+    this.heroExpBar = expBar;
+    this.heroExpText = this.add.text(0, 83, "", {
+      color: UI_THEME.colors.muted,
+      fontFamily: UI_THEME.fontFamily,
+      fontSize: "8px",
+      fontStyle: "bold",
+    }).setOrigin(0.5);
+    player.add(this.heroExpText);
 
     return player;
   }
@@ -528,21 +504,9 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addInventoryButton(): void {
-    this.inventoryButton = this.add.rectangle(862, 66, 104, 28, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 1)
-      .setInteractive({ useHandCursor: true });
-    this.inventoryButtonLabel = this.add.text(862, 66, "Inventory", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    this.inventoryButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        this.openInventory();
-      }
-    });
+    const visual = addCommonButton(this, 862, 66, 104, "Inventory", () => this.openInventory(), { height: 28 });
+    this.inventoryButton = visual.background;
+    this.inventoryButtonLabel = visual.label;
   }
 
   public openInventory(): void {
@@ -748,18 +712,27 @@ export class FieldScene extends Phaser.Scene {
     const heroSlot = formation.slots.find((slot) => slot.rosterUnitId === hero?.rosterUnitId)?.slotIndex;
     const playerGold = getOrCreatePlayerGold(this.game.registry);
     const autoProgress = getOrCreateAutoProgressState(this.game.registry);
-    this.formationButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
-    this.formationButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
-    this.shopButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
-    this.shopButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
-    this.keySettingsButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
-    this.keySettingsButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
-    this.inventoryButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
-    this.inventoryButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
+    const heroExpRequired = hero ? getExperienceToNextLevel(hero.level) : 1;
+    const heroExpRatio = hero && hero.level < 99 ? hero.experience / heroExpRequired : hero ? 1 : 0;
+    if (this.heroExpBar) setProgressBar(this.heroExpBar, 80, heroExpRatio);
+    this.heroExpText?.setText(hero ? (hero.level >= 99 ? "MAX" : `EXP ${hero.experience}/${heroExpRequired}`) : "EXP --");
+    const menuEnabled = this.state === "IDLE";
+    [this.formationButton, this.shopButton, this.keySettingsButton, this.inventoryButton, this.saveDataButton].forEach((button) => {
+      if (menuEnabled) button?.setInteractive({ useHandCursor: true });
+      else button?.disableInteractive();
+    });
+    this.formationButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
+    this.formationButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
+    this.shopButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
+    this.shopButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
+    this.keySettingsButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
+    this.keySettingsButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
+    this.inventoryButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
+    this.inventoryButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
     this.repeatButton?.setFillStyle(autoProgress.autoRepeatEnabled ? 0x3b9b6f : 0x4b8b6d, 1);
     this.repeatButtonLabel?.setText("Repeat: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF"));
-    this.saveDataButton?.setFillStyle(this.state === "IDLE" ? 0x4b8b6d : 0x293044, 1);
-    this.saveDataButtonLabel?.setColor(this.state === "IDLE" ? "#f3f8e9" : "#8795a8");
+    this.saveDataButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
+    this.saveDataButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
     const nextText = [
       "State: " + this.state + " · Target: " + (this.targetMonster?.definition.name ?? "None") + " · Gold: " + playerGold,
       "Formation: " + deployedCount + "/10 · Owned: " + formation.ownedUnits.length + "/13 · Hero Slot: " + (heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1),
@@ -776,48 +749,18 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStage15Controls(): void {
-    this.repeatButton = this.add.rectangle(680, 510, 136, 28, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 1)
-      .setInteractive({ useHandCursor: true });
-    this.repeatButtonLabel = this.add.text(680, 510, "", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "10px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    this.repeatButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) this.toggleRepeatHunt();
-    });
-    this.saveDataButton = this.add.rectangle(835, 510, 136, 28, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 1)
-      .setInteractive({ useHandCursor: true });
-    this.saveDataButtonLabel = this.add.text(835, 510, "Save Data", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "10px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    this.saveDataButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) this.openSaveData();
-    });
+    const repeat = addCommonButton(this, 680, 510, 136, "Repeat: OFF", () => this.toggleRepeatHunt(), { height: 28, fontSize: "10px" });
+    this.repeatButton = repeat.background;
+    this.repeatButtonLabel = repeat.label;
+    const save = addCommonButton(this, 835, 510, 136, "Save Data", () => this.openSaveData(), { height: 28, fontSize: "10px" });
+    this.saveDataButton = save.background;
+    this.saveDataButtonLabel = save.label;
   }
 
   private addOnlineStatusButton(): void {
-    this.onlineStatusButton = this.add.rectangle(500, 510, 130, 28, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 1)
-      .setInteractive({ useHandCursor: true });
-    this.onlineStatusButtonLabel = this.add.text(500, 510, "Online Status", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "10px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    this.onlineStatusButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) this.openOnlineStatus();
-    });
+    const visual = addCommonButton(this, 500, 510, 130, "Online Status", () => this.openOnlineStatus(), { height: 28, fontSize: "10px" });
+    this.onlineStatusButton = visual.background;
+    this.onlineStatusButtonLabel = visual.label;
   }
 
   private toggleRepeatHunt(): void {

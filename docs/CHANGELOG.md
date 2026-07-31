@@ -1,5 +1,13 @@
 # 변경 이력
 
+## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v2 재제출 — 검수 대기
+
+- v1 검수의 `changes_requested` 결과를 보존하고 공통 버튼 상태 API와 Field·Battle·메뉴 주요 버튼 적용을 보완했다.
+- Battle 타깃 링, 피격 flash, 공격 squash, 사망 축소·fade, Battle·Formation·Field HP/EXP 진행 바를 추가했다.
+- Shop·Formation에 기존 원본 SVG 역할별 스프라이트를 적용하고 SVG 안전성·texture mapping 자동 테스트 2개를 추가했다.
+- 브라우저에서 Field·Formation·Shop·Inventory를 확인하고 스크린샷을 저장했다. Battle 우클릭 진입은 `not_run`으로 기록했다.
+- 현재 제출 태그는 `review-visual-ui-pass-1-v2`이며 `main`과 17단계 완료 상태는 변경하지 않았다. 사용자 수동 테스트는 `skipped_by_user`다.
+
 ## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 제출 — 검수 대기
 
 - 17단계 완료 상태와 `stage-17-completed`를 유지한 채 번호가 매겨지지 않은 시각/UI 후속 작업을 추가했다.

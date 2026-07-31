@@ -16,12 +16,27 @@
   "postRoadmapFollowUp": {
     "task": "포스트 로드맵 — 시각/UI 1차 패스",
     "branch": "post-roadmap-visual-ui-pass-1",
-    "tag": "review-visual-ui-pass-1-v1",
+    "tag": "review-visual-ui-pass-1-v2",
+    "version": 2,
     "status": "review_pending",
     "submitted": true,
     "mainBranchMerged": false,
     "userRunTest": "skipped_by_user",
-    "chatGptCodeReview": "not_reviewed"
+    "chatGptCodeReview": "pending",
+    "history": [
+      {
+        "tag": "review-visual-ui-pass-1-v1",
+        "version": 1,
+        "commit": "23d1e8392517f45605181d3d362c9fc9bd3fa4b0",
+        "result": "changes_requested",
+        "approved": false,
+        "reviewer": "ChatGPT",
+        "reviewedAt": "2026-08-01T00:26:00+09:00",
+        "userRunTest": "skipped_by_user",
+        "mainBranchMerged": false,
+        "reason": "원본 Slime·유닛 SVG와 Field/Battle 기본 적용은 확인됐지만, 공통 버튼·진행 바 helper가 실제 Scene에 거의 적용되지 않았고, 전투 타깃 마커·피격/사망 피드백이 없으며, Shop·Formation의 유닛 시각화와 Battle·메뉴 브라우저 검증 범위가 불완전함"
+      }
+    ]
   },
   "reviewSubmission": {
     "branch": "stage-17-online-expansion-readiness",
@@ -716,5 +731,5 @@
   },
   "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-08-01T00:00:00+09:00"
+  "lastUpdated": "2026-08-01T03:04:23+09:00"
 }

@@ -5,7 +5,7 @@
   "currentStage": 17,
   "currentStageName": "온라인 확장 준비",
   "stageStatus": "completed",
-  "activeTask": "전체 17단계 완료 — 추가 개발 명령 대기",
+  "activeTask": "포스트 로드맵 — 시각/UI 1차 패스 검수 대기",
   "workingBranch": "main",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
@@ -13,6 +13,16 @@
   "nextStageName": null,
   "finalStage": true,
   "projectCompletion": "completed",
+  "postRoadmapFollowUp": {
+    "task": "포스트 로드맵 — 시각/UI 1차 패스",
+    "branch": "post-roadmap-visual-ui-pass-1",
+    "tag": "review-visual-ui-pass-1-v1",
+    "status": "review_pending",
+    "submitted": true,
+    "mainBranchMerged": false,
+    "userRunTest": "skipped_by_user",
+    "chatGptCodeReview": "not_reviewed"
+  },
   "reviewSubmission": {
     "branch": "stage-17-online-expansion-readiness",
     "tag": "review-stage-17-v5",
@@ -706,5 +716,5 @@
   },
   "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-07-31T18:02:15+09:00"
+  "lastUpdated": "2026-08-01T00:00:00+09:00"
 }

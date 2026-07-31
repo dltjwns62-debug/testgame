@@ -1,5 +1,17 @@
 # 현재 개발 상태
 
+## 포스트 로드맵 후속 작업 — 시각/UI 1차 패스
+
+- 전체 로드맵 상태: 17단계 완료 (`completed`)
+- 후속 작업 상태: 검수 대기 (`review_pending`)
+- 작업 브랜치: `post-roadmap-visual-ui-pass-1`
+- 검수 태그: `review-visual-ui-pass-1-v1`
+- `main` 반영 여부: 미반영
+- 사용자 실행 테스트: 사용자 수동 테스트는 `skipped_by_user`
+- ChatGPT 코드 검수: `not_reviewed`
+- 범위: 코드 생성 시각 토큰, 필드·전투 배경, 공통 UI 테마와 상태 가독성 개선
+- 제외: 18단계, 게임 규칙 변경, 외부 에셋, 실제 온라인 서버
+
 ## Stage 17 온라인 확장 준비 — 완료
 
 - 전체 단계: 17단계

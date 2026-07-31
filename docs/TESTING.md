@@ -1,5 +1,29 @@
 # 실행 및 테스트 기록
 
+## 포스트 로드맵 시각/UI 1차 패스 — 검수 대기
+
+- 작업 브랜치: `post-roadmap-visual-ui-pass-1`
+- 검수 태그: `review-visual-ui-pass-1-v1`
+- 상태: `review_pending` (17단계 완료 상태와 별도 관리)
+- 코드 검수: `not_reviewed`
+- 사용자 수동 테스트: `skipped_by_user`
+
+### 자동 검사 및 브라우저 smoke 범위
+
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run test`: 통과 (`passed`, 81개)
+- `npm run build`: 통과 (`passed`)
+- `npm run check`: 통과 (`passed`)
+- `npm run dev -- --host 127.0.0.1`: 개발 서버 실행 확인 후 종료 (`passed`)
+- 브라우저 자동 확인: Field 화면의 코드 생성 Slime/Player 토큰, 배경·그리드, 상단 HP/EXP 정보, 하단 버튼 가독성 및 콘솔 error/warning 없음 확인 (`partial_passed`)
+- 브라우저에서 수동 전투 조작과 전체 메뉴 전환을 완료한 것으로 간주하지 않는다.
+
+### 별도 미실행 범위
+
+- 사용자 수동 전투·메뉴 통합 테스트: `skipped_by_user`
+- 18단계 기능과 실제 온라인 서버: `not_run`
+
 ## Stage 17 온라인 확장 준비 — 최종 승인 및 main 반영
 
 - 작업 브랜치: `main`

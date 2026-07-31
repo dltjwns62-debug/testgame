@@ -1,5 +1,13 @@
 # 프로젝트 결정 사항
 
+## 17단계 v5 검수 재제출 결정
+
+- 결정: coordinator sync의 `NO_CONFLICT`는 server snapshot을, `RESOLVED`는 resolver snapshot을 반환하고 `MANUAL_REQUIRED`는 conflict 상태와 server snapshot을 유지한다.
+- 결정: 내부 AbortController cancellation은 gateway가 signal을 무시해도 dispose/disconnect에서 즉시 요청 결과를 종료하며, stale callback은 registry를 갱신하지 않는다.
+- 결정: coordinator 통합 경계와 즉시 cancellation 경계를 자동 테스트로 검증하고, 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+- 결정: v1·v2·v3·v4 태그와 이력은 보존하고 `review-stage-17-v5`를 새 제출 태그로 사용한다.
+- 상태: 확정
+
 ## 17단계 v4 검수 재제출 결정
 
 - 결정: `resolveOnlineConflict`의 `RESOLVED` 결과 snapshot은 coordinator sync 반환값으로 전달하고, 서버 snapshot을 무조건 반환하지 않는다.

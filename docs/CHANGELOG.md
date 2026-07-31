@@ -1,5 +1,12 @@
 # 변경 이력
 
+## 2026-07-31 — 17단계 v4 검수 수정 및 v5 재제출 — 검수 대기
+
+- coordinator sync가 `RESOLVED` conflict 결과를 raw server snapshot 대신 반환하는 통합 테스트를 추가했다.
+- gateway가 abort signal을 무시하는 경우에도 dispose/disconnect 요청이 즉시 `CANCELLED`로 끝나는 경계 검사를 보완했다.
+- 기존 v1·v2·v3·v4 검수 태그와 이력은 보존하고 새 제출 태그는 `review-stage-17-v5`다.
+- 자동 검사는 총 81개가 통과했으며 실제 Online Status 전체 조작·서버·계정·네트워크는 `not_run`, 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+
 ## 2026-07-31 — 17단계 v3 검수 수정 및 v4 재제출 — 검수 대기
 
 - coordinator가 `RESOLVED` conflict snapshot을 sync 결과로 반환하고, `MANUAL_REQUIRED` 외에는 선택된 snapshot을 전달하도록 수정했다.

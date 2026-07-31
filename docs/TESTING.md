@@ -1,23 +1,24 @@
 # 실행 및 테스트 기록
 
-## Stage 17 온라인 확장 준비 — v4 검수 대기
+## Stage 17 온라인 확장 준비 — v5 검수 대기
 
 - 작업 브랜치: `stage-17-online-expansion-readiness`
-- 검수 태그: `review-stage-17-v4`
+- 검수 태그: `review-stage-17-v5`
 - 상태: `review_pending`
 - 완료된 단계: 1단계~16단계
 - 다음 단계: 없음 — 전체 로드맵의 마지막 단계
 
 ### 자동 검사
 
-- `tests/stage17.test.ts`: protocol/snapshot, Disabled/Mock Gateway, operation queue, conflict resolver, sync coordinator, DTO/OpenAPI 경계 검사 (49개; 기존 Stage 16 31개 포함 총 80개)
+- `tests/stage17.test.ts`: protocol/snapshot, Disabled/Mock Gateway, operation queue, conflict resolver, sync coordinator, DTO/OpenAPI 경계 검사 (50개; 기존 Stage 16 31개 포함 총 81개)
 - `npm ci`: 통과 (`passed`)
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run test`: 통과 (`passed`)
 - `npm run build`: 통과 (`passed`)
 - `npm run check`: 통과 (`passed`)
-- `npm run dev -- --host 127.0.0.1`: root·favicon HTTP 200 확인 후 종료 (`passed`)
+- `npm run dev -- --host 127.0.0.1`: root·`/favicon.svg` HTTP 200 확인 후 종료 (`passed`)
 - OpenAPI JSON: `JSON.parse` 검사 통과
+- coordinator RESOLVED snapshot 반환 통합 경로와 gateway signal 무시 시에도 즉시 종료되는 내부 cancellation 경계 검사 통과
 
 ### Stage 17 검사 범위
 

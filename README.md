@@ -1,14 +1,14 @@
 # Test Game
 
-## Stage 17 온라인 확장 준비 — v4 검수 대기
+## Stage 17 온라인 확장 준비 — v5 검수 대기
 
-현재 단계는 17단계 **온라인 확장 준비**다. 작업 브랜치는 `stage-17-online-expansion-readiness`, 검수 태그는 `review-stage-17-v4`, 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 1~16단계는 완료 상태로 보존하고, 이번 단계는 실제 서버·계정·클라우드 없이 미래 연결 계약만 준비한다.
+현재 단계는 17단계 **온라인 확장 준비**다. 작업 브랜치는 `stage-17-online-expansion-readiness`, 검수 태그는 `review-stage-17-v5`, 상태는 `review_pending`이며 `main`에는 병합하지 않았다. 1~16단계는 완료 상태로 보존하고, 이번 단계는 실제 서버·계정·클라우드 없이 미래 연결 계약만 준비한다.
 
-v4에서는 coordinator가 RESOLVED snapshot을 실제 sync 결과로 반환하고, dispose/disconnect가 내부 abort Promise를 즉시 종료하도록 보완했다. 모든 gateway response의 protocolVersion을 검증하고, 잘못된 roster 배열과 OpenAPI request 필드·operation enum을 거부한다. 실제 Online Status Scene 전체 조작은 자동 통과로 기록하지 않는다.
+v5에서는 coordinator 통합 경로가 RESOLVED snapshot을 실제 sync 결과로 반환하는지 검증하고, dispose/disconnect가 gateway가 signal을 무시해도 내부 abort Promise를 즉시 종료하도록 보완했다. 모든 gateway response의 protocolVersion을 검증하고, 잘못된 roster 배열과 OpenAPI request 필드·operation enum을 거부한다. 실제 Online Status Scene 전체 조작은 자동 통과로 기록하지 않는다.
 
 `OnlinePlayerSnapshot`, protocol v1, `OnlineGateway`, Disabled/Mock adapter, operation queue, conflict resolution, sync coordinator, Online Status Scene과 API·위협 모델 문서는 실제 서버 없이 유지한다. 기본 모드는 `DISABLED`이며 `?onlineMock=1`에서만 메모리 Mock 모드를 사용할 수 있다. 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
 
-v1·v2·v3 검수는 `changes_requested`로 보존하고 기존 태그는 이동하지 않는다. 현재 v4도 검수 대기이며 실제 서버·계정·네트워크·멀티플레이어는 구현하지 않았다.
+v1·v2·v3·v4 검수는 `changes_requested`로 보존하고 기존 태그는 이동하지 않는다. 현재 v5도 검수 대기이며 실제 서버·계정·네트워크·멀티플레이어는 구현하지 않았다.
 
 Stage 17 관련 문서: [온라인 준비](docs/ONLINE-READINESS.md), [프로토콜](docs/ONLINE-PROTOCOL.md), [위협 모델](docs/THREAT-MODEL.md), [API 계약](docs/online-api.openapi.json), [테스트 기록](docs/TESTING.md), [현재 상태](docs/STATUS.md).
 

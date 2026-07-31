@@ -1,5 +1,13 @@
 # 변경 이력
 
+## 2026-07-31 — 17단계 v2 검수 수정 및 v3 재제출 — 검수 대기
+
+- 서버 authoritative 충돌 병합에서 owned roster·progression·Gold·Inventory·보상 진행은 서버 값을 유지하고 로컬 슬롯·유효 Control Group·설정만 제한적으로 반영하도록 수정했다.
+- revision conflict 시 pending queue를 PENDING 상태와 retryCount 그대로 보존하고, dispose/disconnect 이후 registry write와 늦은 ONLINE 복귀를 차단했다.
+- Retry-After 전달, Battle/Offline 명시 DTO와 중첩 reward field 차단, unknown snapshot·malformed queue 검증, OpenAPI와 TypeScript response 일치를 보완했다.
+- `review-stage-17-v1`과 `review-stage-17-v2`는 `changes_requested` 이력과 불변 태그로 보존하고, 현재 제출 태그는 `review-stage-17-v3`다.
+- Online Status Scene 전체 브라우저 조작은 `not_run`, 사용자 수동 테스트는 `skipped_by_user`로 유지한다.
+
 ## 2026-07-31 — 17단계 v1 검수 수정 및 v2 재제출 — 검수 대기
 
 - v1 정적 검수에서 요청된 queue record/retry/backoff/rejection 보존과 cap 초과 데이터 보존을 보완했다.

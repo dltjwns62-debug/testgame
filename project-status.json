@@ -5,7 +5,7 @@
   "currentStage": 17,
   "currentStageName": "온라인 확장 준비",
   "stageStatus": "review_pending",
-  "activeTask": "17단계 v2 구현 완료 및 ChatGPT 재검수 대기",
+  "activeTask": "17단계 v3 구현 완료 및 ChatGPT 재검수 대기",
   "workingBranch": "stage-17-online-expansion-readiness",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
@@ -15,16 +15,16 @@
   "projectCompletion": "pending_review",
   "reviewSubmission": {
     "branch": "stage-17-online-expansion-readiness",
-    "tag": "review-stage-17-v2",
-    "version": 2,
+    "tag": "review-stage-17-v3",
+    "version": 3,
     "submitted": true
   },
   "reviewHistory": [
     {
       "stage": 17,
       "branch": "stage-17-online-expansion-readiness",
-      "tag": "review-stage-17-v2",
-      "version": 2,
+      "tag": "review-stage-17-v3",
+      "version": 3,
       "commit": null,
       "submitted": true,
       "approved": false,
@@ -33,7 +33,22 @@
       "reviewedAt": null,
       "userRunTest": "skipped_by_user",
       "mainBranchMerged": false,
-      "reason": "queue record/retry backoff/rejection 보존과 cap 초과 데이터 보존, coordinator lifecycle·revision guard, canonical snapshot·operation validation, Online Status lifecycle, OpenAPI와 테스트 범위를 보완함"
+      "reason": "서버 authoritative conflict 병합, REVISION_CONFLICT queue 보존, dispose 이후 registry write 차단, Retry-After 전달, Battle/Offline DTO, unknown snapshot·malformed queue 검증, OpenAPI·TypeScript 계약을 보완함"
+    },
+    {
+      "stage": 17,
+      "branch": "stage-17-online-expansion-readiness",
+      "tag": "review-stage-17-v2",
+      "version": 2,
+      "commit": "c9daa5aca002ec164e86394b3afe6fd299cfc83e",
+      "submitted": true,
+      "approved": false,
+      "result": "changes_requested",
+      "reviewer": "ChatGPT",
+      "reviewedAt": "2026-07-31T15:52:00+09:00",
+      "userRunTest": "skipped_by_user",
+      "mainBranchMerged": false,
+      "reason": "동일 base revision에서 local formation·ownedRoster·progression이 server authoritative 상태를 덮을 수 있고, push REVISION_CONFLICT가 pending operation을 REJECTED로 만들며, stale/disposed updateIfCurrent가 getState를 통해 registry.set을 실행하고, Retry-After가 coordinator에 연결되지 않았으며, 중첩 보상 필드와 unknown snapshot field·OpenAPI/TypeScript 계약 불일치가 남아 있음"
     },
     {
       "stage": 17,
@@ -654,11 +669,12 @@
     "check": "passed",
     "devServer": "passed",
     "browserAutomation": "partial_passed",
+    "onlineStatusScene": "not_run",
     "userRunTest": "skipped_by_user",
     "userRunTestReason": "사용자 요청에 따라 17단계 수동 테스트를 요구하지 않음",
     "chatGptCodeReview": "pending"
   },
   "mainBranchMerged": false,
   "knownIssues": [],
-  "lastUpdated": "2026-07-31T05:26:50+09:00"
+  "lastUpdated": "2026-07-31T16:35:14+09:00"
 }

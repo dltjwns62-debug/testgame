@@ -1,5 +1,16 @@
 # 프로젝트 결정 사항
 
+## 17단계 v3 검수 재제출 결정
+
+- 결정: 서버 authoritative 영역은 formation.ownedUnits, ownedRoster, progression, Gold, Inventory/equipment와 AutoProgress의 victory count·offline claim sequence·reward 상태로 고정한다.
+- 결정: 같은 base revision에서도 클라이언트는 Formation slots, 서버 owned ID로 필터된 Control Group, Key Binding, Battle Auto Hunt와 서버가 인정한 Repeat Hunt preference만 유지한다.
+- 결정: REVISION_CONFLICT는 자동 retry나 reject를 하지 않고 queue record를 PENDING 그대로 보존하며 session만 CONFLICT로 전환한다.
+- 결정: coordinator의 stale/disposed 경로는 registry helper를 호출하지 않고, disconnect는 active request를 무효화해 늦은 ONLINE 복귀를 막는다.
+- 결정: Retry-After는 안전한 0 이상 정수만 backoff에 반영하고, Battle/Offline operation은 명시 DTO와 중첩 reward authority field 검증을 통과해야 한다.
+- 결정: Online Status Scene 전체 버튼·shutdown·재진입 흐름은 직접 실행하지 않았으므로 `not_run`으로 기록한다.
+- 결정: `review-stage-17-v1`·`review-stage-17-v2`와 이력은 보존하고 `review-stage-17-v3`를 새 제출 태그로 사용한다.
+- 상태: 확정
+
 ## 17단계 v2 검수 재제출 결정
 
 - 결정: `review-stage-17-v1`의 수정 요청 이력과 태그는 이동·삭제하지 않고 `review-stage-17-v2`를 새 제출 태그로 사용한다.

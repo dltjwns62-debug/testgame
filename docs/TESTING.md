@@ -1,16 +1,16 @@
 # 실행 및 테스트 기록
 
-## Stage 17 온라인 확장 준비 — v2 검수 대기
+## Stage 17 온라인 확장 준비 — v3 검수 대기
 
 - 작업 브랜치: `stage-17-online-expansion-readiness`
-- 검수 태그: `review-stage-17-v2`
+- 검수 태그: `review-stage-17-v3`
 - 상태: `review_pending`
 - 완료된 단계: 1단계~16단계
 - 다음 단계: 없음 — 전체 로드맵의 마지막 단계
 
 ### 자동 검사
 
-- `tests/stage17.test.ts`: protocol/snapshot, Disabled/Mock Gateway, operation queue, conflict resolver, sync coordinator 검사 (39개; 기존 Stage 16 31개 포함 총 70개)
+- `tests/stage17.test.ts`: protocol/snapshot, Disabled/Mock Gateway, operation queue, conflict resolver, sync coordinator, DTO/OpenAPI 경계 검사 (48개; 기존 Stage 16 31개 포함 총 79개)
 - `npm ci`: 통과 (`passed`)
 - `npm run typecheck`: 통과 (`passed`)
 - `npm run test`: 통과 (`passed`)
@@ -26,10 +26,10 @@
 - Mock bootstrap/pull/push, revision, duplicate operation, conflict 재현
 - FIFO queue record, operationId 중복 방지, partial acknowledgement, rejected 상태, serialization, 200개·512 KiB cap과 cap 초과 record 보존
 - retry count·nextAttemptAtMs·backoff·jitter·Retry-After 우선순위와 terminal/retryable error 정책
-- server-authoritative Gold/EXP/inventory와 local preference 유지 conflict 정책, resolved hash 재계산·검증
-- canonical snapshot deep consistency, operation type/hash/payload size/sensitive/final reward 검증
-- sync coordinator의 DISABLED/OFFLINE/ONLINE/SYNCING/CONFLICT 전환, 동시 실행 차단, abort·dispose·stale response·revision guard
-- Online Status busy/disable/reenable/disconnect/scene lifecycle 경계와 OpenAPI 3.0.3 계약
+- server-authoritative owned roster/progression/Gold/Inventory/reward 진행과 local slot·유효 Control Group·preference 유지 conflict 정책, resolved hash 재계산·검증
+- canonical snapshot deep consistency, unknown field, operation DTO/type/hash/payload size/sensitive/final reward 검증
+- sync coordinator의 DISABLED/OFFLINE/ONLINE/SYNCING/CONFLICT 전환, 동시 실행 차단, abort·dispose·stale response·revision guard, REVISION_CONFLICT queue 보존과 Retry-After
+- OpenAPI 3.0.3과 TypeScript response 필드·nullable·$ref·오류 응답·Idempotency-Key 계약
 
 ### 미실행·수동 상태
 
@@ -38,6 +38,7 @@
 - 실제 클라우드·DB·멀티플레이어: `not_run`
 - 실제 브라우저 전체 전투·장시간 방치 통합: `not_run`
 - 실제 Online Status 전체 버튼 흐름·Scene shutdown async callback: `not_run`
+- Back 중 active request, Disconnect 후 재진입, mock gateway page-session 유지: `not_run`
 - 사용자 수동 테스트: `skipped_by_user`
 - 생략·미실행 항목은 통과로 간주하거나 표현하지 않는다.
 - ChatGPT 코드 검수: `pending`

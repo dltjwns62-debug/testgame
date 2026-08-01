@@ -1,5 +1,13 @@
 # 프로젝트 결정 사항
 
+## 포스트 로드맵 시각/UI 1차 패스 v3 재제출 결정
+
+- 결정: v2 `changes_requested` 결과와 `review-visual-ui-pass-1-v2` 태그를 보존하고, 수정본은 `review-visual-ui-pass-1-v3` 새 태그로 제출한다.
+- 결정: 공통 버튼은 `ButtonVisual`의 상태 API로만 갱신하고 pressed 상태·shutdown listener를 안전하게 정리한다.
+- 결정: 공격·피격·사망 시각 효과는 독립 tween과 base scale/alpha를 사용하며, 타깃 링은 매 refresh에서 재계산한다.
+- 결정: 제출 스크린샷은 실제 PNG magic bytes를 검사하고, Battle 우클릭 검증 결과와 미실행 수동 범위를 구분해 기록한다.
+- 상태: 확정
+
 ## 포스트 로드맵 시각/UI 1차 패스 v2 재제출 결정
 
 - 결정: v1 `changes_requested` 결과는 `review-visual-ui-pass-1-v1` 불변 태그와 이력으로 보존하고, v2는 `review-visual-ui-pass-1-v2` 새 태그로 제출한다.

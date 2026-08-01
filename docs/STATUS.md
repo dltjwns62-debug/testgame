@@ -5,13 +5,14 @@
 - 전체 로드맵 상태: 17단계 완료 (`completed`)
 - 후속 작업 상태: 검수 대기 (`review_pending`)
 - 작업 브랜치: `post-roadmap-visual-ui-pass-1`
-- 검수 태그: `review-visual-ui-pass-1-v2`
+- 검수 태그: `review-visual-ui-pass-1-v3`
 - `main` 반영 여부: 미반영
 - 사용자 실행 테스트: 사용자 수동 테스트는 `skipped_by_user`
 - ChatGPT 코드 검수: `pending`
 - 범위: 코드 생성 시각 토큰, 필드·전투 배경, 공통 UI 테마와 상태 가독성 개선
 - 제외: 18단계, 게임 규칙 변경, 외부 에셋, 실제 온라인 서버
 - v1 검수 결과: `changes_requested`로 보존. 공통 버튼·진행 바 실제 적용, 전투 타깃 마커·피드백, Shop·Formation 스프라이트와 검증 범위를 보완했다.
+- v2 검수 결과: `changes_requested`로 보존. 공통 ButtonVisual 상태 API 충돌, 토큰 크기 복구, 공격·피격 tween 공유, 타깃 링 갱신 누락, PNG 바이트 형식 문제를 수정해 v3로 재제출한다.
 
 ## Stage 17 온라인 확장 준비 — 완료
 

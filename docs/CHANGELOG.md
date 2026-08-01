@@ -1,5 +1,13 @@
 # 변경 이력
 
+## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v3 재제출 — 검수 대기
+
+- v2 검수의 `changes_requested` 결과를 보존하고 공통 `ButtonVisual` 단일 상태 API, pressed 복구와 shutdown 정리, 토큰 base scale 복구를 보완했다.
+- 공격·피격·사망 tween을 분리하고 스킬 피해 피드백, 타깃 링 갱신, 실제 PNG magic bytes 검사를 추가했다.
+- Battle 캔버스에서 실제 우클릭 전투 진입과 타깃 링을 확인하고 v3 스크린샷을 저장했다. 콘솔 error/warning은 없었다.
+- 현재 제출 태그는 `review-visual-ui-pass-1-v3`이며 v1·v2 태그와 이력, `main` 및 `stage-17-completed`는 변경하지 않았다.
+- 사용자 수동 테스트는 `skipped_by_user`이며 18단계 기능은 구현하지 않았다.
+
 ## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v2 재제출 — 검수 대기
 
 - v1 검수의 `changes_requested` 결과를 보존하고 공통 버튼 상태 API와 Field·Battle·메뉴 주요 버튼 적용을 보완했다.

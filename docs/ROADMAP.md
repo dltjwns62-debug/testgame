@@ -2,13 +2,14 @@
 
 ## 포스트 로드맵 후속 작업 — 시각/UI 1차 패스 (`review_pending`)
 
-17단계까지의 전체 로드맵과 `stage-17-completed` 상태는 완료로 유지한다. 이 작업은 번호가 매겨진 18단계가 아니라 `post-roadmap-visual-ui-pass-1`에서 진행하는 별도 시각/UI 후속 패스이며, 현재 검수 태그는 `review-visual-ui-pass-1-v2`이다. v1은 `changes_requested` 이력과 불변 태그로 보존한다. `main`에는 아직 반영하지 않았고 사용자 수동 테스트는 `skipped_by_user`로 기록한다.
+17단계까지의 전체 로드맵과 `stage-17-completed` 상태는 완료로 유지한다. 이 작업은 번호가 매겨진 18단계가 아니라 `post-roadmap-visual-ui-pass-1`에서 진행하는 별도 시각/UI 후속 패스이며, 현재 검수 태그는 `review-visual-ui-pass-1-v3`이다. v1과 v2는 `changes_requested` 이력과 불변 태그로 보존한다. `main`에는 아직 반영하지 않았고 사용자 수동 테스트는 `skipped_by_user`로 기록한다.
 
 - 목표: 게임 규칙을 변경하지 않고 Field/Battle과 주요 메뉴의 시각적 일관성·가독성·상태 피드백을 개선한다.
 - 주요 구현 항목: 코드 생성 Slime/아군 토큰, 필드·전투 배경, 공통 색상·패널·버튼·진행 바 helper, HP/EXP·선택·타깃·쿨다운·비활성 상태 표시, 간단한 시각 효과.
 - 구현하지 않을 항목: 18단계, 새 게임 규칙, 외부 이미지·에셋, 실제 서버·네트워크 기능.
-- 검수 상태: `review_pending` / `review-visual-ui-pass-1-v2`
+- 검수 상태: `review_pending` / `review-visual-ui-pass-1-v3`
 - v1 검수 결과: `changes_requested` — 공통 버튼·진행 바 실제 적용, 전투 피드백·타깃 마커, 메뉴 스프라이트와 브라우저 검증 보완 요청
+- v2 검수 결과: `changes_requested` — 공통 ButtonVisual 상태 API와 Scene 직접 조작 충돌, 토큰 setScale 복구, 공격·피격 tween 분리와 정리, 타깃 링 갱신, PNG 바이트 형식 보완 요청
 
 ## Stage 17 온라인 확장 준비 — `completed`
 

@@ -1,5 +1,15 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH } from "../constants";
+import {
+  BUTTON_TONE_COLORS,
+  normalizeProgressRatio,
+  resolveButtonRenderState,
+  type ButtonRenderStateInput,
+  type ButtonRenderState,
+  type ButtonTone,
+} from "./buttonState";
+export { normalizeProgressRatio, resolveButtonRenderState } from "./buttonState";
+export type { ButtonRenderStateInput, ButtonRenderState, ButtonTone } from "./buttonState";
 
 export const UI_THEME = {
   colors: {
@@ -21,8 +31,6 @@ export const UI_THEME = {
   },
   fontFamily: "Segoe UI, system-ui, sans-serif",
 } as const;
-
-export type ButtonTone = "success" | "neutral" | "warning" | "purple";
 
 export type ButtonVisual = {
   background: Phaser.GameObjects.Rectangle;
@@ -88,24 +96,19 @@ export function addButton(
 ): ButtonVisual {
   let enabled = !(options.disabled ?? false);
   let busy = false;
+  let visible = true;
+  let hovered = false;
   let pressed = false;
   let textValue = label;
   let colorOverride = options.color;
   let tone = options.tone ?? "success";
-  const toneColors: Record<ButtonTone, number> = {
-    success: UI_THEME.colors.success,
-    neutral: UI_THEME.colors.inkSoft,
-    warning: UI_THEME.colors.warning,
-    purple: UI_THEME.colors.purple,
-  };
-  const normalColor = options.color ?? toneColors[tone];
   const height = options.height ?? 34;
   const background = scene.add.rectangle(
     x,
     y,
     width,
     height,
-    normalColor,
+    colorOverride ?? BUTTON_TONE_COLORS[tone],
     1,
   ).setStrokeStyle(1, enabled ? UI_THEME.colors.successBorder : 0x496176, 0.95);
   const text = scene.add.text(x, y, textValue, {
@@ -115,25 +118,37 @@ export function addButton(
     fontStyle: "bold",
     align: "center",
   }).setOrigin(0.5);
-  const render = (hover = false): void => {
-    const active = enabled && !busy;
-    const baseColor = colorOverride ?? toneColors[tone];
-    const fillColor = !active ? UI_THEME.colors.inkSoft : pressed ? UI_THEME.colors.warning : hover ? UI_THEME.colors.panelRaised : baseColor;
+  const render = (): void => {
+    const state = resolveButtonRenderState({
+      enabled,
+      busy,
+      visible,
+      hovered,
+      pressed,
+      tone,
+      colorOverride,
+    });
     background
-      .setFillStyle(fillColor, active ? 1 : 0.72)
-      .setStrokeStyle(1, active ? UI_THEME.colors.successBorder : 0x496176, 0.95);
-    text.setText(busy ? `${textValue} ···` : textValue).setColor(active ? UI_THEME.colors.text : "#7890a4");
-    if (active) background.setInteractive({ useHandCursor: true });
+      .setVisible(visible)
+      .setFillStyle(state.fillColor, state.fillAlpha)
+      .setStrokeStyle(1, state.active ? UI_THEME.colors.successBorder : 0x496176, 0.95);
+    text
+      .setVisible(visible)
+      .setText(busy ? `${textValue} ···` : textValue)
+      .setColor(state.textColor);
+    if (state.interactive) background.setInteractive({ useHandCursor: true });
     else background.disableInteractive();
   };
   const visual: ButtonVisual = {
     background,
     label: text,
     setEnabled(nextEnabled: boolean): void {
+      if (enabled !== nextEnabled) pressed = false;
       enabled = nextEnabled;
       render();
     },
     setBusy(nextBusy: boolean): void {
+      if (busy !== nextBusy) pressed = false;
       busy = nextBusy;
       render();
     },
@@ -146,26 +161,30 @@ export function addButton(
       colorOverride = undefined;
       render();
     },
-    setVisible(visible: boolean): void {
-      background.setVisible(visible);
-      text.setVisible(visible);
+    setVisible(nextVisible: boolean): void {
+      if (!nextVisible) {
+        hovered = false;
+        pressed = false;
+      }
+      visible = nextVisible;
+      render();
     },
     destroy(): void {
       background.destroy();
       text.destroy();
     },
   };
-  background.on("pointerover", () => { if (enabled && !busy) render(true); });
-  background.on("pointerout", () => { pressed = false; render(); });
+  background.on("pointerover", () => { hovered = true; render(); });
+  background.on("pointerout", () => { hovered = false; pressed = false; render(); });
   background.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
     pointer.event?.stopPropagation();
-    if (pointer.button !== 0 || !enabled || busy) return;
+    if (pointer.button !== 0 || !visible || !enabled || busy) return;
     pressed = true;
     render();
     action();
   });
-  background.on("pointerup", () => { pressed = false; render(true); });
-  background.on("pointerupoutside", () => { pressed = false; render(); });
+  background.on("pointerup", () => { pressed = false; render(); });
+  background.on("pointerupoutside", () => { hovered = false; pressed = false; render(); });
   render();
   return visual;
 }
@@ -181,7 +200,7 @@ export function addProgressBar(
 ): { background: Phaser.GameObjects.Rectangle; fill: Phaser.GameObjects.Rectangle } {
   const background = scene.add.rectangle(x, y, width, height, UI_THEME.colors.ink, 0.95)
     .setStrokeStyle(1, UI_THEME.colors.panelBorder, 0.65);
-  const fill = scene.add.rectangle(x - width / 2 + 2, y, Math.max(0, width - 4) * Phaser.Math.Clamp(ratio, 0, 1), height - 3, fillColor, 1)
+  const fill = scene.add.rectangle(x - width / 2 + 2, y, Math.max(0, width - 4) * normalizeProgressRatio(ratio), height - 3, fillColor, 1)
     .setOrigin(0, 0.5);
   return { background, fill };
 }
@@ -191,7 +210,7 @@ export function setProgressBar(
   width: number,
   ratio: number,
 ): void {
-  visual.fill.displayWidth = Math.max(0, width - 4) * Phaser.Math.Clamp(ratio, 0, 1);
+  visual.fill.displayWidth = Math.max(0, width - 4) * normalizeProgressRatio(ratio);
 }
 
 export function addBadge(

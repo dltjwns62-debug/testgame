@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { getAllyUnitDefinition } from "../src/game/rtsBattleDefinitions";
+import { normalizeProgressRatio, resolveButtonRenderState } from "../src/game/ui/buttonState";
 import { getSlimeTextureKey, getUnitTextureKey } from "../src/game/ui/visuals";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -60,4 +61,37 @@ test("review screenshots use PNG files with matching magic bytes", () => {
     const bytes = readFileSync(join(repoRoot, relativePath));
     assert.deepEqual([...bytes.subarray(0, 8)], pngMagic, relativePath);
   }
+});
+
+test("button render state preserves hover and clears invalid pressed states", () => {
+  const input = {
+    enabled: true,
+    busy: false,
+    visible: true,
+    hovered: true,
+    pressed: false,
+    tone: "success",
+  } as const;
+  const hovered = resolveButtonRenderState(input);
+  assert.equal(hovered.fillColor, 0x29465b);
+  assert.equal(hovered.interactive, true);
+
+  const disabled = resolveButtonRenderState({ ...input, enabled: false, pressed: false });
+  assert.equal(disabled.interactive, false);
+  assert.equal(disabled.fillColor, 0x172a40);
+
+  const busy = resolveButtonRenderState({ ...input, busy: true, pressed: false });
+  assert.equal(busy.interactive, false);
+
+  const hidden = resolveButtonRenderState({ ...input, visible: false, hovered: false, pressed: false });
+  assert.equal(hidden.interactive, false);
+});
+
+test("progress ratios normalize non-finite and out-of-range values", () => {
+  assert.equal(normalizeProgressRatio(Number.NaN), 0);
+  assert.equal(normalizeProgressRatio(Number.POSITIVE_INFINITY), 0);
+  assert.equal(normalizeProgressRatio(Number.NEGATIVE_INFINITY), 0);
+  assert.equal(normalizeProgressRatio(-1), 0);
+  assert.equal(normalizeProgressRatio(0.5), 0.5);
+  assert.equal(normalizeProgressRatio(2), 1);
 });

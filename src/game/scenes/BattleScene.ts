@@ -51,7 +51,7 @@ import {
 } from "../keyBindings";
 import { createEnemyIds, getAllyUnitDefinition, getEnemyDefinition } from "../rtsBattleDefinitions";
 import { createVisualTextures, getSlimeTextureKey, getUnitTextureKey } from "../ui/visuals";
-import { addButton as addCommonButton, addPanel, addProgressBar, addSceneBackdrop, setProgressBar, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addPanel, addProgressBar, addSceneBackdrop, setProgressBar, UI_THEME, type ButtonVisual } from "../ui/theme";
 import type {
   BattleOutcome,
   BattlePosition,
@@ -93,7 +93,11 @@ type UnitVisual = {
   targetRing: Phaser.GameObjects.Arc;
   attackReachRing: Phaser.GameObjects.Arc;
   guardReachRing: Phaser.GameObjects.Arc;
-  feedbackTween?: Phaser.Tweens.Tween;
+  baseScaleX: number;
+  baseScaleY: number;
+  baseAlpha: number;
+  attackTween?: Phaser.Tweens.Tween;
+  hitTween?: Phaser.Tweens.Tween;
   deathTween?: Phaser.Tweens.Tween;
 };
 
@@ -103,14 +107,8 @@ type SlotVisual = {
   hpFill: Phaser.GameObjects.Rectangle;
 };
 
-type AutoHuntButtonVisual = {
-  background: Phaser.GameObjects.Rectangle;
-  label: Phaser.GameObjects.Text;
-};
-
 type SkillButtonVisual = {
-  background: Phaser.GameObjects.Rectangle;
-  label: Phaser.GameObjects.Text;
+  visual: ButtonVisual;
   skillId: UnitSkillId;
 };
 
@@ -161,7 +159,7 @@ export class BattleScene extends Phaser.Scene {
   private skillPanel!: SkillPanelVisual;
   private outcomeText!: Phaser.GameObjects.Text;
   private attackLogText!: Phaser.GameObjects.Text;
-  private autoHuntButton!: AutoHuntButtonVisual;
+  private autoHuntButton!: ButtonVisual;
   private readonly controlGroupTexts = new Map<ControlGroupIndex, Phaser.GameObjects.Text>();
   private readonly allyBySlot = new Map<number, RTSBattleUnit>();
   private readonly delayedEvents = new Set<Phaser.Time.TimerEvent>();
@@ -544,10 +542,7 @@ export class BattleScene extends Phaser.Scene {
       height: 28,
       fontSize: "12px",
     });
-    this.autoHuntButton = {
-      background: autoHunt.background,
-      label: autoHunt.label,
-    };
+    this.autoHuntButton = autoHunt;
     this.statusText = this.add.text(730, 14, "", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
@@ -604,13 +599,10 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private updateAutoHuntUi(): void {
-    const color = this.autoHuntEnabled ? 0x3b9b6f : 0x26394b;
-    const stroke = this.autoHuntEnabled ? 0x9ce4b0 : 0x54748a;
     const label = `Auto Hunt: ${this.autoHuntEnabled ? "ON" : "OFF"}`;
-    if (this.autoHuntButton?.label.text !== label) {
-      this.autoHuntButton?.background.setFillStyle(color, 1).setStrokeStyle(1, stroke, 1);
-      this.autoHuntButton?.label.setText(label);
-    }
+    this.autoHuntButton?.setLabel(label);
+    this.autoHuntButton?.setTone(this.autoHuntEnabled ? "success" : "neutral");
+    this.autoHuntButton?.setEnabled(this.combatState === "RUNNING" && !this.dataError);
   }
 
   private getSingleSelectedSkillOwner(): RTSBattleUnit | null {
@@ -644,8 +636,8 @@ export class BattleScene extends Phaser.Scene {
       const button = this.skillPanel.buttons.get(skillId);
       const definition = getUnitSkillDefinition(skillId);
       if (!button || !definition || !owner.skills.includes(skillId)) {
-        button?.background.disableInteractive().setVisible(false);
-        button?.label.setVisible(false);
+        button?.visual.setEnabled(false);
+        button?.visual.setVisible(false);
         continue;
       }
 
@@ -657,19 +649,13 @@ export class BattleScene extends Phaser.Scene {
         ? "FULL HP"
         : "READY";
       const enabled = remainingMs <= 0 && !fullHp;
-      button.background
-        .setFillStyle(enabled ? 0x4b3670 : 0x293044, 1)
-        .setStrokeStyle(1, enabled ? 0xa78bfa : 0x536078, 1)
-        .setVisible(true);
       const keyLabel = skillId === "whirlwind"
         ? getKeyCodeLabel(this.keyBindingState.whirlwindCode)
         : getKeyCodeLabel(this.keyBindingState.firstAidCode);
-      button.label.setText(`[${keyLabel}] ${definition.name} · ${status}`).setVisible(true);
-      if (enabled) {
-        button.background.setInteractive({ useHandCursor: true });
-      } else {
-        button.background.disableInteractive();
-      }
+      button.visual.setLabel(`[${keyLabel}] ${definition.name} · ${status}`);
+      button.visual.setTone("purple");
+      button.visual.setEnabled(enabled);
+      button.visual.setVisible(true);
     }
   }
 
@@ -677,8 +663,8 @@ export class BattleScene extends Phaser.Scene {
     this.skillPanel?.background.setVisible(false);
     this.skillPanel?.ownerText.setVisible(false);
     this.skillPanel?.buttons.forEach((button) => {
-      button.background.disableInteractive().setVisible(false);
-      button.label.setVisible(false);
+      button.visual.setEnabled(false);
+      button.visual.setVisible(false);
     });
   }
 
@@ -700,6 +686,7 @@ export class BattleScene extends Phaser.Scene {
 
       caster.currentHp += actualHeal;
       caster.skillReadyAtMs[skillId] = this.combatTimeMs + definition.cooldownMs;
+      this.flashUnit(caster, 0x86efac);
       this.addAttackLog(`${caster.displayName} restored ${actualHeal} HP with First Aid.`);
       this.showSkillEffect(caster.position, caster.collisionRadius + 16, 0x86efac);
       this.updateUi();
@@ -728,6 +715,7 @@ export class BattleScene extends Phaser.Scene {
       return;
     }
 
+    this.playAttackFeedback(caster);
     caster.skillReadyAtMs[skillId] = this.combatTimeMs + definition.cooldownMs;
     this.addAttackLog(
       defeatedCount > 0
@@ -759,6 +747,7 @@ export class BattleScene extends Phaser.Scene {
     }
 
     target.currentHp = Math.max(0, target.currentHp - calculatePhysicalDamage(damage, target.defense));
+    this.flashUnit(target, target.currentHp === 0 ? 0xef7185 : 0xffffff);
     if (target.currentHp === 0) {
       this.markUnitDead(target, caster);
     }
@@ -810,6 +799,9 @@ export class BattleScene extends Phaser.Scene {
         ? getUnitTextureKey(getAllyUnitDefinition(unit.definitionId))
         : getSlimeTextureKey(this.sourceWorldMonsterId);
       const token = this.add.image(0, 0, textureKey).setDisplaySize(radius * 3.25, radius * 3.25);
+      const baseScaleX = token.scaleX;
+      const baseScaleY = token.scaleY;
+      const baseAlpha = token.alpha;
       const label = this.add.text(0, radius + 8, this.getUnitLabel(unit), {
         color: unit.team === "ALLY" ? "#d9f2ff" : "#ffd2d2",
         fontFamily: "Segoe UI, sans-serif",
@@ -831,6 +823,9 @@ export class BattleScene extends Phaser.Scene {
         targetRing,
         attackReachRing,
         guardReachRing,
+        baseScaleX,
+        baseScaleY,
+        baseAlpha,
       });
     }
   }
@@ -896,7 +891,7 @@ export class BattleScene extends Phaser.Scene {
       });
       visual.background.setVisible(false);
       visual.label.setVisible(false);
-      buttons.set(skillId, { background: visual.background, label: visual.label, skillId });
+      buttons.set(skillId, { visual, skillId });
     });
     this.skillPanel = { background, ownerText, buttons };
   }
@@ -1314,35 +1309,39 @@ export class BattleScene extends Phaser.Scene {
   private playAttackFeedback(unit: RTSBattleUnit): void {
     const visual = this.unitVisuals.get(unit.battleUnitId);
     if (!visual || !unit.isAlive) return;
-    visual.feedbackTween?.stop();
-    visual.token.setScale(1);
-    visual.feedbackTween = this.tweens.add({
+    visual.attackTween?.stop();
+    visual.token.setScale(visual.baseScaleX, visual.baseScaleY);
+    visual.attackTween = this.tweens.add({
       targets: visual.token,
-      scaleX: 1.08,
-      scaleY: 0.92,
+      scaleX: visual.baseScaleX * 1.08,
+      scaleY: visual.baseScaleY * 0.92,
       duration: 70,
       yoyo: true,
       ease: "Quad.out",
-      onComplete: () => { visual.feedbackTween = undefined; visual.token.setScale(1); },
+      onComplete: () => {
+        visual.attackTween = undefined;
+        visual.token.setScale(visual.baseScaleX, visual.baseScaleY);
+      },
     });
   }
 
   private flashUnit(unit: RTSBattleUnit, color: number): void {
     const visual = this.unitVisuals.get(unit.battleUnitId);
     if (!visual) return;
-    visual.feedbackTween?.stop();
+    visual.hitTween?.stop();
     visual.token.clearTint();
+    visual.token.setAlpha(visual.baseAlpha);
     visual.token.setTint(color);
-    visual.feedbackTween = this.tweens.add({
+    visual.hitTween = this.tweens.add({
       targets: visual.token,
       alpha: unit.isAlive ? 0.48 : 0.28,
       duration: 55,
       yoyo: true,
       repeat: 1,
       onComplete: () => {
-        visual.feedbackTween = undefined;
+        visual.hitTween = undefined;
         visual.token.clearTint();
-        visual.token.setAlpha(unit.isAlive ? 1 : 0.28);
+        visual.token.setAlpha(unit.isAlive ? visual.baseAlpha : 0.28);
       },
     });
   }
@@ -1350,13 +1349,16 @@ export class BattleScene extends Phaser.Scene {
   private playDeathFeedback(unit: RTSBattleUnit): void {
     const visual = this.unitVisuals.get(unit.battleUnitId);
     if (!visual) return;
-    visual.feedbackTween?.stop();
+    visual.attackTween?.stop();
+    visual.hitTween?.stop();
     visual.deathTween?.stop();
     visual.token.clearTint();
+    visual.token.setScale(visual.baseScaleX, visual.baseScaleY);
+    visual.token.setAlpha(visual.baseAlpha);
     visual.deathTween = this.tweens.add({
       targets: visual.token,
-      scaleX: 0.62,
-      scaleY: 0.62,
+      scaleX: visual.baseScaleX * 0.62,
+      scaleY: visual.baseScaleY * 0.62,
       alpha: 0.08,
       duration: 150,
       ease: "Quad.in",
@@ -1771,7 +1773,9 @@ export class BattleScene extends Phaser.Scene {
 
   private refreshAllVisuals(): void {
     this.refreshUnitTransformsAndHealth();
-    if (this.visualStateDirty) this.refreshUnitStateVisuals();
+    // Target ownership can change inside the combat loop without a UI event.
+    // Recompute the lightweight 20-unit state layer every visual refresh so rings never lag.
+    this.refreshUnitStateVisuals();
   }
 
   private refreshUnitTransformsAndHealth(): void {
@@ -1952,12 +1956,15 @@ export class BattleScene extends Phaser.Scene {
 
   private cleanupVisualEffects(): void {
     for (const visual of this.unitVisuals.values()) {
-      visual.feedbackTween?.stop();
+      visual.attackTween?.stop();
+      visual.hitTween?.stop();
       visual.deathTween?.stop();
-      visual.feedbackTween = undefined;
+      visual.attackTween = undefined;
+      visual.hitTween = undefined;
       visual.deathTween = undefined;
       visual.token.clearTint();
-      visual.token.setScale(1);
+      visual.token.setScale(visual.baseScaleX, visual.baseScaleY);
+      visual.token.setAlpha(visual.baseAlpha);
     }
   }
 

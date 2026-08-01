@@ -8,13 +8,12 @@ import {
 } from "../persistence";
 import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import { getResetRestartScene, getSaveDataReturnScene, type SaveDataReturnScene } from "../sceneNavigation";
-import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME, type ButtonVisual } from "../ui/theme";
 
 export class SaveDataScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
   private messageText!: Phaser.GameObjects.Text;
-  private resetButton!: Phaser.GameObjects.Rectangle;
-  private resetLabel!: Phaser.GameObjects.Text;
+  private resetButton!: ButtonVisual;
   private resetConfirmUntil = 0;
   private returnScene: SaveDataReturnScene = "FieldScene";
 
@@ -56,7 +55,6 @@ export class SaveDataScene extends Phaser.Scene {
       this.refreshUi();
     });
     this.resetButton = this.addButton(480, 455, 180, "Reset Save", () => this.resetSave());
-    this.resetLabel = this.resetButton.getData("label") as Phaser.GameObjects.Text;
     this.addButton(710, 455, 180, this.returnScene === "RecoveryScene" ? "Back to Recovery" : "Back to Field", () => this.returnToField());
     this.refreshUi();
   }
@@ -74,10 +72,8 @@ export class SaveDataScene extends Phaser.Scene {
     width: number,
     label: string,
     action: () => void,
-  ): Phaser.GameObjects.Rectangle {
-    const visual = addCommonButton(this, x, y, width, label, action);
-    visual.background.setData("label", visual.label);
-    return visual.background;
+  ): ButtonVisual {
+    return addCommonButton(this, x, y, width, label, action);
   }
 
   private refreshUi(): void {
@@ -103,14 +99,14 @@ export class SaveDataScene extends Phaser.Scene {
     const now = Date.now();
     if (now > this.resetConfirmUntil) {
       this.resetConfirmUntil = now + 5000;
-      this.resetLabel.setText("Confirm Reset (5s)");
+      this.resetButton.setLabel("Confirm Reset (5s)");
       this.messageText.setColor("#f3c969").setText("Click Reset Save again within 5 seconds to confirm.");
       return;
     }
     repairRuntimeStateAtBoundary(this.game.registry);
     const result = resetSaveData(this.game.registry, now);
     this.resetConfirmUntil = 0;
-    this.resetLabel.setText("Reset Save");
+    this.resetButton.setLabel("Reset Save");
     this.messageText.setColor(result.ok ? "#9ce4b0" : "#f3c969").setText(result.message);
     this.refreshUi();
     if (result.ok) {

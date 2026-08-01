@@ -12,8 +12,6 @@ import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME, typ
 import { createVisualTextures, getUnitTextureKey } from "../ui/visuals";
 
 type OfferVisual = {
-  button: Phaser.GameObjects.Rectangle;
-  buttonLabel: Phaser.GameObjects.Text;
   visual: ButtonVisual;
 };
 
@@ -118,7 +116,7 @@ export class ShopScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     const visual = addCommonButton(this, x, 323, 150, "Buy", () => this.purchase(offer), { height: 32, fontSize: "11px" });
-    this.offerVisuals.set(offer.offerId, { button: visual.background, buttonLabel: visual.label, visual });
+    this.offerVisuals.set(offer.offerId, { visual });
   }
 
   private addControls(): void {
@@ -182,17 +180,17 @@ export class ShopScene extends Phaser.Scene {
       const full = formation.ownedUnits.length >= MAX_OWNED_UNIT_COUNT;
       if (owned) {
         visual.visual.setEnabled(false);
-        visual.button.setFillStyle(0x536078, 1).setAlpha(0.8);
-        visual.buttonLabel.setText("Owned").setColor("#d9f2ff");
+        visual.visual.setTone("neutral");
+        visual.visual.setLabel("Owned");
       } else if (full) {
         visual.visual.setEnabled(false);
-        visual.button.setFillStyle(0x293044, 1).setAlpha(0.65);
-        visual.buttonLabel.setText("Roster Full").setColor("#8795a8");
+        visual.visual.setTone("neutral");
+        visual.visual.setLabel("Roster Full");
       } else {
         const affordable = gold >= offer.price;
         visual.visual.setEnabled(affordable);
-        visual.button.setFillStyle(affordable ? 0x4b8b6d : 0x293044, 1).setAlpha(1);
-        visual.buttonLabel.setText("Buy").setColor(affordable ? "#f3f8e9" : "#8795a8");
+        visual.visual.setTone(affordable ? "success" : "neutral");
+        visual.visual.setLabel("Buy");
       }
     }
   }

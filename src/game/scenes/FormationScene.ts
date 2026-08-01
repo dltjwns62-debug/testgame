@@ -46,8 +46,6 @@ export class FormationScene extends Phaser.Scene {
   private selectedExpBar!: { fill: Phaser.GameObjects.Rectangle };
   private selectedExpText!: Phaser.GameObjects.Text;
   private statusText!: Phaser.GameObjects.Text;
-  private removeButton!: Phaser.GameObjects.Rectangle;
-  private removeButtonLabel!: Phaser.GameObjects.Text;
   private removeButtonVisual!: ButtonVisual;
 
   public constructor() {
@@ -205,8 +203,6 @@ export class FormationScene extends Phaser.Scene {
       fontSize: "10px",
       height: 28,
     });
-    this.removeButton = this.removeButtonVisual.background;
-    this.removeButtonLabel = this.removeButtonVisual.label;
   }
 
   private addButton(
@@ -420,7 +416,7 @@ export class FormationScene extends Phaser.Scene {
 
     const canRemove = Boolean(selected && selected.unitRole !== "MAIN_CHARACTER" && this.findSlotForUnit(selected.rosterUnitId) !== null);
     this.removeButtonVisual.setEnabled(canRemove);
-    this.removeButtonLabel.setColor(canRemove ? "#fff1d0" : "#8795a8");
+    this.removeButtonVisual.setTone(canRemove ? "warning" : "neutral");
   }
 
   private getUnitSummary(unit: OwnedRosterUnit, slotIndex = this.findSlotForUnit(unit.rosterUnitId)): string {

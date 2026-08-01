@@ -2,12 +2,12 @@ import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH } from "../constants";
 import { resetSaveData } from "../persistence";
 import { prepareRecoveryRetry } from "../runtimeStateValidation";
-import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME, type ButtonVisual } from "../ui/theme";
 
 export class RecoveryScene extends Phaser.Scene {
   private messageText!: Phaser.GameObjects.Text;
   private resetConfirmUntil = 0;
-  private resetLabel!: Phaser.GameObjects.Text;
+  private resetButton!: ButtonVisual;
 
   public constructor() {
     super("RecoveryScene");
@@ -34,17 +34,14 @@ export class RecoveryScene extends Phaser.Scene {
       this.scene.pause("RecoveryScene");
       this.scene.launch("SaveDataScene", { returnScene: "RecoveryScene" });
     });
-    const reset = this.addButton(480, 430, "Reset Save", () => this.resetSave());
-    this.resetLabel = reset.getData("label") as Phaser.GameObjects.Text;
+    this.resetButton = this.addButton(480, 430, "Reset Save", () => this.resetSave());
     this.add.text(GAME_WIDTH / 2, 480, "Reset Save keeps the existing five-second confirmation rule.", {
       color: "#a7b8c8", fontFamily: "Segoe UI, sans-serif", fontSize: "12px",
     }).setOrigin(0.5);
   }
 
-  private addButton(x: number, y: number, label: string, action: () => void): Phaser.GameObjects.Rectangle {
-    const visual = addCommonButton(this, x, y, 150, label, action, { fontSize: "12px", height: 36 });
-    visual.background.setData("label", visual.label);
-    return visual.background;
+  private addButton(x: number, y: number, label: string, action: () => void): ButtonVisual {
+    return addCommonButton(this, x, y, 150, label, action, { fontSize: "12px", height: 36 });
   }
 
   private returnToField(): void {
@@ -69,13 +66,13 @@ export class RecoveryScene extends Phaser.Scene {
     const now = Date.now();
     if (now > this.resetConfirmUntil) {
       this.resetConfirmUntil = now + 5000;
-      this.resetLabel.setText("Confirm Reset (5s)");
+      this.resetButton.setLabel("Confirm Reset (5s)");
       this.messageText.setText("Click Reset Save again within 5 seconds to confirm.");
       return;
     }
     const result = resetSaveData(this.game.registry, now);
     this.resetConfirmUntil = 0;
-    this.resetLabel.setText("Reset Save");
+    this.resetButton.setLabel("Reset Save");
     this.messageText.setText(result.ok ? "Save reset. Try Again to boot with defaults." : result.message);
     if (result.ok) {
       this.scene.stop("RecoveryScene");

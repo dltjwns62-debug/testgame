@@ -19,7 +19,7 @@ import {
   type SkillBindingId,
 } from "../keyBindings";
 import type { FieldScene } from "./FieldScene";
-import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME, type ButtonVisual } from "../ui/theme";
 
 type CaptureAction =
   | { kind: "GROUP"; groupIndex: ControlGroupIndex }
@@ -27,14 +27,12 @@ type CaptureAction =
 
 type GroupVisual = {
   label: Phaser.GameObjects.Text;
-  button: Phaser.GameObjects.Rectangle;
-  buttonLabel: Phaser.GameObjects.Text;
+  button: ButtonVisual;
 };
 
 type SkillVisual = {
   label: Phaser.GameObjects.Text;
-  button: Phaser.GameObjects.Rectangle;
-  buttonLabel: Phaser.GameObjects.Text;
+  button: ButtonVisual;
 };
 
 export class KeySettingsScene extends Phaser.Scene {
@@ -144,22 +142,8 @@ export class KeySettingsScene extends Phaser.Scene {
         fontStyle: "bold",
         wordWrap: { width: 250 },
       });
-      const button = this.add.rectangle(x + 150, y, 82, 25, 0x536078, 1)
-        .setStrokeStyle(1, 0x9ce4b0, 0.9)
-        .setInteractive({ useHandCursor: true });
-      const buttonLabel = this.add.text(x + 150, y, "Change", {
-        color: "#f3f8e9",
-        fontFamily: "Segoe UI, sans-serif",
-        fontSize: "10px",
-        fontStyle: "bold",
-      }).setOrigin(0.5);
-      button.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-        pointer.event?.stopPropagation();
-        if (pointer.button === 0) {
-          this.beginGroupCapture(typedIndex);
-        }
-      });
-      this.groupVisuals.set(typedIndex, { label, button, buttonLabel });
+      const button = addCommonButton(this, x + 150, y, 82, "Change", () => this.beginGroupCapture(typedIndex), { color: UI_THEME.colors.inkSoft, height: 25, fontSize: "10px" });
+      this.groupVisuals.set(typedIndex, { label, button });
     }
   }
 
@@ -184,22 +168,8 @@ export class KeySettingsScene extends Phaser.Scene {
         fontSize: "11px",
         fontStyle: "bold",
       });
-      const button = this.add.rectangle(x + 150, y, 82, 25, 0x536078, 1)
-        .setStrokeStyle(1, 0x9ce4b0, 0.9)
-        .setInteractive({ useHandCursor: true });
-      const buttonLabel = this.add.text(x + 150, y, "Change", {
-        color: "#f3f8e9",
-        fontFamily: "Segoe UI, sans-serif",
-        fontSize: "10px",
-        fontStyle: "bold",
-      }).setOrigin(0.5);
-      button.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-        pointer.event?.stopPropagation();
-        if (pointer.button === 0) {
-          this.beginSkillCapture(skillId);
-        }
-      });
-      this.skillVisuals.set(skillId, { label, button, buttonLabel });
+      const button = addCommonButton(this, x + 150, y, 82, "Change", () => this.beginSkillCapture(skillId), { color: UI_THEME.colors.inkSoft, height: 25, fontSize: "10px" });
+      this.skillVisuals.set(skillId, { label, button });
       label.setData("skillName", name);
     });
   }
@@ -303,7 +273,8 @@ export class KeySettingsScene extends Phaser.Scene {
       const key = getKeyCodeLabel(this.draftKeyBindings.controlGroupCodes[groupIndex]);
       const active = this.captureAction?.kind === "GROUP" && this.captureAction.groupIndex === groupIndex;
       visual.label.setText(`Group ${label}\nRecall: ${key} · Save: Ctrl + ${key}`);
-      visual.button.setFillStyle(active ? 0x4b3670 : 0x536078, 1).setStrokeStyle(1, active ? 0xe9ddff : 0x9ce4b0, 0.9);
+      visual.button.setEnabled(true);
+      visual.button.setTone(active ? "purple" : "neutral");
     }
 
     for (const [skillId, visual] of this.skillVisuals) {
@@ -313,7 +284,8 @@ export class KeySettingsScene extends Phaser.Scene {
       const name = skillId === "whirlwind" ? "Whirlwind" : "First Aid";
       const active = this.captureAction?.kind === "SKILL" && this.captureAction.skillId === skillId;
       visual.label.setText(`${name}\nKey: ${key}`);
-      visual.button.setFillStyle(active ? 0x4b3670 : 0x536078, 1).setStrokeStyle(1, active ? 0xe9ddff : 0x9ce4b0, 0.9);
+      visual.button.setEnabled(true);
+      visual.button.setTone(active ? "purple" : "neutral");
     }
 
     if (this.captureAction?.kind === "GROUP") {

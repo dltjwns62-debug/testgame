@@ -22,12 +22,16 @@ export const UI_THEME = {
   fontFamily: "Segoe UI, system-ui, sans-serif",
 } as const;
 
+export type ButtonTone = "success" | "neutral" | "warning" | "purple";
+
 export type ButtonVisual = {
   background: Phaser.GameObjects.Rectangle;
   label: Phaser.GameObjects.Text;
   setEnabled(enabled: boolean): void;
   setBusy(busy: boolean): void;
   setLabel(label: string): void;
+  setTone(tone: ButtonTone): void;
+  setVisible(visible: boolean): void;
   destroy(): void;
 };
 
@@ -80,12 +84,21 @@ export function addButton(
   width: number,
   label: string,
   action: () => void,
-  options: { color?: number; disabled?: boolean; fontSize?: string; height?: number } = {},
+  options: { color?: number; disabled?: boolean; fontSize?: string; height?: number; tone?: ButtonTone } = {},
 ): ButtonVisual {
   let enabled = !(options.disabled ?? false);
   let busy = false;
+  let pressed = false;
   let textValue = label;
-  const normalColor = options.color ?? UI_THEME.colors.success;
+  let colorOverride = options.color;
+  let tone = options.tone ?? "success";
+  const toneColors: Record<ButtonTone, number> = {
+    success: UI_THEME.colors.success,
+    neutral: UI_THEME.colors.inkSoft,
+    warning: UI_THEME.colors.warning,
+    purple: UI_THEME.colors.purple,
+  };
+  const normalColor = options.color ?? toneColors[tone];
   const height = options.height ?? 34;
   const background = scene.add.rectangle(
     x,
@@ -102,10 +115,12 @@ export function addButton(
     fontStyle: "bold",
     align: "center",
   }).setOrigin(0.5);
-  const render = (color = normalColor): void => {
+  const render = (hover = false): void => {
     const active = enabled && !busy;
+    const baseColor = colorOverride ?? toneColors[tone];
+    const fillColor = !active ? UI_THEME.colors.inkSoft : pressed ? UI_THEME.colors.warning : hover ? UI_THEME.colors.panelRaised : baseColor;
     background
-      .setFillStyle(active ? color : UI_THEME.colors.inkSoft, active ? 1 : 0.72)
+      .setFillStyle(fillColor, active ? 1 : 0.72)
       .setStrokeStyle(1, active ? UI_THEME.colors.successBorder : 0x496176, 0.95);
     text.setText(busy ? `${textValue} ···` : textValue).setColor(active ? UI_THEME.colors.text : "#7890a4");
     if (active) background.setInteractive({ useHandCursor: true });
@@ -126,19 +141,31 @@ export function addButton(
       textValue = nextLabel;
       render();
     },
+    setTone(nextTone: ButtonTone): void {
+      tone = nextTone;
+      colorOverride = undefined;
+      render();
+    },
+    setVisible(visible: boolean): void {
+      background.setVisible(visible);
+      text.setVisible(visible);
+    },
     destroy(): void {
       background.destroy();
       text.destroy();
     },
   };
-  background.on("pointerover", () => { if (enabled && !busy) render(UI_THEME.colors.panelRaised); });
-  background.on("pointerout", () => render());
+  background.on("pointerover", () => { if (enabled && !busy) render(true); });
+  background.on("pointerout", () => { pressed = false; render(); });
   background.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
     pointer.event?.stopPropagation();
     if (pointer.button !== 0 || !enabled || busy) return;
-    render(UI_THEME.colors.warning);
+    pressed = true;
+    render();
     action();
   });
+  background.on("pointerup", () => { pressed = false; render(true); });
+  background.on("pointerupoutside", () => { pressed = false; render(); });
   render();
   return visual;
 }

@@ -30,7 +30,7 @@ import { hasFatalRuntimeStateIssue, inspectRuntimeState, repairRuntimeStateAtBou
 import type { OfflineRewardSummary } from "../offlineProgress";
 import type { BattleOutcome, OwnedRosterUnit, RTSBattleResult, RTSBattleSceneData } from "../rtsBattleTypes";
 import { createVisualTextures, getSlimeTextureKey } from "../ui/visuals";
-import { addButton as addCommonButton, addProgressBar, addSceneBackdrop, addPanel, setProgressBar, UI_THEME } from "../ui/theme";
+import { addButton as addCommonButton, addProgressBar, addSceneBackdrop, addPanel, setProgressBar, UI_THEME, type ButtonVisual } from "../ui/theme";
 
 type FieldState = "IDLE" | "MOVING" | "BATTLE";
 
@@ -67,20 +67,13 @@ export class FieldScene extends Phaser.Scene {
   private stateText!: Phaser.GameObjects.Text;
   private battleTransitionStarted = false;
   private battleResultApplied = false;
-  private formationButton!: Phaser.GameObjects.Rectangle;
-  private formationButtonLabel!: Phaser.GameObjects.Text;
-  private shopButton!: Phaser.GameObjects.Rectangle;
-  private shopButtonLabel!: Phaser.GameObjects.Text;
-  private keySettingsButton!: Phaser.GameObjects.Rectangle;
-  private keySettingsButtonLabel!: Phaser.GameObjects.Text;
-  private inventoryButton!: Phaser.GameObjects.Rectangle;
-  private inventoryButtonLabel!: Phaser.GameObjects.Text;
-  private repeatButton!: Phaser.GameObjects.Rectangle;
-  private repeatButtonLabel!: Phaser.GameObjects.Text;
-  private saveDataButton!: Phaser.GameObjects.Rectangle;
-  private saveDataButtonLabel!: Phaser.GameObjects.Text;
-  private onlineStatusButton!: Phaser.GameObjects.Rectangle;
-  private onlineStatusButtonLabel!: Phaser.GameObjects.Text;
+  private formationButton!: ButtonVisual;
+  private shopButton!: ButtonVisual;
+  private keySettingsButton!: ButtonVisual;
+  private inventoryButton!: ButtonVisual;
+  private repeatButton!: ButtonVisual;
+  private saveDataButton!: ButtonVisual;
+  private onlineStatusButton!: ButtonVisual;
   private formationMessage: string | null = null;
   private repeatAfterBattlePending = false;
   private repeatMovementInProgress = false;
@@ -217,21 +210,15 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addFormationButton(): void {
-    const visual = addCommonButton(this, 520, 66, 112, "Formation", () => this.openFormation(), { height: 28 });
-    this.formationButton = visual.background;
-    this.formationButtonLabel = visual.label;
+    this.formationButton = addCommonButton(this, 520, 66, 112, "Formation", () => this.openFormation(), { height: 28 });
   }
 
   private addShopButton(): void {
-    const visual = addCommonButton(this, 640, 66, 104, "Shop", () => this.openShop(), { height: 28 });
-    this.shopButton = visual.background;
-    this.shopButtonLabel = visual.label;
+    this.shopButton = addCommonButton(this, 640, 66, 104, "Shop", () => this.openShop(), { height: 28 });
   }
 
   private addKeySettingsButton(): void {
-    const visual = addCommonButton(this, 750, 66, 96, "Keys", () => this.openKeySettings(), { height: 28 });
-    this.keySettingsButton = visual.background;
-    this.keySettingsButtonLabel = visual.label;
+    this.keySettingsButton = addCommonButton(this, 750, 66, 96, "Keys", () => this.openKeySettings(), { height: 28 });
   }
 
   private addPlayer(): Phaser.GameObjects.Container {
@@ -504,9 +491,7 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addInventoryButton(): void {
-    const visual = addCommonButton(this, 862, 66, 104, "Inventory", () => this.openInventory(), { height: 28 });
-    this.inventoryButton = visual.background;
-    this.inventoryButtonLabel = visual.label;
+    this.inventoryButton = addCommonButton(this, 862, 66, 104, "Inventory", () => this.openInventory(), { height: 28 });
   }
 
   public openInventory(): void {
@@ -717,22 +702,18 @@ export class FieldScene extends Phaser.Scene {
     if (this.heroExpBar) setProgressBar(this.heroExpBar, 80, heroExpRatio);
     this.heroExpText?.setText(hero ? (hero.level >= 99 ? "MAX" : `EXP ${hero.experience}/${heroExpRequired}`) : "EXP --");
     const menuEnabled = this.state === "IDLE";
-    [this.formationButton, this.shopButton, this.keySettingsButton, this.inventoryButton, this.saveDataButton].forEach((button) => {
-      if (menuEnabled) button?.setInteractive({ useHandCursor: true });
-      else button?.disableInteractive();
+    [this.formationButton, this.shopButton, this.keySettingsButton, this.inventoryButton, this.saveDataButton, this.onlineStatusButton].forEach((button) => {
+      button?.setEnabled(menuEnabled);
     });
-    this.formationButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
-    this.formationButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
-    this.shopButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
-    this.shopButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
-    this.keySettingsButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
-    this.keySettingsButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
-    this.inventoryButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
-    this.inventoryButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
-    this.repeatButton?.setFillStyle(autoProgress.autoRepeatEnabled ? 0x3b9b6f : 0x4b8b6d, 1);
-    this.repeatButtonLabel?.setText("Repeat: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF"));
-    this.saveDataButton?.setFillStyle(menuEnabled ? 0x4b8b6d : 0x293044, 1);
-    this.saveDataButtonLabel?.setColor(menuEnabled ? "#f3f8e9" : "#8795a8");
+    this.repeatButton?.setEnabled(menuEnabled && !this.runtimeFatal);
+    this.formationButton?.setTone(menuEnabled ? "success" : "neutral");
+    this.shopButton?.setTone(menuEnabled ? "success" : "neutral");
+    this.keySettingsButton?.setTone(menuEnabled ? "success" : "neutral");
+    this.inventoryButton?.setTone(menuEnabled ? "success" : "neutral");
+    this.saveDataButton?.setTone(menuEnabled ? "success" : "neutral");
+    this.onlineStatusButton?.setTone(menuEnabled ? "success" : "neutral");
+    this.repeatButton?.setLabel("Repeat: " + (autoProgress.autoRepeatEnabled ? "ON" : "OFF"));
+    this.repeatButton?.setTone(autoProgress.autoRepeatEnabled ? "success" : "neutral");
     const nextText = [
       "State: " + this.state + " · Target: " + (this.targetMonster?.definition.name ?? "None") + " · Gold: " + playerGold,
       "Formation: " + deployedCount + "/10 · Owned: " + formation.ownedUnits.length + "/13 · Hero Slot: " + (heroSlot === undefined ? "-" : heroSlot === 9 ? "0" : heroSlot + 1),
@@ -749,18 +730,12 @@ export class FieldScene extends Phaser.Scene {
   }
 
   private addStage15Controls(): void {
-    const repeat = addCommonButton(this, 680, 510, 136, "Repeat: OFF", () => this.toggleRepeatHunt(), { height: 28, fontSize: "10px" });
-    this.repeatButton = repeat.background;
-    this.repeatButtonLabel = repeat.label;
-    const save = addCommonButton(this, 835, 510, 136, "Save Data", () => this.openSaveData(), { height: 28, fontSize: "10px" });
-    this.saveDataButton = save.background;
-    this.saveDataButtonLabel = save.label;
+    this.repeatButton = addCommonButton(this, 680, 510, 136, "Repeat: OFF", () => this.toggleRepeatHunt(), { height: 28, fontSize: "10px" });
+    this.saveDataButton = addCommonButton(this, 835, 510, 136, "Save Data", () => this.openSaveData(), { height: 28, fontSize: "10px" });
   }
 
   private addOnlineStatusButton(): void {
-    const visual = addCommonButton(this, 500, 510, 130, "Online Status", () => this.openOnlineStatus(), { height: 28, fontSize: "10px" });
-    this.onlineStatusButton = visual.background;
-    this.onlineStatusButtonLabel = visual.label;
+    this.onlineStatusButton = addCommonButton(this, 500, 510, 130, "Online Status", () => this.openOnlineStatus(), { height: 28, fontSize: "10px" });
   }
 
   private toggleRepeatHunt(): void {

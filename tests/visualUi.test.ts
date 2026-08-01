@@ -19,6 +19,13 @@ const assetPaths = [
   "public/assets/units/scout.svg",
   "public/assets/units/skill-merc.svg",
 ];
+const screenshotPaths = [
+    "docs/screenshots/visual-ui-pass-1-v3/field.png",
+    "docs/screenshots/visual-ui-pass-1-v3/formation.png",
+    "docs/screenshots/visual-ui-pass-1-v3/shop.png",
+    "docs/screenshots/visual-ui-pass-1-v3/inventory.png",
+    "docs/screenshots/visual-ui-pass-1-v3/battle.png",
+];
 
 test("visual pass ships ten safe, self-contained SVG assets", () => {
   for (const relativePath of assetPaths) {
@@ -45,4 +52,12 @@ test("visual texture keys distinguish Slimes and every current ally definition",
   ];
   const unitKeys = allyDefinitionIds.map((id) => getUnitTextureKey(getAllyUnitDefinition(id)));
   assert.equal(new Set(unitKeys).size, allyDefinitionIds.length);
+});
+
+test("review screenshots use PNG files with matching magic bytes", () => {
+  const pngMagic = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+  for (const relativePath of screenshotPaths) {
+    const bytes = readFileSync(join(repoRoot, relativePath));
+    assert.deepEqual([...bytes.subarray(0, 8)], pngMagic, relativePath);
+  }
 });

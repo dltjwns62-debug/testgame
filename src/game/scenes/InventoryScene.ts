@@ -36,9 +36,7 @@ type SlotVisual = {
   background: Phaser.GameObjects.Rectangle;
   labelText: Phaser.GameObjects.Text;
   itemText: Phaser.GameObjects.Text;
-  button: Phaser.GameObjects.Rectangle;
-  buttonLabel: Phaser.GameObjects.Text;
-  buttonVisual: ButtonVisual;
+  button: ButtonVisual;
 };
 
 const ITEMS_PER_PAGE = 6;
@@ -59,10 +57,9 @@ export class InventoryScene extends Phaser.Scene {
   private itemDetailText!: Phaser.GameObjects.Text;
   private statusText!: Phaser.GameObjects.Text;
   private pageText!: Phaser.GameObjects.Text;
-  private previousButton!: Phaser.GameObjects.Rectangle;
-  private nextButton!: Phaser.GameObjects.Rectangle;
-  private equipButton!: Phaser.GameObjects.Rectangle;
-  private equipButtonLabel!: Phaser.GameObjects.Text;
+  private previousButton!: ButtonVisual;
+  private nextButton!: ButtonVisual;
+  private equipButton!: ButtonVisual;
 
   private readonly handleWheel = (
     _pointer: Phaser.Input.Pointer,
@@ -210,7 +207,7 @@ export class InventoryScene extends Phaser.Scene {
         wordWrap: { width: 150 },
       });
       const buttonVisual = addCommonButton(this, 580, y, 62, "Unequip", () => this.unequip(slot.id), { color: UI_THEME.colors.inkSoft, height: 24, fontSize: "8px" });
-      this.slotVisuals.set(slot.id, { background, labelText, itemText, button: buttonVisual.background, buttonLabel: buttonVisual.label, buttonVisual });
+      this.slotVisuals.set(slot.id, { background, labelText, itemText, button: buttonVisual });
     });
   }
 
@@ -268,12 +265,9 @@ export class InventoryScene extends Phaser.Scene {
       wordWrap: { width: 400 },
     });
     const equipVisual = addCommonButton(this, 805, 472, 150, "Equip Selected", () => this.equipSelectedItem(), { height: 28, fontSize: "10px" });
-    this.equipButton = equipVisual.background;
-    this.equipButtonLabel = equipVisual.label;
-    this.equipButton.setData("buttonVisual", equipVisual);
+    this.equipButton = equipVisual;
     const previousVisual = addCommonButton(this, 688, 512, 48, "<", () => { this.inventoryPage -= 1; this.refreshUi(); }, { color: UI_THEME.colors.inkSoft, height: 22, fontSize: "12px" });
-    this.previousButton = previousVisual.background;
-    this.previousButton.setData("buttonVisual", previousVisual);
+    this.previousButton = previousVisual;
     this.pageText = this.add.text(805, 512, "", {
       color: "#b9cad7",
       fontFamily: "Segoe UI, sans-serif",
@@ -281,8 +275,7 @@ export class InventoryScene extends Phaser.Scene {
       align: "center",
     }).setOrigin(0.5);
     const nextVisual = addCommonButton(this, 922, 512, 48, ">", () => { this.inventoryPage += 1; this.refreshUi(); }, { color: UI_THEME.colors.inkSoft, height: 22, fontSize: "12px" });
-    this.nextButton = nextVisual.background;
-    this.nextButton.setData("buttonVisual", nextVisual);
+    this.nextButton = nextVisual;
   }
 
   private selectUnit(rosterUnitId: string): void {
@@ -361,9 +354,8 @@ export class InventoryScene extends Phaser.Scene {
       const item = itemInstanceId ? inventory.itemInstances.find((candidate) => candidate.itemInstanceId === itemInstanceId) : null;
       const definition = item ? getItemDefinition(item.itemDefinitionId) : null;
       visual.itemText.setText(definition ? definition.displayName + " (" + itemInstanceId + ")" : "Empty");
-      visual.buttonVisual.setEnabled(Boolean(item));
-      visual.button.setAlpha(item ? 1 : 0.45);
-      visual.buttonLabel.setColor(item ? "#f3f8e9" : "#8795a8");
+      visual.button.setEnabled(Boolean(item));
+      visual.button.setTone(item ? "neutral" : "neutral");
     }
 
     for (let index = 0; index < this.itemRows.length; index += 1) {
@@ -405,15 +397,11 @@ export class InventoryScene extends Phaser.Scene {
         getAllyUnitDefinition(currentUnit.unitDefinitionId)?.allowedWeaponCategories ?? [],
         selectedItem.itemInstanceId,
       ));
-    this.equipButton.setFillStyle(canEquip ? 0x4b8b6d : 0x293044, 1).setAlpha(canEquip ? 1 : 0.6);
-    const equipVisual = this.equipButton.getData("buttonVisual") as ButtonVisual | undefined;
-    equipVisual?.setEnabled(canEquip);
-    this.equipButtonLabel.setColor(canEquip ? "#f3f8e9" : "#8795a8");
+    this.equipButton.setEnabled(canEquip);
+    this.equipButton.setTone(canEquip ? "success" : "neutral");
     this.pageText.setText("Page " + (this.inventoryPage + 1) + "/" + (maxPage + 1) + " · " + available.length + " items");
-    (this.previousButton.getData("buttonVisual") as ButtonVisual | undefined)?.setEnabled(this.inventoryPage > 0);
-    (this.nextButton.getData("buttonVisual") as ButtonVisual | undefined)?.setEnabled(this.inventoryPage < maxPage);
-    this.previousButton.setAlpha(this.inventoryPage > 0 ? 1 : 0.45);
-    this.nextButton.setAlpha(this.inventoryPage < maxPage ? 1 : 0.45);
+    this.previousButton.setEnabled(this.inventoryPage > 0);
+    this.nextButton.setEnabled(this.inventoryPage < maxPage);
   }
 
   private equipSelectedItem(): void {

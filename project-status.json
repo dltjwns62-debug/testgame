@@ -16,8 +16,8 @@
   "postRoadmapFollowUp": {
     "task": "포스트 로드맵 — 시각/UI 1차 패스",
     "branch": "post-roadmap-visual-ui-pass-1",
-    "tag": "review-visual-ui-pass-1-v3",
-    "version": 3,
+    "tag": "review-visual-ui-pass-1-v4",
+    "version": 4,
     "status": "review_pending",
     "submitted": true,
     "approved": false,
@@ -52,6 +52,20 @@
         "userRunTest": "skipped_by_user",
         "mainBranchMerged": false,
         "reason": "공통 ButtonVisual 내부 상태와 Scene의 직접 label·fill·interactive 조작이 충돌해 Auto Hunt·Repeat·Skill 문구와 disabled 상태가 hover 시 깨질 수 있고, 공격 효과가 setScale(1)로 토큰 원본 크기를 복구해 첫 공격 후 크기가 변할 수 있으며, 공격·피격 tween 공유로 tint·alpha·scale이 남을 수 있고, 자동 타깃 재지정 시 visualStateDirty 누락으로 타깃 링이 갱신되지 않으며, 제출된 .png 스크린샷이 실제 JPEG 바이트임"
+      },
+      {
+        "task": "포스트 로드맵 — 시각/UI 1차 패스",
+        "branch": "post-roadmap-visual-ui-pass-1",
+        "tag": "review-visual-ui-pass-1-v3",
+        "version": 3,
+        "commit": "4ee51366c76781a12b5c954dfef12d1ea50ed5e0",
+        "result": "changes_requested",
+        "approved": false,
+        "reviewer": "ChatGPT",
+        "reviewedAt": "2026-08-01T15:31:00+09:00",
+        "userRunTest": "skipped_by_user",
+        "mainBranchMerged": false,
+        "reason": "v2의 토큰 scale, tween 분리, 타깃 링과 PNG 형식 문제는 수정됐지만, ButtonVisual이 hover를 내부 상태로 보존하지 않아 Field·Battle의 주기적 setLabel·setTone·setEnabled 갱신 시 hover가 사라지고, disable·busy·hide 전환에서 pressed 상태가 초기화되지 않아 Skill cooldown 후 pressed 색상이 남을 수 있으며, ProgressBar가 NaN·Infinity 입력을 안전하게 0으로 정규화하지 않음"
       }
     ]
   },
@@ -748,5 +762,5 @@
   },
   "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-08-01T15:15:05+09:00"
+  "lastUpdated": "2026-08-01T15:48:14+09:00"
 }

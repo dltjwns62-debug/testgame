@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v4 재제출 — 검수 대기
+
+- v3 검수의 `changes_requested` 결과를 보존하고 ButtonVisual에 visible·hovered·pressed를 포함한 내부 상태 계산을 추가했다.
+- 동적 label·tone·enabled·busy 갱신 중 hover를 유지하고 disable·busy·hide 시 pressed를 초기화하도록 보완했다.
+- Phaser-free 순수 상태 helper와 ProgressBar NaN·Infinity 정규화, 회귀 테스트를 추가했다.
+- Field Repeat와 Battle Auto Hunt hover 및 동적 문구를 브라우저에서 확인했으며 Skill cooldown 전체 수동 시나리오는 `not_run`으로 유지했다.
+- 현재 제출 태그는 `review-visual-ui-pass-1-v4`이며 v1·v2·v3 태그와 이력, `main` 및 `stage-17-completed`는 변경하지 않았다.
+- 사용자 수동 테스트는 `skipped_by_user`이며 18단계 기능은 구현하지 않았다.
+
 ## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v3 재제출 — 검수 대기
 
 - v2 검수의 `changes_requested` 결과를 보존하고 공통 `ButtonVisual` 단일 상태 API, pressed 복구와 shutdown 정리, 토큰 base scale 복구를 보완했다.

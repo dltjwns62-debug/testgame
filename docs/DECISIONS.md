@@ -1,5 +1,13 @@
 # 프로젝트 결정 사항
 
+## 포스트 로드맵 시각/UI 1차 패스 v4 재제출 결정
+
+- 결정: v3 `changes_requested` 결과와 `review-visual-ui-pass-1-v3` 태그를 보존하고, 수정본은 `review-visual-ui-pass-1-v4` 새 태그로 제출한다.
+- 결정: ButtonVisual은 enabled·busy·visible·hovered·pressed·label·tone을 내부 상태로 관리하고 모든 setter가 같은 render 계산을 사용한다.
+- 결정: ProgressBar 입력은 Phaser GameObject 생성 전 순수 정규화 helper를 거쳐 NaN·Infinity를 0으로 처리한다.
+- 결정: 브라우저에서 확인한 hover 범위와 실행하지 않은 Skill cooldown·전투 tween 수동 범위를 구분해 기록한다.
+- 상태: 확정
+
 ## 포스트 로드맵 시각/UI 1차 패스 v3 재제출 결정
 
 - 결정: v2 `changes_requested` 결과와 `review-visual-ui-pass-1-v2` 태그를 보존하고, 수정본은 `review-visual-ui-pass-1-v3` 새 태그로 제출한다.

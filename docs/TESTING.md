@@ -3,7 +3,7 @@
 ## 포스트 로드맵 시각/UI 1차 패스 — 검수 대기
 
 - 작업 브랜치: `post-roadmap-visual-ui-pass-1`
-- 검수 태그: `review-visual-ui-pass-1-v3`
+- 검수 태그: `review-visual-ui-pass-1-v4`
 - 상태: `review_pending` (17단계 완료 상태와 별도 관리)
 - 코드 검수: `pending`
 - 사용자 수동 테스트: `skipped_by_user`
@@ -12,13 +12,13 @@
 
 - `npm ci`: 통과 (`passed`)
 - `npm run typecheck`: 통과 (`passed`)
-- `npm run test`: 통과 (`passed`, 84개; 기존 83개에 v3 스크린샷 PNG magic-byte 검사 1개를 추가)
+- `npm run test`: 통과 (`passed`, 86개; v4 순수 ButtonVisual 상태·ProgressBar 정규화 검사 2개 추가)
 - `npm run build`: 통과 (`passed`)
 - `npm run check`: 통과 (`passed`)
 - `npm run dev -- --host 127.0.0.1`: 개발 서버 실행 확인 후 종료 (`passed`)
-- 브라우저 자동 확인: Field·Battle의 토큰·배경·HP/EXP·공통 버튼 가독성을 확인하고, Battle 캔버스에서 실제 우클릭으로 전투에 진입해 선택 유닛·공격 범위 링과 상태 HUD를 확인했으며 콘솔 error/warning은 없었다 (`partial_passed`)
+- 브라우저 자동 확인: Field Formation·Repeat 버튼과 Battle Auto Hunt 버튼을 500ms 이상 hover한 뒤 동적 문구와 hover 색상을 확인했고, Battle 실제 우클릭 진입·상태 HUD·콘솔 error/warning 없음도 확인했다 (`partial_passed`)
 - 스크린샷: `docs/screenshots/visual-ui-pass-1-v3/field.png`, `formation.png`, `shop.png`, `inventory.png`, `battle.png` (제출 PNG magic bytes 확인)
-- Battle의 실제 공격·피격·사망 tween 전체 수동 시나리오: `not_run`; 사용자 수동 테스트는 `skipped_by_user`
+- Skill cooldown 재활성화와 Battle 공격·피격·사망 tween 전체 수동 시나리오: `not_run`; 사용자 수동 테스트는 `skipped_by_user`
 - 브라우저에서 수동 전투 조작과 전체 메뉴 전환을 완료한 것으로 간주하지 않는다.
 
 ### 별도 미실행 범위

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="mercenary unit token">
+  <ellipse cx="48" cy="84" rx="25" ry="6" fill="#0b1220" opacity=".24"/>
+  <path d="M28 75c2-19 10-29 20-29s18 10 20 29z" fill="#4f8dd8"/>
+  <path d="M35 48h26l-4-16H39z" fill="#d9a441"/>
+  <path d="M37 31h22l-4-8H41z" fill="#f4d35e"/>
+  <circle cx="48" cy="42" r="13" fill="#ffd08a"/>
+  <circle cx="43" cy="41" r="2.5" fill="#172033"/><circle cx="53" cy="41" r="2.5" fill="#172033"/>
+  <path d="M43 47c3 3 7 3 10 0" fill="none" stroke="#172033" stroke-width="2" stroke-linecap="round"/>
+  <path d="M24 72h48" stroke="#f7d154" stroke-width="4" stroke-linecap="round"/>
+</svg>

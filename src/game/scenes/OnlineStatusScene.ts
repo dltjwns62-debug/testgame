@@ -5,6 +5,7 @@ import { createRegistrySnapshotForOnlineSync, OnlineSyncCoordinator } from "../o
 import { createSnapshotCheckpointOperation } from "../online/onlineOperations";
 import { createDefaultOnlineSessionState, getOrCreateOnlineSessionState, setOnlineSessionState } from "../online/onlineRegistry";
 import { type MockOnlineGateway } from "../online/mockOnlineGateway";
+import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME, type ButtonVisual } from "../ui/theme";
 
 export class OnlineStatusScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
@@ -14,7 +15,7 @@ export class OnlineStatusScene extends Phaser.Scene {
   private mockMode = false;
   private busy = false;
   private disposed = false;
-  private readonly actionButtons: Phaser.GameObjects.Rectangle[] = [];
+  private readonly actionButtons: ButtonVisual[] = [];
 
   public constructor() {
     super("OnlineStatusScene");
@@ -30,8 +31,8 @@ export class OnlineStatusScene extends Phaser.Scene {
     setOnlineSessionState(this.game.registry, this.mockMode ? next : { ...createDefaultOnlineSessionState(false), deviceId: existing.deviceId, clientInstanceId: existing.clientInstanceId });
     if (!this.gateway || (this.gateway instanceof Object && this.mockMode !== this.gatewayIsMock())) this.gateway = createOnlineGateway(this.mockMode);
     this.coordinator = new OnlineSyncCoordinator(this.game.registry, this.gateway);
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 280, 860, 360, 0x1f2937, 1).setStrokeStyle(1, 0x54748a, 1);
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.accent);
+    addPanel(this, GAME_WIDTH / 2, 280, 860, 360, UI_THEME.colors.panel, 0.97);
     this.add.text(48, 32, "Stage 17: Online Expansion Readiness", { color: "#f3f8e9", fontFamily: "Segoe UI, sans-serif", fontSize: "24px", fontStyle: "bold" });
     this.add.text(50, 68, "Disabled by default. Mock mode never contacts a real server.", { color: "#c4e4d0", fontFamily: "Segoe UI, sans-serif", fontSize: "13px" });
     this.statusText = this.add.text(64, 124, "", { color: "#d9f2ff", fontFamily: "Segoe UI, sans-serif", fontSize: "14px", lineSpacing: 8, wordWrap: { width: 820 } });
@@ -55,20 +56,16 @@ export class OnlineStatusScene extends Phaser.Scene {
   }
 
   private addButton(x: number, y: number, width: number, label: string, action: () => void, managed = true): void {
-    const button = this.add.rectangle(x, y, width, 32, 0x4b8b6d, 1).setStrokeStyle(1, 0x9ce4b0, 0.9).setInteractive({ useHandCursor: true });
-    this.add.text(x, y, label, { color: "#f3f8e9", fontFamily: "Segoe UI, sans-serif", fontSize: "11px", fontStyle: "bold" }).setOrigin(0.5);
-    if (managed) this.actionButtons.push(button);
-    button.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0 && !this.busy && !this.disposed) void action();
-    });
+    const visual = addCommonButton(this, x, y, width, label, () => {
+      if (!this.busy && !this.disposed) void action();
+    }, { height: 32 });
+    if (managed) this.actionButtons.push(visual);
   }
 
   private setActionsEnabled(enabled: boolean): void {
     for (const button of this.actionButtons) {
-      button.disableInteractive();
-      if (enabled) button.setInteractive({ useHandCursor: true });
-      button.setFillStyle(enabled ? 0x4b8b6d : 0x293044, 1);
+      button.setBusy(!enabled);
+      button.setEnabled(enabled);
     }
   }
 

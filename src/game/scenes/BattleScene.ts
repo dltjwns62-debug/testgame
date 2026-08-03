@@ -50,6 +50,8 @@ import {
   type KeyBindingState,
 } from "../keyBindings";
 import { createEnemyIds, getAllyUnitDefinition, getEnemyDefinition } from "../rtsBattleDefinitions";
+import { createVisualTextures, getSlimeTextureKey, getUnitTextureKey } from "../ui/visuals";
+import { addButton as addCommonButton, addPanel, addProgressBar, addSceneBackdrop, setProgressBar, UI_THEME, type ButtonVisual } from "../ui/theme";
 import type {
   BattleOutcome,
   BattlePosition,
@@ -85,9 +87,18 @@ type UnitVisual = {
   container: Phaser.GameObjects.Container;
   interactionZone: Phaser.GameObjects.Zone;
   healthFill: Phaser.GameObjects.Rectangle;
+  healthBarWidth: number;
+  token: Phaser.GameObjects.Image;
   selectionRing: Phaser.GameObjects.Arc;
+  targetRing: Phaser.GameObjects.Arc;
   attackReachRing: Phaser.GameObjects.Arc;
   guardReachRing: Phaser.GameObjects.Arc;
+  baseScaleX: number;
+  baseScaleY: number;
+  baseAlpha: number;
+  attackTween?: Phaser.Tweens.Tween;
+  hitTween?: Phaser.Tweens.Tween;
+  deathTween?: Phaser.Tweens.Tween;
 };
 
 type SlotVisual = {
@@ -96,14 +107,8 @@ type SlotVisual = {
   hpFill: Phaser.GameObjects.Rectangle;
 };
 
-type AutoHuntButtonVisual = {
-  background: Phaser.GameObjects.Rectangle;
-  label: Phaser.GameObjects.Text;
-};
-
 type SkillButtonVisual = {
-  background: Phaser.GameObjects.Rectangle;
-  label: Phaser.GameObjects.Text;
+  visual: ButtonVisual;
   skillId: UnitSkillId;
 };
 
@@ -154,7 +159,7 @@ export class BattleScene extends Phaser.Scene {
   private skillPanel!: SkillPanelVisual;
   private outcomeText!: Phaser.GameObjects.Text;
   private attackLogText!: Phaser.GameObjects.Text;
-  private autoHuntButton!: AutoHuntButtonVisual;
+  private autoHuntButton!: ButtonVisual;
   private readonly controlGroupTexts = new Map<ControlGroupIndex, Phaser.GameObjects.Text>();
   private readonly allyBySlot = new Map<number, RTSBattleUnit>();
   private readonly delayedEvents = new Set<Phaser.Time.TimerEvent>();
@@ -222,6 +227,7 @@ export class BattleScene extends Phaser.Scene {
 
   public create(data: unknown): void {
     repairRuntimeStateAtBoundary(this.game.registry);
+    createVisualTextures(this);
     this.resetBattle(data);
     this.drawBackground();
     this.addHeader();
@@ -243,6 +249,7 @@ export class BattleScene extends Phaser.Scene {
 
     this.input.keyboard?.on("keydown", this.handleBattleKeyDown, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanupInput, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanupVisualEffects, this);
   }
 
   public update(_time: number, delta: number): void {
@@ -494,9 +501,10 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 235, 920, 340, 0x1f2937, 1);
-    this.add.rectangle(GAME_WIDTH / 2, 438, 920, 92, 0x172033, 1);
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.accent);
+    addPanel(this, GAME_WIDTH / 2, 235, 920, 340, UI_THEME.colors.panel, 0.97);
+    this.add.rectangle(GAME_WIDTH / 2, 438, 920, 92, UI_THEME.colors.inkSoft, 0.98)
+      .setStrokeStyle(1, UI_THEME.colors.panelBorder, 0.52);
     this.add.line(0, 0, 22, 420, 938, 420, 0x6ec6a7, 0.65).setOrigin(0);
   }
 
@@ -529,22 +537,12 @@ export class BattleScene extends Phaser.Scene {
       fontSize: "10px",
       fontStyle: "bold",
     });
-    const autoHuntBackground = this.add.rectangle(500, 28, 150, 28, 0x26394b, 1)
-      .setStrokeStyle(1, 0x54748a, 1);
-    autoHuntBackground.setInteractive({ useHandCursor: true });
-    autoHuntBackground.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      this.setAutoHuntEnabled(!this.autoHuntEnabled);
+    const autoHunt = addCommonButton(this, 500, 28, 150, "Auto Hunt: OFF", () => this.setAutoHuntEnabled(!this.autoHuntEnabled), {
+      color: UI_THEME.colors.inkSoft,
+      height: 28,
+      fontSize: "12px",
     });
-    this.autoHuntButton = {
-      background: autoHuntBackground,
-      label: this.add.text(500, 28, "", {
-        color: "#d9e8f2",
-        fontFamily: "Segoe UI, sans-serif",
-        fontSize: "12px",
-        fontStyle: "bold",
-      }).setOrigin(0.5),
-    };
+    this.autoHuntButton = autoHunt;
     this.statusText = this.add.text(730, 14, "", {
       color: "#f3f8e9",
       fontFamily: "Segoe UI, sans-serif",
@@ -601,13 +599,10 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private updateAutoHuntUi(): void {
-    const color = this.autoHuntEnabled ? 0x3b9b6f : 0x26394b;
-    const stroke = this.autoHuntEnabled ? 0x9ce4b0 : 0x54748a;
     const label = `Auto Hunt: ${this.autoHuntEnabled ? "ON" : "OFF"}`;
-    if (this.autoHuntButton?.label.text !== label) {
-      this.autoHuntButton?.background.setFillStyle(color, 1).setStrokeStyle(1, stroke, 1);
-      this.autoHuntButton?.label.setText(label);
-    }
+    this.autoHuntButton?.setLabel(label);
+    this.autoHuntButton?.setTone(this.autoHuntEnabled ? "success" : "neutral");
+    this.autoHuntButton?.setEnabled(this.combatState === "RUNNING" && !this.dataError);
   }
 
   private getSingleSelectedSkillOwner(): RTSBattleUnit | null {
@@ -641,8 +636,8 @@ export class BattleScene extends Phaser.Scene {
       const button = this.skillPanel.buttons.get(skillId);
       const definition = getUnitSkillDefinition(skillId);
       if (!button || !definition || !owner.skills.includes(skillId)) {
-        button?.background.disableInteractive().setVisible(false);
-        button?.label.setVisible(false);
+        button?.visual.setEnabled(false);
+        button?.visual.setVisible(false);
         continue;
       }
 
@@ -654,19 +649,13 @@ export class BattleScene extends Phaser.Scene {
         ? "FULL HP"
         : "READY";
       const enabled = remainingMs <= 0 && !fullHp;
-      button.background
-        .setFillStyle(enabled ? 0x4b3670 : 0x293044, 1)
-        .setStrokeStyle(1, enabled ? 0xa78bfa : 0x536078, 1)
-        .setVisible(true);
       const keyLabel = skillId === "whirlwind"
         ? getKeyCodeLabel(this.keyBindingState.whirlwindCode)
         : getKeyCodeLabel(this.keyBindingState.firstAidCode);
-      button.label.setText(`[${keyLabel}] ${definition.name} · ${status}`).setVisible(true);
-      if (enabled) {
-        button.background.setInteractive({ useHandCursor: true });
-      } else {
-        button.background.disableInteractive();
-      }
+      button.visual.setLabel(`[${keyLabel}] ${definition.name} · ${status}`);
+      button.visual.setTone("purple");
+      button.visual.setEnabled(enabled);
+      button.visual.setVisible(true);
     }
   }
 
@@ -674,8 +663,8 @@ export class BattleScene extends Phaser.Scene {
     this.skillPanel?.background.setVisible(false);
     this.skillPanel?.ownerText.setVisible(false);
     this.skillPanel?.buttons.forEach((button) => {
-      button.background.disableInteractive().setVisible(false);
-      button.label.setVisible(false);
+      button.visual.setEnabled(false);
+      button.visual.setVisible(false);
     });
   }
 
@@ -697,6 +686,7 @@ export class BattleScene extends Phaser.Scene {
 
       caster.currentHp += actualHeal;
       caster.skillReadyAtMs[skillId] = this.combatTimeMs + definition.cooldownMs;
+      this.flashUnit(caster, 0x86efac);
       this.addAttackLog(`${caster.displayName} restored ${actualHeal} HP with First Aid.`);
       this.showSkillEffect(caster.position, caster.collisionRadius + 16, 0x86efac);
       this.updateUi();
@@ -725,6 +715,7 @@ export class BattleScene extends Phaser.Scene {
       return;
     }
 
+    this.playAttackFeedback(caster);
     caster.skillReadyAtMs[skillId] = this.combatTimeMs + definition.cooldownMs;
     this.addAttackLog(
       defeatedCount > 0
@@ -756,6 +747,7 @@ export class BattleScene extends Phaser.Scene {
     }
 
     target.currentHp = Math.max(0, target.currentHp - calculatePhysicalDamage(damage, target.defense));
+    this.flashUnit(target, target.currentHp === 0 ? 0xef7185 : 0xffffff);
     if (target.currentHp === 0) {
       this.markUnitDead(target, caster);
     }
@@ -785,7 +777,6 @@ export class BattleScene extends Phaser.Scene {
   private addBattleUnits(): void {
     for (const unit of this.units.values()) {
       const radius = unit.collisionRadius;
-      const color = unit.team === "ALLY" ? unit.color : this.enemyColor;
       const container = this.add.container(unit.position.x, unit.position.y);
       const guardReachRing = this.add.arc(
         unit.guardPosition.x,
@@ -802,29 +793,39 @@ export class BattleScene extends Phaser.Scene {
       attackReachRing.setStrokeStyle(1, 0x67e8f9, 0.42).setVisible(false);
       const selectionRing = this.add.arc(0, 0, radius + 7, 0, 360, false, 0xf7d154, 0);
       selectionRing.setStrokeStyle(2, 0xf7d154, 1).setVisible(false);
-      const body = this.add.circle(0, 0, radius, color);
-      const banner = this.add.rectangle(0, radius - 1, radius * 1.55, 6, color);
-      const eyes = [this.add.circle(-4, -2, 2, 0x172033), this.add.circle(4, -2, 2, 0x172033)];
+      const targetRing = this.add.arc(0, 0, radius + 12, 0, 360, false, 0xf97316, 0);
+      targetRing.setStrokeStyle(2, 0xf97316, 0.95).setVisible(false);
+      const textureKey = unit.team === "ALLY"
+        ? getUnitTextureKey(getAllyUnitDefinition(unit.definitionId))
+        : getSlimeTextureKey(this.sourceWorldMonsterId);
+      const token = this.add.image(0, 0, textureKey).setDisplaySize(radius * 3.25, radius * 3.25);
+      const baseScaleX = token.scaleX;
+      const baseScaleY = token.scaleY;
+      const baseAlpha = token.alpha;
       const label = this.add.text(0, radius + 8, this.getUnitLabel(unit), {
         color: unit.team === "ALLY" ? "#d9f2ff" : "#ffd2d2",
         fontFamily: "Segoe UI, sans-serif",
         fontSize: "10px",
         fontStyle: "bold",
       }).setOrigin(0.5);
-      const healthBack = this.add.rectangle(0, -radius - 7, 32, 4, 0x0b1220).setOrigin(0.5);
-      const healthFill = this.add.rectangle(0, -radius - 7, 32, 4, unit.team === "ALLY" ? 0x66d18f : 0xef7185).setOrigin(0, 0.5);
-      healthFill.x = -16;
-      container.add([attackReachRing, selectionRing, body, banner, ...eyes, label, healthBack, healthFill]);
+      const healthBar = addProgressBar(this, 0, -radius - 7, 42, 1, unit.team === "ALLY" ? 0x66d18f : 0xef7185, 6);
+      container.add([targetRing, attackReachRing, selectionRing, token, label, healthBar.background, healthBar.fill]);
       const interactionZone = this.add.zone(unit.position.x, unit.position.y, radius * 2 + 12, radius * 2 + 12);
       interactionZone.setInteractive({ useHandCursor: true });
       interactionZone.on("pointerdown", (pointer: Phaser.Input.Pointer) => this.handleUnitPointerDown(unit.battleUnitId, pointer));
       this.unitVisuals.set(unit.battleUnitId, {
         container,
         interactionZone,
-        healthFill,
+        healthFill: healthBar.fill,
+        healthBarWidth: 38,
+        token,
         selectionRing,
+        targetRing,
         attackReachRing,
         guardReachRing,
+        baseScaleX,
+        baseScaleY,
+        baseAlpha,
       });
     }
   }
@@ -883,22 +884,14 @@ export class BattleScene extends Phaser.Scene {
       { skillId: "whirlwind" as const, x: 680 },
       { skillId: "first-aid" as const, x: 820 },
     ]).forEach(({ skillId, x }) => {
-      const buttonBackground = this.add.rectangle(x, 443, 126, 25, 0x4b3670, 1)
-        .setStrokeStyle(1, 0xa78bfa, 1)
-        .setVisible(false);
-      buttonBackground.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-        pointer.event?.stopPropagation();
-        if (pointer.button === 0) {
-          this.useSelectedSkill(skillId);
-        }
-      });
-      const label = this.add.text(x, 443, "", {
-        color: "#f4efff",
-        fontFamily: "Segoe UI, sans-serif",
+      const visual = addCommonButton(this, x, 443, 126, "", () => this.useSelectedSkill(skillId), {
+        color: UI_THEME.colors.purple,
+        height: 25,
         fontSize: "10px",
-        fontStyle: "bold",
-      }).setOrigin(0.5).setVisible(false);
-      buttons.set(skillId, { background: buttonBackground, label, skillId });
+      });
+      visual.background.setVisible(false);
+      visual.label.setVisible(false);
+      buttons.set(skillId, { visual, skillId });
     });
     this.skillPanel = { background, ownerText, buttons };
   }
@@ -948,20 +941,12 @@ export class BattleScene extends Phaser.Scene {
         fontSize: "9px",
         align: "center",
       }).setOrigin(0.5);
-      const hpBack = this.add.rectangle(x - 27, 511, 54, 4, 0x0b1220).setOrigin(0, 0.5);
-      const hpFill = this.add.rectangle(x - 27, 511, 54, 4, 0x66d18f).setOrigin(0, 0.5);
+      const hpBar = addProgressBar(this, x, 511, 54, 1, 0x66d18f, 6);
+      const hpFill = hpBar.fill;
       this.slotVisuals.set(index, { nameText, stateText, hpFill });
     }
 
-    const returnButton = this.add.rectangle(840, 35, 150, 32, 0x4b8b6d, 1).setStrokeStyle(1, 0x9ce4b0, 1);
-    returnButton.setInteractive({ useHandCursor: true });
-    returnButton.on("pointerdown", this.handleReturnToField);
-    this.add.text(840, 35, "Return to Field", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "13px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
+    addCommonButton(this, 840, 35, 150, "Return to Field", this.handleReturnToField, { height: 32, fontSize: "13px" });
   }
 
   private updateAllies(deltaMs: number): void {
@@ -1318,6 +1303,70 @@ export class BattleScene extends Phaser.Scene {
     this.selectedUnitIds.delete(unit.battleUnitId);
     this.markVisualStateDirty();
     this.unitVisuals.get(unit.battleUnitId)?.interactionZone.disableInteractive();
+    this.playDeathFeedback(unit);
+  }
+
+  private playAttackFeedback(unit: RTSBattleUnit): void {
+    const visual = this.unitVisuals.get(unit.battleUnitId);
+    if (!visual || !unit.isAlive) return;
+    visual.attackTween?.stop();
+    visual.token.setScale(visual.baseScaleX, visual.baseScaleY);
+    visual.attackTween = this.tweens.add({
+      targets: visual.token,
+      scaleX: visual.baseScaleX * 1.08,
+      scaleY: visual.baseScaleY * 0.92,
+      duration: 70,
+      yoyo: true,
+      ease: "Quad.out",
+      onComplete: () => {
+        visual.attackTween = undefined;
+        visual.token.setScale(visual.baseScaleX, visual.baseScaleY);
+      },
+    });
+  }
+
+  private flashUnit(unit: RTSBattleUnit, color: number): void {
+    const visual = this.unitVisuals.get(unit.battleUnitId);
+    if (!visual) return;
+    visual.hitTween?.stop();
+    visual.token.clearTint();
+    visual.token.setAlpha(visual.baseAlpha);
+    visual.token.setTint(color);
+    visual.hitTween = this.tweens.add({
+      targets: visual.token,
+      alpha: unit.isAlive ? 0.48 : 0.28,
+      duration: 55,
+      yoyo: true,
+      repeat: 1,
+      onComplete: () => {
+        visual.hitTween = undefined;
+        visual.token.clearTint();
+        visual.token.setAlpha(unit.isAlive ? visual.baseAlpha : 0.28);
+      },
+    });
+  }
+
+  private playDeathFeedback(unit: RTSBattleUnit): void {
+    const visual = this.unitVisuals.get(unit.battleUnitId);
+    if (!visual) return;
+    visual.attackTween?.stop();
+    visual.hitTween?.stop();
+    visual.deathTween?.stop();
+    visual.token.clearTint();
+    visual.token.setScale(visual.baseScaleX, visual.baseScaleY);
+    visual.token.setAlpha(visual.baseAlpha);
+    visual.deathTween = this.tweens.add({
+      targets: visual.token,
+      scaleX: visual.baseScaleX * 0.62,
+      scaleY: visual.baseScaleY * 0.62,
+      alpha: 0.08,
+      duration: 150,
+      ease: "Quad.in",
+      onComplete: () => {
+        visual.deathTween = undefined;
+        visual.token.setVisible(false).setAlpha(0.08);
+      },
+    });
   }
 
   private grantDirectExperience(killer: RTSBattleUnit | null): void {
@@ -1451,7 +1500,9 @@ export class BattleScene extends Phaser.Scene {
     }
 
     const damage = calculatePhysicalDamage(attacker.attackDamage, target.defense);
+    this.playAttackFeedback(attacker);
     target.currentHp = Math.max(0, target.currentHp - damage);
+    this.flashUnit(target, target.currentHp === 0 ? 0xef7185 : 0xffffff);
     target.lastAttackerId = attacker.battleUnitId;
     target.lastAttackedAt = this.combatTimeMs;
     if (target.team === "ALLY") {
@@ -1609,6 +1660,7 @@ export class BattleScene extends Phaser.Scene {
       unit.lastAttackedAt = 0;
       unit.state = "MOVING";
     });
+    this.markVisualStateDirty();
     this.addAttackLog(`Move order issued to ${selected.length} allied units.`);
   }
 
@@ -1629,6 +1681,7 @@ export class BattleScene extends Phaser.Scene {
       unit.lastAttackedAt = 0;
       unit.state = "CHASING";
     });
+    this.markVisualStateDirty();
     this.addAttackLog(`Attack order issued against ${enemy.displayName}.`);
   }
 
@@ -1720,7 +1773,9 @@ export class BattleScene extends Phaser.Scene {
 
   private refreshAllVisuals(): void {
     this.refreshUnitTransformsAndHealth();
-    if (this.visualStateDirty) this.refreshUnitStateVisuals();
+    // Target ownership can change inside the combat loop without a UI event.
+    // Recompute the lightweight 20-unit state layer every visual refresh so rings never lag.
+    this.refreshUnitStateVisuals();
   }
 
   private refreshUnitTransformsAndHealth(): void {
@@ -1730,13 +1785,21 @@ export class BattleScene extends Phaser.Scene {
       visual.container.setPosition(unit.position.x, unit.position.y);
       visual.interactionZone.setPosition(unit.position.x, unit.position.y);
       visual.guardReachRing.setPosition(unit.guardPosition.x, unit.guardPosition.y);
-      visual.healthFill.setDisplaySize(32 * this.getHealthRatio(unit.currentHp, unit.maxHp), 4);
+      visual.healthFill.setDisplaySize(visual.healthBarWidth * this.getHealthRatio(unit.currentHp, unit.maxHp), 3);
     }
   }
 
   private refreshUnitStateVisuals(): void {
     const selectedAllies = this.getSelectedAliveAllies();
     const selectedAllyId = selectedAllies.length === 1 ? selectedAllies[0].battleUnitId : null;
+    const selectedTargetModes = new Map<string, "FOCUS_ATTACK" | "LOCAL_ENGAGE" | "AUTO_HUNT">();
+    for (const ally of selectedAllies) {
+      const target = this.getAliveEnemy(ally.currentTargetId);
+      if (!target) continue;
+      const mode = ally.commandMode === "FOCUS_ATTACK" ? "FOCUS_ATTACK" : ally.commandMode === "AUTO_HUNT" ? "AUTO_HUNT" : "LOCAL_ENGAGE";
+      const previous = selectedTargetModes.get(target.battleUnitId);
+      if (!previous || mode === "FOCUS_ATTACK") selectedTargetModes.set(target.battleUnitId, mode);
+    }
     for (const unit of this.units.values()) {
       const visual = this.unitVisuals.get(unit.battleUnitId);
       if (!visual) {
@@ -1749,6 +1812,13 @@ export class BattleScene extends Phaser.Scene {
         visual.interactionZone.disableInteractive();
       }
       visual.selectionRing.setVisible(unit.isAlive && this.selectedUnitIds.has(unit.battleUnitId));
+      const targetMode = unit.team === "ENEMY" ? selectedTargetModes.get(unit.battleUnitId) : undefined;
+      visual.targetRing.setVisible(unit.isAlive && Boolean(targetMode));
+      if (targetMode === "FOCUS_ATTACK") {
+        visual.targetRing.setStrokeStyle(3, 0xef4444, 1);
+      } else if (targetMode) {
+        visual.targetRing.setStrokeStyle(2, 0xf59e0b, 0.95);
+      }
       visual.attackReachRing.setVisible(unit.isAlive && unit.battleUnitId === selectedAllyId);
       visual.guardReachRing.setVisible(
         unit.isAlive &&
@@ -1832,7 +1902,7 @@ export class BattleScene extends Phaser.Scene {
       const stateLabel = unit.commandMode === "AUTO_HUNT" ? `AUTO / ${unit.state}` : unit.state;
       this.setTextIfChanged(visual.stateText, unit.isAlive ? stateLabel : "DEAD");
       visual.stateText.setColor(unit.isAlive ? "#b9cad7" : "#ef9a9a");
-      visual.hpFill.setDisplaySize(54 * this.getHealthRatio(unit.currentHp, unit.maxHp), 4);
+      visual.hpFill.setDisplaySize(50 * this.getHealthRatio(unit.currentHp, unit.maxHp), 3);
     }
   }
 
@@ -1882,6 +1952,20 @@ export class BattleScene extends Phaser.Scene {
     this.input.keyboard?.off("keydown", this.handleBattleKeyDown, this);
     for (const timer of this.delayedEvents) this.time.removeEvent(timer);
     this.delayedEvents.clear();
+  }
+
+  private cleanupVisualEffects(): void {
+    for (const visual of this.unitVisuals.values()) {
+      visual.attackTween?.stop();
+      visual.hitTween?.stop();
+      visual.deathTween?.stop();
+      visual.attackTween = undefined;
+      visual.hitTween = undefined;
+      visual.deathTween = undefined;
+      visual.token.clearTint();
+      visual.token.setScale(visual.baseScaleX, visual.baseScaleY);
+      visual.token.setAlpha(visual.baseAlpha);
+    }
   }
 
   private scheduleDelayed(delayMs: number, callback: () => void): void {

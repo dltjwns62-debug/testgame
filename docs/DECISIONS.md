@@ -1,5 +1,38 @@
 # 프로젝트 결정 사항
 
+## 포스트 로드맵 시각/UI 1차 패스 v4 재제출 결정
+
+- 결정: v3 `changes_requested` 결과와 `review-visual-ui-pass-1-v3` 태그를 보존하고, 수정본은 `review-visual-ui-pass-1-v4` 새 태그로 제출한다.
+- 결정: ButtonVisual은 enabled·busy·visible·hovered·pressed·label·tone을 내부 상태로 관리하고 모든 setter가 같은 render 계산을 사용한다.
+- 결정: ProgressBar 입력은 Phaser GameObject 생성 전 순수 정규화 helper를 거쳐 NaN·Infinity를 0으로 처리한다.
+- 결정: 브라우저에서 확인한 hover 범위와 실행하지 않은 Skill cooldown·전투 tween 수동 범위를 구분해 기록한다.
+- 상태: 확정
+
+## 포스트 로드맵 시각/UI 1차 패스 v3 재제출 결정
+
+- 결정: v2 `changes_requested` 결과와 `review-visual-ui-pass-1-v2` 태그를 보존하고, 수정본은 `review-visual-ui-pass-1-v3` 새 태그로 제출한다.
+- 결정: 공통 버튼은 `ButtonVisual`의 상태 API로만 갱신하고 pressed 상태·shutdown listener를 안전하게 정리한다.
+- 결정: 공격·피격·사망 시각 효과는 독립 tween과 base scale/alpha를 사용하며, 타깃 링은 매 refresh에서 재계산한다.
+- 결정: 제출 스크린샷은 실제 PNG magic bytes를 검사하고, Battle 우클릭 검증 결과와 미실행 수동 범위를 구분해 기록한다.
+- 상태: 확정
+
+## 포스트 로드맵 시각/UI 1차 패스 v2 재제출 결정
+
+- 결정: v1 `changes_requested` 결과는 `review-visual-ui-pass-1-v1` 불변 태그와 이력으로 보존하고, v2는 `review-visual-ui-pass-1-v2` 새 태그로 제출한다.
+- 결정: 공통 버튼의 normal·hover·pressed·disabled·busy 상태와 진행 바 helper를 실제 주요 Scene에 적용한다.
+- 결정: 타깃 링과 피격·공격·사망 시각 효과는 화면 피드백만 변경하며 전투 판정·위치·밸런스는 변경하지 않는다.
+- 결정: Battle 캔버스 우클릭 자동 검증이 불가능한 범위는 `not_run`으로 기록하고 통과로 간주하지 않는다.
+- 상태: 확정
+
+## 포스트 로드맵 시각/UI 1차 패스 결정
+
+- 결정: 17단계 완료 후 시각/UI 1차 패스는 번호가 매겨진 18단계가 아닌 별도 후속 작업으로 관리한다.
+- 결정: 토큰과 배경은 외부 다운로드 없이 저장소 내부의 코드 생성 또는 원본 SVG 에셋만 사용한다.
+- 결정: 공통 테마와 시각 피드백은 게임 규칙·전투 판정·저장 상태를 변경하지 않는다.
+- 결정: `post-roadmap-visual-ui-pass-1`의 제출 버전은 `review-visual-ui-pass-1-v1`로 고정하며 `main` 반영 전 상태를 `review_pending`으로 관리한다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`로 기록하고 실제 통과로 표시하지 않는다.
+- 상태: 확정
+
 ## 17단계 검수 승인 및 전체 로드맵 완료 결정
 
 - 결정: `review-stage-17-v5`와 승인 커밋 `e8c9ed4517b22ee6a13d3122c8eb513104b2fa3a`를 승인하고 `main`에 반영한다.

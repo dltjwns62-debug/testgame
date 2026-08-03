@@ -8,10 +8,11 @@ import type { AllyUnitDefinition } from "../rtsBattleDefinitions";
 import { getAllyUnitDefinition } from "../rtsBattleDefinitions";
 import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import type { FieldScene } from "./FieldScene";
+import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME, type ButtonVisual } from "../ui/theme";
+import { createVisualTextures, getUnitTextureKey } from "../ui/visuals";
 
 type OfferVisual = {
-  button: Phaser.GameObjects.Rectangle;
-  buttonLabel: Phaser.GameObjects.Text;
+  visual: ButtonVisual;
 };
 
 export class ShopScene extends Phaser.Scene {
@@ -29,6 +30,7 @@ export class ShopScene extends Phaser.Scene {
     repairRuntimeStateAtBoundary(this.game.registry);
     this.offerVisuals.clear();
     this.purchaseInProgress = false;
+    createVisualTextures(this);
     this.drawBackground();
     this.addHeader();
     this.addOffers();
@@ -37,9 +39,10 @@ export class ShopScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 250, 920, 330, 0x1f2937, 1);
-    this.add.rectangle(GAME_WIDTH / 2, 492, 920, 70, 0x172033, 1);
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.goldValue);
+    addPanel(this, GAME_WIDTH / 2, 250, 920, 330, UI_THEME.colors.panel, 0.97);
+    this.add.rectangle(GAME_WIDTH / 2, 492, 920, 70, UI_THEME.colors.inkSoft, 0.98)
+      .setStrokeStyle(1, UI_THEME.colors.panelBorder, 0.52);
   }
 
   private addHeader(): void {
@@ -80,7 +83,9 @@ export class ShopScene extends Phaser.Scene {
   private addOfferCard(offer: ShopOffer, definition: AllyUnitDefinition | null, x: number): void {
     this.add.rectangle(x, 235, 270, 260, 0x26394b, 1)
       .setStrokeStyle(1, definition?.color ?? 0x54748a, 1);
-    this.add.circle(x - 92, 139, 18, definition?.color ?? 0x54748a);
+    if (definition) {
+      this.add.image(x - 92, 141, getUnitTextureKey(definition)).setDisplaySize(52, 52);
+    }
     this.add.text(x - 62, 125, offer.displayName, {
       color: "#d9f2ff",
       fontFamily: "Segoe UI, sans-serif",
@@ -110,23 +115,8 @@ export class ShopScene extends Phaser.Scene {
       align: "center",
     }).setOrigin(0.5);
 
-    const button = this.add.rectangle(x, 323, 150, 32, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 0.9)
-      .setInteractive({ useHandCursor: true });
-    const buttonLabel = this.add.text(x, 323, "Buy", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-      align: "center",
-    }).setOrigin(0.5);
-    button.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        this.purchase(offer);
-      }
-    });
-    this.offerVisuals.set(offer.offerId, { button, buttonLabel });
+    const visual = addCommonButton(this, x, 323, 150, "Buy", () => this.purchase(offer), { height: 32, fontSize: "11px" });
+    this.offerVisuals.set(offer.offerId, { visual });
   }
 
   private addControls(): void {
@@ -137,21 +127,7 @@ export class ShopScene extends Phaser.Scene {
       wordWrap: { width: 620 },
     });
 
-    const returnButton = this.add.rectangle(820, 475, 180, 32, 0x536078, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 0.9)
-      .setInteractive({ useHandCursor: true });
-    this.add.text(820, 475, "Return to Field", {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    returnButton.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) {
-        this.returnToField();
-      }
-    });
+    addCommonButton(this, 820, 475, 180, "Return to Field", () => this.returnToField(), { color: UI_THEME.colors.inkSoft, height: 32 });
   }
 
   private purchase(offer: ShopOffer): void {
@@ -203,15 +179,18 @@ export class ShopScene extends Phaser.Scene {
       const owned = formation.ownedUnits.some((unit) => unit.rosterUnitId === offer.rosterUnitId);
       const full = formation.ownedUnits.length >= MAX_OWNED_UNIT_COUNT;
       if (owned) {
-        visual.button.setFillStyle(0x536078, 1).setAlpha(0.8);
-        visual.buttonLabel.setText("Owned").setColor("#d9f2ff");
+        visual.visual.setEnabled(false);
+        visual.visual.setTone("neutral");
+        visual.visual.setLabel("Owned");
       } else if (full) {
-        visual.button.setFillStyle(0x293044, 1).setAlpha(0.65);
-        visual.buttonLabel.setText("Roster Full").setColor("#8795a8");
+        visual.visual.setEnabled(false);
+        visual.visual.setTone("neutral");
+        visual.visual.setLabel("Roster Full");
       } else {
         const affordable = gold >= offer.price;
-        visual.button.setFillStyle(affordable ? 0x4b8b6d : 0x293044, 1).setAlpha(1);
-        visual.buttonLabel.setText("Buy").setColor(affordable ? "#f3f8e9" : "#8795a8");
+        visual.visual.setEnabled(affordable);
+        visual.visual.setTone(affordable ? "success" : "neutral");
+        visual.visual.setLabel("Buy");
       }
     }
   }

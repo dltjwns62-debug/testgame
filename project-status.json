@@ -5,7 +5,7 @@
   "currentStage": 17,
   "currentStageName": "온라인 확장 준비",
   "stageStatus": "completed",
-  "activeTask": "전체 17단계 완료 — 추가 개발 명령 대기",
+  "activeTask": "포스트 로드맵 — 시각/UI 1차 패스 검수 대기",
   "workingBranch": "main",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
@@ -13,6 +13,62 @@
   "nextStageName": null,
   "finalStage": true,
   "projectCompletion": "completed",
+  "postRoadmapFollowUp": {
+    "task": "포스트 로드맵 — 시각/UI 1차 패스",
+    "branch": "post-roadmap-visual-ui-pass-1",
+    "tag": "review-visual-ui-pass-1-v4",
+    "version": 4,
+    "status": "review_pending",
+    "submitted": true,
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null,
+    "mainBranchMerged": false,
+    "userRunTest": "skipped_by_user",
+    "chatGptCodeReview": "pending",
+    "history": [
+      {
+        "tag": "review-visual-ui-pass-1-v1",
+        "version": 1,
+        "commit": "23d1e8392517f45605181d3d362c9fc9bd3fa4b0",
+        "result": "changes_requested",
+        "approved": false,
+        "reviewer": "ChatGPT",
+        "reviewedAt": "2026-08-01T00:26:00+09:00",
+        "userRunTest": "skipped_by_user",
+        "mainBranchMerged": false,
+        "reason": "원본 Slime·유닛 SVG와 Field/Battle 기본 적용은 확인됐지만, 공통 버튼·진행 바 helper가 실제 Scene에 거의 적용되지 않았고, 전투 타깃 마커·피격/사망 피드백이 없으며, Shop·Formation의 유닛 시각화와 Battle·메뉴 브라우저 검증 범위가 불완전함"
+      },
+      {
+        "task": "포스트 로드맵 — 시각/UI 1차 패스",
+        "branch": "post-roadmap-visual-ui-pass-1",
+        "tag": "review-visual-ui-pass-1-v2",
+        "version": 2,
+        "commit": "43e43c724ea0fe1aa17f39c27241f92428536a87",
+        "result": "changes_requested",
+        "approved": false,
+        "reviewer": "ChatGPT",
+        "reviewedAt": "2026-08-01T14:49:00+09:00",
+        "userRunTest": "skipped_by_user",
+        "mainBranchMerged": false,
+        "reason": "공통 ButtonVisual 내부 상태와 Scene의 직접 label·fill·interactive 조작이 충돌해 Auto Hunt·Repeat·Skill 문구와 disabled 상태가 hover 시 깨질 수 있고, 공격 효과가 setScale(1)로 토큰 원본 크기를 복구해 첫 공격 후 크기가 변할 수 있으며, 공격·피격 tween 공유로 tint·alpha·scale이 남을 수 있고, 자동 타깃 재지정 시 visualStateDirty 누락으로 타깃 링이 갱신되지 않으며, 제출된 .png 스크린샷이 실제 JPEG 바이트임"
+      },
+      {
+        "task": "포스트 로드맵 — 시각/UI 1차 패스",
+        "branch": "post-roadmap-visual-ui-pass-1",
+        "tag": "review-visual-ui-pass-1-v3",
+        "version": 3,
+        "commit": "4ee51366c76781a12b5c954dfef12d1ea50ed5e0",
+        "result": "changes_requested",
+        "approved": false,
+        "reviewer": "ChatGPT",
+        "reviewedAt": "2026-08-01T15:31:00+09:00",
+        "userRunTest": "skipped_by_user",
+        "mainBranchMerged": false,
+        "reason": "v2의 토큰 scale, tween 분리, 타깃 링과 PNG 형식 문제는 수정됐지만, ButtonVisual이 hover를 내부 상태로 보존하지 않아 Field·Battle의 주기적 setLabel·setTone·setEnabled 갱신 시 hover가 사라지고, disable·busy·hide 전환에서 pressed 상태가 초기화되지 않아 Skill cooldown 후 pressed 색상이 남을 수 있으며, ProgressBar가 NaN·Infinity 입력을 안전하게 0으로 정규화하지 않음"
+      }
+    ]
+  },
   "reviewSubmission": {
     "branch": "stage-17-online-expansion-readiness",
     "tag": "review-stage-17-v5",
@@ -706,5 +762,5 @@
   },
   "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-07-31T18:02:15+09:00"
+  "lastUpdated": "2026-08-01T15:48:14+09:00"
 }

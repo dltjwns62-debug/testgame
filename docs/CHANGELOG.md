@@ -1,5 +1,38 @@
 # 변경 이력
 
+## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v4 재제출 — 검수 대기
+
+- v3 검수의 `changes_requested` 결과를 보존하고 ButtonVisual에 visible·hovered·pressed를 포함한 내부 상태 계산을 추가했다.
+- 동적 label·tone·enabled·busy 갱신 중 hover를 유지하고 disable·busy·hide 시 pressed를 초기화하도록 보완했다.
+- Phaser-free 순수 상태 helper와 ProgressBar NaN·Infinity 정규화, 회귀 테스트를 추가했다.
+- Field Repeat와 Battle Auto Hunt hover 및 동적 문구를 브라우저에서 확인했으며 Skill cooldown 전체 수동 시나리오는 `not_run`으로 유지했다.
+- 현재 제출 태그는 `review-visual-ui-pass-1-v4`이며 v1·v2·v3 태그와 이력, `main` 및 `stage-17-completed`는 변경하지 않았다.
+- 사용자 수동 테스트는 `skipped_by_user`이며 18단계 기능은 구현하지 않았다.
+
+## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v3 재제출 — 검수 대기
+
+- v2 검수의 `changes_requested` 결과를 보존하고 공통 `ButtonVisual` 단일 상태 API, pressed 복구와 shutdown 정리, 토큰 base scale 복구를 보완했다.
+- 공격·피격·사망 tween을 분리하고 스킬 피해 피드백, 타깃 링 갱신, 실제 PNG magic bytes 검사를 추가했다.
+- Battle 캔버스에서 실제 우클릭 전투 진입과 타깃 링을 확인하고 v3 스크린샷을 저장했다. 콘솔 error/warning은 없었다.
+- 현재 제출 태그는 `review-visual-ui-pass-1-v3`이며 v1·v2 태그와 이력, `main` 및 `stage-17-completed`는 변경하지 않았다.
+- 사용자 수동 테스트는 `skipped_by_user`이며 18단계 기능은 구현하지 않았다.
+
+## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v2 재제출 — 검수 대기
+
+- v1 검수의 `changes_requested` 결과를 보존하고 공통 버튼 상태 API와 Field·Battle·메뉴 주요 버튼 적용을 보완했다.
+- Battle 타깃 링, 피격 flash, 공격 squash, 사망 축소·fade, Battle·Formation·Field HP/EXP 진행 바를 추가했다.
+- Shop·Formation에 기존 원본 SVG 역할별 스프라이트를 적용하고 SVG 안전성·texture mapping 자동 테스트 2개를 추가했다.
+- 브라우저에서 Field·Formation·Shop·Inventory를 확인하고 스크린샷을 저장했다. Battle 우클릭 진입은 `not_run`으로 기록했다.
+- 현재 제출 태그는 `review-visual-ui-pass-1-v2`이며 `main`과 17단계 완료 상태는 변경하지 않았다. 사용자 수동 테스트는 `skipped_by_user`다.
+
+## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 제출 — 검수 대기
+
+- 17단계 완료 상태와 `stage-17-completed`를 유지한 채 번호가 매겨지지 않은 시각/UI 후속 작업을 추가했다.
+- 코드 생성 Slime·아군 토큰, 필드·전투 배경, 공통 UI 테마와 HP/EXP·선택·타깃 상태 가독성을 보완했다.
+- 작업 브랜치 `post-roadmap-visual-ui-pass-1`, 검수 태그 `review-visual-ui-pass-1-v1`로 제출하며 `main`에는 아직 반영하지 않았다.
+- 자동 검사와 브라우저 smoke 범위를 기록하고 사용자 수동 테스트는 `skipped_by_user`, ChatGPT 코드 검수는 `not_reviewed`로 유지한다.
+- 외부 에셋, 실제 온라인 서버, 18단계 기능과 게임 규칙 변경은 구현하지 않았다.
+
 ## 2026-07-31 — 17단계 검수 승인 및 전체 로드맵 완료 — 완료
 
 - 불변 검수 태그 `review-stage-17-v5`와 승인 커밋 `e8c9ed4517b22ee6a13d3122c8eb513104b2fa3a`를 확인했다.

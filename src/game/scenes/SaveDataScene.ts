@@ -8,12 +8,12 @@ import {
 } from "../persistence";
 import { repairRuntimeStateAtBoundary } from "../runtimeStateValidation";
 import { getResetRestartScene, getSaveDataReturnScene, type SaveDataReturnScene } from "../sceneNavigation";
+import { addButton as addCommonButton, addPanel, addSceneBackdrop, UI_THEME, type ButtonVisual } from "../ui/theme";
 
 export class SaveDataScene extends Phaser.Scene {
   private statusText!: Phaser.GameObjects.Text;
   private messageText!: Phaser.GameObjects.Text;
-  private resetButton!: Phaser.GameObjects.Rectangle;
-  private resetLabel!: Phaser.GameObjects.Text;
+  private resetButton!: ButtonVisual;
   private resetConfirmUntil = 0;
   private returnScene: SaveDataReturnScene = "FieldScene";
 
@@ -55,16 +55,15 @@ export class SaveDataScene extends Phaser.Scene {
       this.refreshUi();
     });
     this.resetButton = this.addButton(480, 455, 180, "Reset Save", () => this.resetSave());
-    this.resetLabel = this.resetButton.getData("label") as Phaser.GameObjects.Text;
     this.addButton(710, 455, 180, this.returnScene === "RecoveryScene" ? "Back to Recovery" : "Back to Field", () => this.returnToField());
     this.refreshUi();
   }
 
   private drawBackground(): void {
-    this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x111827);
-    this.add.rectangle(GAME_WIDTH / 2, 280, 860, 330, 0x1f2937, 1)
+    addSceneBackdrop(this, UI_THEME.colors.ink, UI_THEME.colors.goldValue);
+    addPanel(this, GAME_WIDTH / 2, 280, 860, 330, UI_THEME.colors.panel, 0.97)
       .setStrokeStyle(1, 0x54748a, 1);
-    this.add.rectangle(GAME_WIDTH / 2, 510, GAME_WIDTH, 40, 0x172033, 1);
+    this.add.rectangle(GAME_WIDTH / 2, 510, GAME_WIDTH, 40, UI_THEME.colors.inkSoft, 1);
   }
 
   private addButton(
@@ -73,22 +72,8 @@ export class SaveDataScene extends Phaser.Scene {
     width: number,
     label: string,
     action: () => void,
-  ): Phaser.GameObjects.Rectangle {
-    const button = this.add.rectangle(x, y, width, 34, 0x4b8b6d, 1)
-      .setStrokeStyle(1, 0x9ce4b0, 0.9)
-      .setInteractive({ useHandCursor: true });
-    const text = this.add.text(x, y, label, {
-      color: "#f3f8e9",
-      fontFamily: "Segoe UI, sans-serif",
-      fontSize: "11px",
-      fontStyle: "bold",
-    }).setOrigin(0.5);
-    button.setData("label", text);
-    button.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      pointer.event?.stopPropagation();
-      if (pointer.button === 0) action();
-    });
-    return button;
+  ): ButtonVisual {
+    return addCommonButton(this, x, y, width, label, action);
   }
 
   private refreshUi(): void {
@@ -114,14 +99,14 @@ export class SaveDataScene extends Phaser.Scene {
     const now = Date.now();
     if (now > this.resetConfirmUntil) {
       this.resetConfirmUntil = now + 5000;
-      this.resetLabel.setText("Confirm Reset (5s)");
+      this.resetButton.setLabel("Confirm Reset (5s)");
       this.messageText.setColor("#f3c969").setText("Click Reset Save again within 5 seconds to confirm.");
       return;
     }
     repairRuntimeStateAtBoundary(this.game.registry);
     const result = resetSaveData(this.game.registry, now);
     this.resetConfirmUntil = 0;
-    this.resetLabel.setText("Reset Save");
+    this.resetButton.setLabel("Reset Save");
     this.messageText.setColor(result.ok ? "#9ce4b0" : "#f3c969").setText(result.message);
     this.refreshUi();
     if (result.ok) {

@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-08-03 포스트 로드맵 시각/UI 1차 패스 검수 승인 및 main 반영 — 완료
+
+- 승인 태그 `review-visual-ui-pass-1-v4`와 커밋 `c323f8464d6e0eb11ef79b7d3ca7852e1b668133`을 확인했다.
+- 승인 태그를 `main`에 `--no-ff` 병합하고 완료 문서 커밋을 생성했다.
+- 86개 자동검사, typecheck, build, check와 root/favicon HTTP 200을 확인했다.
+- 완료 태그 `visual-ui-pass-1-completed`를 최종 완료 문서 커밋에 생성했다.
+- 사용자 수동 테스트는 `skipped_by_user`로 유지하며, Skill cooldown·전투 tween 전체 수동 시나리오는 `not_run`이다.
+- 전체 17단계 완료 상태와 `stage-17-completed`를 유지하고 Stage 18은 생성하지 않았다.
+
 ## 2026-08-01 포스트 로드맵 시각/UI 1차 패스 v4 재제출 — 검수 대기
 
 - v3 검수의 `changes_requested` 결과를 보존하고 ButtonVisual에 visible·hovered·pressed를 포함한 내부 상태 계산을 추가했다.

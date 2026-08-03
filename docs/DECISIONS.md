@@ -1,5 +1,13 @@
 # 프로젝트 결정 사항
 
+## 포스트 로드맵 시각/UI 1차 패스 최종 승인 결정
+
+- 결정: `review-visual-ui-pass-1-v4` 검수 결과를 승인하고 승인 커밋을 `main`에 no-ff 병합한다.
+- 결정: 최종 문서 커밋에 annotated 완료 태그 `visual-ui-pass-1-completed`를 생성한다.
+- 결정: 사용자 수동 테스트는 `skipped_by_user`로 유지하며 Skill cooldown·전투 tween 전체 수동 시나리오는 `not_run`으로 기록한다.
+- 결정: 17단계 완료와 `totalStages: 17`, `projectCompletion: completed`를 유지하고 Stage 18은 생성하지 않는다.
+- 상태: 확정
+
 ## 포스트 로드맵 시각/UI 1차 패스 v4 재제출 결정
 
 - 결정: v3 `changes_requested` 결과와 `review-visual-ui-pass-1-v3` 태그를 보존하고, 수정본은 `review-visual-ui-pass-1-v4` 새 태그로 제출한다.

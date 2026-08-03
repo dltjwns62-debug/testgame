@@ -1,11 +1,12 @@
 # 실행 및 테스트 기록
 
-## 포스트 로드맵 시각/UI 1차 패스 — 검수 대기
+## 포스트 로드맵 시각/UI 1차 패스 — 최종 승인 및 main 반영
 
-- 작업 브랜치: `post-roadmap-visual-ui-pass-1`
+- 작업 브랜치: `main`
 - 검수 태그: `review-visual-ui-pass-1-v4`
-- 상태: `review_pending` (17단계 완료 상태와 별도 관리)
-- 코드 검수: `pending`
+- 완료 태그: `visual-ui-pass-1-completed`
+- 상태: `completed` (17단계 완료 상태에 이어 반영)
+- 코드 검수: `approved`
 - 사용자 수동 테스트: `skipped_by_user`
 
 ### 자동 검사 및 브라우저 smoke 범위
@@ -16,7 +17,7 @@
 - `npm run build`: 통과 (`passed`)
 - `npm run check`: 통과 (`passed`)
 - `npm run dev -- --host 127.0.0.1`: 개발 서버 실행 확인 후 종료 (`passed`)
-- 브라우저 자동 확인: Field Formation·Repeat 버튼과 Battle Auto Hunt 버튼을 500ms 이상 hover한 뒤 동적 문구와 hover 색상을 확인했고, Battle 실제 우클릭 진입·상태 HUD·콘솔 error/warning 없음도 확인했다 (`partial_passed`)
+- 브라우저 자동 확인: 병합 후 완료 모달, Field·Battle 표시, Formation hover 600ms, Repeat ON 문구, 실제 Battle HUD와 콘솔 error/warning 없음 확인 (`partial_passed`)
 - 스크린샷: `docs/screenshots/visual-ui-pass-1-v3/field.png`, `formation.png`, `shop.png`, `inventory.png`, `battle.png` (제출 PNG magic bytes 확인)
 - Skill cooldown 재활성화와 Battle 공격·피격·사망 tween 전체 수동 시나리오: `not_run`; 사용자 수동 테스트는 `skipped_by_user`
 - 브라우저에서 수동 전투 조작과 전체 메뉴 전환을 완료한 것으로 간주하지 않는다.
@@ -25,6 +26,9 @@
 
 - 사용자 수동 전투·메뉴 통합 테스트: `skipped_by_user`
 - 18단계 기능과 실제 온라인 서버: `not_run`
+
+- 포스트 로드맵 후속 패스: `completed`
+- `main` 반영: 완료 (`visual-ui-pass-1-completed`)
 
 ## Stage 17 온라인 확장 준비 — 최종 승인 및 main 반영
 

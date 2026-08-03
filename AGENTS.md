@@ -2,7 +2,7 @@
 
 Stage 17 scope note: the submitted v5 work is limited to online protocol v1 contracts, server-authoritative conflict boundaries, local OnlinePlayerSnapshot and DTO validation, Disabled/Mock gateways, operation idempotency and record-based pending queue with retry/backoff/rejection preservation, revision-guarded sync coordinator lifecycle and cancellation, Retry-After propagation, gateway response protocol validation, OpenAPI/TypeScript request-response alignment, Online Status UI lifecycle documentation, threat model, and automatic tests. It does not implement a real server, HTTP/WebSocket transport, accounts, OAuth, cloud sync, multiplayer, chat, commerce, deployment, or Stage 18.
 
-Post-roadmap visual/UI pass note: `post-roadmap-visual-ui-pass-1` is a non-numbered follow-up after the completed 17-stage roadmap. The current review tag is `review-visual-ui-pass-1-v4`; v1, v2, and v3 remain immutable as `changes_requested` records. It is limited to original code-generated visual assets, scene backgrounds, shared UI theme/helpers, readability and visual feedback. It does not change game rules, project completion, totalStages, or implement Stage 18.
+Post-roadmap visual/UI pass note: `post-roadmap-visual-ui-pass-1` is a non-numbered follow-up after the completed 17-stage roadmap. `review-visual-ui-pass-1-v4` was approved and merged into `main`, then fixed by the immutable `visual-ui-pass-1-completed` tag; v1, v2, and v3 remain immutable as `changes_requested` records. It is limited to original code-generated visual assets, scene backgrounds, shared UI theme/helpers, readability and visual feedback. It does not change game rules, project completion, totalStages, or implement Stage 18.
 
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 

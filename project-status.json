@@ -5,7 +5,7 @@
   "currentStage": 17,
   "currentStageName": "온라인 확장 준비",
   "stageStatus": "completed",
-  "activeTask": "시각/UI 1차 패스 완료 — 사용자 플레이 테스트 대기",
+  "activeTask": "포스트 로드맵 — 원거리 공격·투사체·범위 마법 1차 패스 검수 대기",
   "workingBranch": "main",
   "completedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
   "approvedStages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
@@ -83,6 +83,21 @@
         "reason": "ButtonVisual이 enabled·busy·visible·hovered·pressed를 내부 상태로 관리해 동적 label·tone·enabled 갱신 중 hover를 보존하고 disable·busy·hide 전환에서 pressed를 초기화하며, ProgressBar가 비정상 비율을 안전하게 정규화하고 기존 스프라이트·전투 피드백·타깃 링과 총 86개 자동검사가 정적 코드 검수를 통과함"
       }
     ]
+  },
+  "postRoadmapRangedCombatPass": {
+    "task": "포스트 로드맵 — 원거리 공격·투사체·범위 마법 1차 패스",
+    "branch": "post-roadmap-ranged-combat-pass-1",
+    "tag": "review-ranged-combat-pass-1-v1",
+    "version": 1,
+    "status": "review_pending",
+    "submitted": true,
+    "approved": false,
+    "reviewer": null,
+    "reviewedAt": null,
+    "mainBranchMerged": false,
+    "userRunTest": "skipped_by_user",
+    "chatGptCodeReview": "pending",
+    "history": []
   },
   "reviewSubmission": {
     "branch": "stage-17-online-expansion-readiness",
@@ -777,5 +792,5 @@
   },
   "mainBranchMerged": true,
   "knownIssues": [],
-  "lastUpdated": "2026-08-03T16:33:15+09:00"
+  "lastUpdated": "2026-08-14T03:10:16+09:00"
 }

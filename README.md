@@ -4,6 +4,10 @@
 
 전체 17단계 로드맵과 `stage-17-completed` 완료 상태는 유지된다. 포스트 로드맵 시각/UI 1차 패스는 `review-visual-ui-pass-1-v4` 검수를 승인받아 `main`에 반영했고, 완료 태그는 `visual-ui-pass-1-completed`다. v1·v2·v3은 `changes_requested` 이력과 불변 태그로 보존한다. 사용자 수동 테스트는 `skipped_by_user`이며 다음 권장 작업은 완성 화면 기반 사용자 플레이 테스트다.
 
+## 포스트 로드맵 후속 작업 — 원거리 공격·투사체·범위 마법 1차 패스
+
+이번 작업은 Stage 18이 아닌 별도 후속 패스다. `post-roadmap-ranged-combat-pass-1`에서 근접·화살·마법탄 기본 공격을 데이터 기반으로 구분하고, 실제 투사체, Meteor ground-target 범위 마법, Arcane Burst 확률형 proc, Meteor 키 마이그레이션을 추가했다. 기존 17단계 완료와 `visual-ui-pass-1-completed`는 유지하며, 자동 카이팅·실제 온라인 서버·Stage 18은 구현하지 않는다. 현재 상태는 `review_pending`이고 사용자 수동 테스트는 `skipped_by_user`다.
+
 이번 패스는 게임 규칙을 변경하지 않고 코드로 생성한 몬스터·아군 토큰, 필드·전투 배경, 공통 UI 테마, HP/EXP 가독성, 선택·타깃·상태 시각 피드백과 주요 메뉴 화면을 보완한다. 외부 에셋·실제 온라인 서버·18단계 기능은 구현하지 않는다.
 
 ## Stage 17 온라인 확장 준비 — 완료

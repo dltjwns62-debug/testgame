@@ -1,5 +1,15 @@
 # Test Game 개발 로드맵
 
+## 포스트 로드맵 후속 작업 — 원거리 공격·투사체·범위 마법 1차 패스 (`review_pending`)
+
+17단계와 `visual-ui-pass-1-completed`를 완료 상태로 유지한다. 이 작업은 Stage 18이 아닌 `post-roadmap-ranged-combat-pass-1` 별도 후속 패스다.
+
+- 목표: 근접·화살·마법탄 기본 공격을 구분하고 투사체와 지면 지정 Meteor 범위 마법을 추가한다.
+- 주요 구현 항목: 공격 프로필, ARROW/MAGIC_BOLT 투사체, 고정 targetUnitId, stale 투사체 정리, Meteor preview/cast/impact, Arcane Burst proc, Meteor 키 마이그레이션.
+- 구현하지 않을 항목: 자동 카이팅, 실제 온라인 서버, Stage 18, UI 전체 재디자인, 전투 밀어내기 규칙 변경.
+- 검수 상태: `review_pending` / `review-ranged-combat-pass-1-v1`
+- 사용자 수동 테스트: `skipped_by_user`
+
 ## 포스트 로드맵 후속 작업 — 시각/UI 1차 패스 (`completed`)
 
 17단계까지의 전체 로드맵과 `stage-17-completed` 상태는 완료로 유지한다. 이 작업은 번호가 매겨진 18단계가 아니라 `post-roadmap-visual-ui-pass-1`에서 진행한 별도 시각/UI 후속 패스이며, `review-visual-ui-pass-1-v4` 승인 후 `main`에 반영하고 `visual-ui-pass-1-completed`로 고정했다. v1·v2·v3은 `changes_requested` 이력과 불변 태그로 보존하며 사용자 수동 테스트는 `skipped_by_user`로 기록한다.

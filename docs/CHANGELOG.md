@@ -1,5 +1,14 @@
 # 변경 이력
 
+## 2026-08-14 포스트 로드맵 원거리 공격·투사체·범위 마법 1차 패스 — 검수 대기
+
+- 기존 17단계와 `visual-ui-pass-1-completed`를 유지한 별도 후속 패스를 추가했다.
+- Scout의 ARROW, Mage의 MAGIC_BOLT 기본 공격 프로필과 실제 이동 투사체를 구현했다.
+- Meteor ground-target AoE와 Arcane Burst 확률형 proc, Meteor 키 마이그레이션 및 세 스킬 키 충돌 교환을 추가했다.
+- 투사체는 발사 시 targetUnitId에 고정하고, 명중 전 피해 없음·명중 1회·사망 대상 제거·씬 종료 cleanup을 적용했다.
+- 자동 카이팅과 실제 온라인 서버는 구현하지 않았다. 사용자 수동 테스트는 `skipped_by_user`다.
+- 새 검수 태그는 `review-ranged-combat-pass-1-v1`이다.
+
 ## 2026-08-03 포스트 로드맵 시각/UI 1차 패스 검수 승인 및 main 반영 — 완료
 
 - 승인 태그 `review-visual-ui-pass-1-v4`와 커밋 `c323f8464d6e0eb11ef79b7d3ca7852e1b668133`을 확인했다.

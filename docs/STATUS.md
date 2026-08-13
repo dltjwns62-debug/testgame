@@ -1,5 +1,16 @@
 # 현재 개발 상태
 
+## 포스트 로드맵 원거리 공격·투사체·범위 마법 1차 패스
+
+- 상태: 검수 대기 (`review_pending`)
+- 작업 브랜치: `post-roadmap-ranged-combat-pass-1`
+- 검수 태그: `review-ranged-combat-pass-1-v1`
+- 범위: MELEE/PROJECTILE 공격 프로필, Scout 화살, Mage 마법탄, Meteor ground-target AoE, Arcane Burst, Meteor 키 마이그레이션
+- 사용자 실행 테스트: `skipped_by_user`
+- ChatGPT 코드 검수: `pending`
+- 브라우저 smoke: Skill Merc projectile hit 로그와 승리 화면은 확인했으며, Archer 화살·Meteor 낙하/폭발·전체 수동 전투 시나리오는 `not_run`
+- 자동 카이팅·실제 온라인 서버·Stage 18: 미구현
+
 ## 포스트 로드맵 후속 작업 — 시각/UI 1차 패스 — 완료
 
 - 전체 로드맵 상태: 17단계 완료 (`completed`)

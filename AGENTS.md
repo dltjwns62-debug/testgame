@@ -4,6 +4,8 @@ Stage 17 scope note: the submitted v5 work is limited to online protocol v1 cont
 
 Post-roadmap visual/UI pass note: `post-roadmap-visual-ui-pass-1` is a non-numbered follow-up after the completed 17-stage roadmap. `review-visual-ui-pass-1-v4` was approved and merged into `main`, then fixed by the immutable `visual-ui-pass-1-completed` tag; v1, v2, and v3 remain immutable as `changes_requested` records. It is limited to original code-generated visual assets, scene backgrounds, shared UI theme/helpers, readability and visual feedback. It does not change game rules, project completion, totalStages, or implement Stage 18.
 
+Post-roadmap ranged combat pass note: `post-roadmap-ranged-combat-pass-1` is a separate follow-up, not Stage 18. Its v1 submission covers data-driven MELEE/PROJECTILE attack profiles, ARROW/MAGIC_BOLT projectiles, Meteor ground targeting, Arcane Burst, and key migration. It does not add auto-kiting, online services, or alter the completed 17-stage roadmap.
+
 Codex 및 다른 개발 AI는 다음 규칙을 반드시 지킨다.
 
 1. 작업을 시작하기 전에 반드시 `README.md`, `docs/ROADMAP.md`, `docs/STATUS.md`, `docs/DECISIONS.md`, `project-status.json`을 읽는다.

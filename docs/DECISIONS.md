@@ -1,5 +1,14 @@
 # 프로젝트 결정 사항
 
+## 포스트 로드맵 원거리 전투 1차 패스 제출 결정
+
+- 결정: 이 작업은 Stage 18이 아닌 별도 후속 패스 `post-roadmap-ranged-combat-pass-1`로 관리한다.
+- 결정: 직업명 분기 대신 BasicAttackProfile로 MELEE와 PROJECTILE을 선언하고, Scout은 ARROW, Mage는 MAGIC_BOLT를 사용한다.
+- 결정: Meteor는 단일 선택 Mage의 ground-target AoE이며, Arcane Burst는 MAGIC_BOLT 명중에만 제한된 비재귀 proc이다.
+- 결정: Meteor 키는 기존 Q/W를 보존하고 누락된 저장 상태에 E를 migration하며, 세 스킬 키는 충돌 시 교환한다.
+- 결정: 자동 카이팅과 실제 온라인 기능은 범위에서 제외하고 사용자 수동 테스트는 `skipped_by_user`로 기록한다.
+- 상태: 확정
+
 ## 포스트 로드맵 시각/UI 1차 패스 최종 승인 결정
 
 - 결정: `review-visual-ui-pass-1-v4` 검수 결과를 승인하고 승인 커밋을 `main`에 no-ff 병합한다.

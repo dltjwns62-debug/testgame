@@ -1,5 +1,23 @@
 # 실행 및 테스트 기록
 
+## 포스트 로드맵 원거리 공격·투사체·범위 마법 1차 패스 — 검수 대기
+
+- 작업 브랜치: `post-roadmap-ranged-combat-pass-1`
+- 검수 태그: `review-ranged-combat-pass-1-v1`
+- 상태: `review_pending`
+- `npm ci`: 통과 (`passed`)
+- `npm run typecheck`: 통과 (`passed`)
+- `npm run test`: 통과 (`passed`, 91개; 원거리 전투 테스트 5개 추가)
+- `npm run build`: 통과 (`passed`)
+- `npm run check`: 통과 (`passed`)
+- `npm run dev -- --host 127.0.0.1`: 정상 시작 및 root/favicon HTTP 200 확인 후 종료 (`passed`)
+- 브라우저 확인: 실제 Battle에서 `Skill Merc projectile hit Slime` 로그와 승리 화면 확인. 종료 경계 오류를 수정했으며 수정 후 브라우저 콘솔 재검증은 `not_run`
+- Archer 화살 전체 시나리오: `not_run`
+- Mage 마법탄 전체 시나리오: 부분 확인
+- Meteor 낙하·폭발·범위 판정 전체 시나리오: `not_run`
+- Skill cooldown·전체 수동 전투: `not_run`
+- 사용자 수동 테스트: `skipped_by_user`
+
 ## 포스트 로드맵 시각/UI 1차 패스 — 최종 승인 및 main 반영
 
 - 작업 브랜치: `main`

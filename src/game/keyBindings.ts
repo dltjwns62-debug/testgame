@@ -18,6 +18,7 @@ export type KeyBindingState = {
   controlGroupCodes: DigitKeyCode[];
   whirlwindCode: LetterKeyCode;
   firstAidCode: LetterKeyCode;
+  meteorCode: LetterKeyCode;
 };
 
 const DIGIT_CODES: readonly DigitKeyCode[] = [
@@ -50,14 +51,20 @@ export function createDefaultKeyBindingState(): KeyBindingState {
     ],
     whirlwindCode: "KeyQ",
     firstAidCode: "KeyW",
+    meteorCode: "KeyE",
   };
 }
 
 export function cloneKeyBindingState(state: KeyBindingState): KeyBindingState {
+  const used = new Set([state.whirlwindCode, state.firstAidCode]);
+  const meteorCode = isLetterKeyCode(state.meteorCode) && !used.has(state.meteorCode)
+    ? state.meteorCode
+    : LETTER_CODES.find((code) => !used.has(code)) ?? "KeyE";
   return {
     controlGroupCodes: [...state.controlGroupCodes],
     whirlwindCode: state.whirlwindCode,
     firstAidCode: state.firstAidCode,
+    meteorCode,
   };
 }
 
@@ -71,7 +78,8 @@ export function isValidKeyBindingState(value: unknown): value is KeyBindingState
     !candidate.controlGroupCodes.every(isDigitKeyCode) ||
     new Set(candidate.controlGroupCodes).size !== CONTROL_GROUP_INDICES.length ||
     !isLetterKeyCode(candidate.whirlwindCode) || !isLetterKeyCode(candidate.firstAidCode) ||
-    candidate.whirlwindCode === candidate.firstAidCode) {
+    (candidate.meteorCode !== undefined && (!isLetterKeyCode(candidate.meteorCode) ||
+      new Set([candidate.whirlwindCode, candidate.firstAidCode, candidate.meteorCode]).size !== 3))) {
     return false;
   }
 
@@ -138,7 +146,7 @@ export function swapControlGroupBinding(
   return previousIndex as ControlGroupIndex;
 }
 
-export type SkillBindingId = "whirlwind" | "first-aid";
+export type SkillBindingId = "whirlwind" | "first-aid" | "meteor";
 
 export function swapSkillBinding(
   state: KeyBindingState,
@@ -149,23 +157,44 @@ export function swapSkillBinding(
     return false;
   }
 
-  const currentCode = skillId === "whirlwind" ? state.whirlwindCode : state.firstAidCode;
+  const currentCode = skillId === "whirlwind"
+    ? state.whirlwindCode
+    : skillId === "first-aid" ? state.firstAidCode : (state.meteorCode ?? "KeyE");
   if (code === currentCode) {
     return false;
   }
 
-  if (skillId === "whirlwind") {
-    const previous = currentCode;
-    state.whirlwindCode = code;
-    if (state.firstAidCode === code) {
-      state.firstAidCode = previous;
-    }
-  } else {
-    const previous = currentCode;
-    state.firstAidCode = code;
-    if (state.whirlwindCode === code) {
-      state.whirlwindCode = previous;
-    }
-  }
+  const codes: Record<SkillBindingId, LetterKeyCode> = {
+    whirlwind: state.whirlwindCode,
+    "first-aid": state.firstAidCode,
+    meteor: state.meteorCode ?? "KeyE",
+  };
+  const previous = currentCode;
+  codes[skillId] = code;
+  const conflictingSkill = (Object.keys(codes) as SkillBindingId[]).find((id) => id !== skillId && codes[id] === code);
+  if (conflictingSkill) codes[conflictingSkill] = previous;
+  state.whirlwindCode = codes.whirlwind;
+  state.firstAidCode = codes["first-aid"];
+  state.meteorCode = codes.meteor;
   return true;
+}
+
+export function normalizeKeyBindingState(value: unknown): KeyBindingState {
+  const candidate = value && typeof value === "object" ? value as Partial<KeyBindingState> : {};
+  const fallback = createDefaultKeyBindingState();
+  const controlGroupCodes = Array.isArray(candidate.controlGroupCodes) &&
+    candidate.controlGroupCodes.length === CONTROL_GROUP_INDICES.length &&
+    candidate.controlGroupCodes.every(isDigitKeyCode) &&
+    new Set(candidate.controlGroupCodes).size === CONTROL_GROUP_INDICES.length
+    ? [...candidate.controlGroupCodes]
+    : fallback.controlGroupCodes;
+  const whirlwindCode = isLetterKeyCode(candidate.whirlwindCode) ? candidate.whirlwindCode : fallback.whirlwindCode;
+  const firstAidCode = isLetterKeyCode(candidate.firstAidCode) && candidate.firstAidCode !== whirlwindCode
+    ? candidate.firstAidCode : fallback.firstAidCode === whirlwindCode ? "KeyR" : fallback.firstAidCode;
+  const used = new Set([whirlwindCode, firstAidCode]);
+  const requestedMeteor = candidate.meteorCode;
+  const meteorCode = isLetterKeyCode(requestedMeteor) && !used.has(requestedMeteor)
+    ? requestedMeteor
+    : !used.has("KeyE") ? "KeyE" : LETTER_CODES.find((code) => !used.has(code)) ?? "KeyE";
+  return { controlGroupCodes, whirlwindCode, firstAidCode, meteorCode };
 }

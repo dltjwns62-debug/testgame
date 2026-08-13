@@ -45,6 +45,7 @@ import {
   createDefaultKeyBindingState,
   getOrCreateKeyBindingState,
   isValidKeyBindingState,
+  normalizeKeyBindingState,
   setKeyBindingState,
   type KeyBindingState,
 } from "./keyBindings";
@@ -287,9 +288,7 @@ export function normalizeSavePayload(value: unknown): SavePayload {
   return {
     formation,
     playerGold: isValidPlayerGold(candidate.playerGold) ? candidate.playerGold : 0,
-    keyBindings: isValidKeyBindingState(candidate.keyBindings)
-      ? cloneKeyBindingState(candidate.keyBindings)
-      : createDefaultKeyBindingState(),
+    keyBindings: normalizeKeyBindingState(candidate.keyBindings),
     controlGroups,
     inventory: normalizeInventoryStateForOwnedUnits(candidate.inventory, ownedIds),
     battleAutoHuntEnabled: candidate.battleAutoHuntEnabled === true,

@@ -156,19 +156,20 @@ export class KeySettingsScene extends Phaser.Scene {
     });
 
     ([
-      { skillId: "whirlwind" as const, x: 250, name: "Whirlwind" },
-      { skillId: "first-aid" as const, x: 700, name: "First Aid" },
+      { skillId: "whirlwind" as const, x: 190, name: "Whirlwind" },
+      { skillId: "first-aid" as const, x: 480, name: "First Aid" },
+      { skillId: "meteor" as const, x: 770, name: "Meteor" },
     ]).forEach(({ skillId, x, name }) => {
       const y = 393;
-      this.add.rectangle(x, y, 408, 42, 0x26394b, 1)
+      this.add.rectangle(x, y, 260, 42, 0x26394b, 1)
         .setStrokeStyle(1, 0x7c5bb8, 1);
-      const label = this.add.text(x - 190, y - 12, "", {
+      const label = this.add.text(x - 120, y - 12, "", {
         color: "#e9ddff",
         fontFamily: "Segoe UI, sans-serif",
         fontSize: "11px",
         fontStyle: "bold",
       });
-      const button = addCommonButton(this, x + 150, y, 82, "Change", () => this.beginSkillCapture(skillId), { color: UI_THEME.colors.inkSoft, height: 25, fontSize: "10px" });
+      const button = addCommonButton(this, x + 82, y, 82, "Change", () => this.beginSkillCapture(skillId), { color: UI_THEME.colors.inkSoft, height: 25, fontSize: "10px" });
       this.skillVisuals.set(skillId, { label, button });
       label.setData("skillName", name);
     });
@@ -241,7 +242,7 @@ export class KeySettingsScene extends Phaser.Scene {
       return;
     }
     const changed = swapSkillBinding(this.draftKeyBindings, action.skillId, code);
-    const skillName = action.skillId === "whirlwind" ? "Whirlwind" : "First Aid";
+    const skillName = action.skillId === "whirlwind" ? "Whirlwind" : action.skillId === "first-aid" ? "First Aid" : "Meteor";
     this.setStatus(changed ? `${skillName} binding updated.` : `${skillName} binding unchanged.`, changed ? "#9ce4b0" : "#c4e4d0");
     this.captureAction = null;
     this.refreshUi();
@@ -280,8 +281,8 @@ export class KeySettingsScene extends Phaser.Scene {
     for (const [skillId, visual] of this.skillVisuals) {
       const key = skillId === "whirlwind"
         ? getKeyCodeLabel(this.draftKeyBindings.whirlwindCode)
-        : getKeyCodeLabel(this.draftKeyBindings.firstAidCode);
-      const name = skillId === "whirlwind" ? "Whirlwind" : "First Aid";
+        : skillId === "first-aid" ? getKeyCodeLabel(this.draftKeyBindings.firstAidCode) : getKeyCodeLabel(this.draftKeyBindings.meteorCode);
+      const name = skillId === "whirlwind" ? "Whirlwind" : skillId === "first-aid" ? "First Aid" : "Meteor";
       const active = this.captureAction?.kind === "SKILL" && this.captureAction.skillId === skillId;
       visual.label.setText(`${name}\nKey: ${key}`);
       visual.button.setEnabled(true);
@@ -291,7 +292,7 @@ export class KeySettingsScene extends Phaser.Scene {
     if (this.captureAction?.kind === "GROUP") {
       this.captureText.setText(`Press a number key for Group ${getControlGroupOrdinalLabel(this.captureAction.groupIndex)}. Escape cancels.`);
     } else if (this.captureAction?.kind === "SKILL") {
-      this.captureText.setText(`Press a letter key for ${this.captureAction.skillId === "whirlwind" ? "Whirlwind" : "First Aid"}. Escape cancels.`);
+      this.captureText.setText(`Press a letter key for ${this.captureAction.skillId === "whirlwind" ? "Whirlwind" : this.captureAction.skillId === "first-aid" ? "First Aid" : "Meteor"}. Escape cancels.`);
     } else {
       this.captureText.setText("Select Change to edit a key. Changes are saved only with Apply & Return.");
     }

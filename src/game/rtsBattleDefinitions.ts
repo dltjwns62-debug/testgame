@@ -7,7 +7,7 @@ import {
   RTS_TRIAL_MERCENARY,
 } from "./constants";
 import { getMonsterDropTable } from "./items";
-import type { EnemyDefinition, OwnedRosterUnit, RosterEntry, UnitRole, UnitSkillId } from "./rtsBattleTypes";
+import type { BasicAttackProfile, EnemyDefinition, OwnedRosterUnit, RosterEntry, UnitRole, UnitSkillId } from "./rtsBattleTypes";
 import type { WeaponCategory } from "./items";
 
 export type AllyUnitDefinition = {
@@ -21,6 +21,7 @@ export type AllyUnitDefinition = {
   attackIntervalMs: number;
   moveSpeed: number;
   attackRange: number;
+  basicAttack: BasicAttackProfile;
   collisionRadius: number;
   skills: readonly UnitSkillId[];
   allowedWeaponCategories: readonly WeaponCategory[];
@@ -33,6 +34,7 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     unitRole: "MAIN_CHARACTER",
     color: 0xf4d35e,
     ...RTS_TRIAL_MAIN_CHARACTER,
+    basicAttack: { style: "MELEE" },
     skills: [],
     allowedWeaponCategories: ["melee"],
   },
@@ -42,16 +44,19 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     unitRole: "MERCENARY",
     color: 0x63b3ed,
     ...RTS_TRIAL_MERCENARY,
+    basicAttack: { style: "MELEE" },
     skills: [],
     allowedWeaponCategories: ["melee"],
   },
   {
     id: "trial-skill-mercenary",
-    displayName: "Skill Merc",
+    displayName: "Mage",
     unitRole: "MERCENARY",
     color: 0xa78bfa,
     ...RTS_TRIAL_MERCENARY,
-    skills: ["whirlwind", "first-aid"],
+    attackRange: 170,
+    basicAttack: { style: "PROJECTILE", projectileType: "MAGIC_BOLT", projectileSpeed: 440, proc: { type: "ARCANE_BURST", chance: 0.15, radius: 42, damageMultiplier: 0.5 } },
+    skills: ["meteor"],
     allowedWeaponCategories: ["magic"],
   },
   {
@@ -65,6 +70,7 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     attackIntervalMs: 1000,
     moveSpeed: 105,
     attackRange: 8,
+    basicAttack: { style: "MELEE" },
     collisionRadius: 12,
     skills: [],
     allowedWeaponCategories: ["melee"],
@@ -80,6 +86,7 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     attackIntervalMs: 1200,
     moveSpeed: 85,
     attackRange: 8,
+    basicAttack: { style: "MELEE" },
     collisionRadius: 13,
     skills: [],
     allowedWeaponCategories: ["melee"],
@@ -94,8 +101,9 @@ const allyUnitDefinitions: readonly AllyUnitDefinition[] = [
     defense: 1,
     attackIntervalMs: 900,
     moveSpeed: 125,
-    attackRange: 8,
+    attackRange: 165,
     collisionRadius: 11,
+    basicAttack: { style: "PROJECTILE", projectileType: "ARROW", projectileSpeed: 580 },
     skills: [],
     allowedWeaponCategories: ["ranged"],
   },
@@ -145,7 +153,7 @@ export function createTrialRoster(): RosterEntry[] {
         rosterUnitId: "ally-skill-mercenary",
         unitDefinitionId: "trial-skill-mercenary",
         unitRole: "MERCENARY",
-        displayName: "Skill Merc",
+        displayName: "Mage",
         slotIndex: index,
         level: 1,
         experience: 0,

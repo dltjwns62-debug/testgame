@@ -33,6 +33,21 @@ export function createVisualTextures(scene: Phaser.Scene): void {
       createFallbackTexture(scene, key);
     }
   }
+  if (!scene.textures.exists("visual-projectile-arrow")) {
+    const arrow = scene.make.graphics({ x: 0, y: 0 });
+    arrow.lineStyle(3, 0xf8e7a1, 1).lineBetween(3, 8, 25, 8);
+    arrow.fillStyle(0xffd166, 1).fillTriangle(29, 8, 21, 3, 21, 13);
+    arrow.generateTexture("visual-projectile-arrow", 32, 16);
+    arrow.destroy();
+  }
+  if (!scene.textures.exists("visual-projectile-magic-bolt")) {
+    const bolt = scene.make.graphics({ x: 0, y: 0 });
+    bolt.fillStyle(0x93c5fd, 0.22).fillCircle(12, 12, 11);
+    bolt.fillStyle(0xc4b5fd, 0.9).fillCircle(12, 12, 6);
+    bolt.fillStyle(0xffffff, 1).fillCircle(10, 10, 2);
+    bolt.generateTexture("visual-projectile-magic-bolt", 24, 24);
+    bolt.destroy();
+  }
 }
 
 function createFallbackTexture(scene: Phaser.Scene, key: string): void {

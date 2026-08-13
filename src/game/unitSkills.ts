@@ -19,7 +19,20 @@ export type UnitSkillDefinition =
       hotkey: "W";
       effectType: "SELF_HEAL";
       healAmount: number;
+    }
+  | {
+      id: "meteor";
+      name: "Meteor";
+      shortDescription: string;
+      cooldownMs: number;
+      hotkey: "E";
+      effectType: "GROUND_AREA_DAMAGE";
+      damage: number;
+      effectRadius: number;
+      castDelayMs: number;
     };
+
+export const UNIT_SKILL_IDS: readonly UnitSkillId[] = ["whirlwind", "first-aid", "meteor"];
 
 export const UNIT_SKILL_DEFINITIONS: Readonly<Record<UnitSkillId, UnitSkillDefinition>> = {
   whirlwind: {
@@ -40,6 +53,17 @@ export const UNIT_SKILL_DEFINITIONS: Readonly<Record<UnitSkillId, UnitSkillDefin
     hotkey: "W",
     effectType: "SELF_HEAL",
     healAmount: 25,
+  },
+  meteor: {
+    id: "meteor",
+    name: "Meteor",
+    shortDescription: "Target the ground for delayed area damage.",
+    cooldownMs: 9000,
+    hotkey: "E",
+    effectType: "GROUND_AREA_DAMAGE",
+    damage: 30,
+    effectRadius: 72,
+    castDelayMs: 450,
   },
 };
 

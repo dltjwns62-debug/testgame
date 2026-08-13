@@ -12,7 +12,7 @@ import { getOrCreateAutoProgressState, normalizeAutoProgressState } from "../aut
 import { getOrCreatePersistentControlGroupState, normalizePersistentControlGroupState } from "../controlGroups";
 import { getOrCreateFormationState, isValidFormationState, normalizeFormationState } from "../formationState";
 import { getOrCreateInventoryState, isValidInventoryState, normalizeInventoryStateForOwnedUnits } from "../items";
-import { getOrCreateKeyBindingState, isValidKeyBindingState, createDefaultKeyBindingState } from "../keyBindings";
+import { getOrCreateKeyBindingState, isValidKeyBindingState, createDefaultKeyBindingState, normalizeKeyBindingState } from "../keyBindings";
 import { getOrCreatePlayerGold, isValidPlayerGold } from "../playerEconomy";
 import { getPersistenceMeta } from "../persistence";
 import { ONLINE_PROTOCOL_VERSION, type DeviceId, type ClientInstanceId, type OnlinePlayerSnapshot, type ServerRevision } from "./onlineTypes";
@@ -107,7 +107,7 @@ export function normalizeOnlineSnapshot(value: unknown): OnlinePlayerSnapshot | 
     progression: formation.ownedUnits,
     inventory: normalizeInventoryStateForOwnedUnits(candidate.inventory, ownedIds),
     controlGroups: normalizePersistentControlGroupState(candidate.controlGroups, ownedIds),
-    keyBindings: isValidKeyBindingState(candidate.keyBindings) ? candidate.keyBindings : createDefaultKeyBindingState(),
+    keyBindings: normalizeKeyBindingState(candidate.keyBindings),
     battleAutoHuntEnabled: candidate.battleAutoHuntEnabled === true,
     autoProgress: normalizeAutoProgressState(candidate.autoProgress),
   } satisfies Omit<OnlinePlayerSnapshot, "snapshotHash">;

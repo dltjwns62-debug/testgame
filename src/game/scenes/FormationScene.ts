@@ -422,7 +422,7 @@ export class FormationScene extends Phaser.Scene {
   private getUnitSummary(unit: OwnedRosterUnit, slotIndex = this.findSlotForUnit(unit.rosterUnitId)): string {
     const role = unit.unitRole === "MAIN_CHARACTER" ? "Main Character" : "Mercenary";
     const required = unit.unitRole === "MAIN_CHARACTER" ? " · Required" : "";
-    const skills = this.hasSkills(unit) ? " · Skills Q/W" : "";
+    const skills = this.hasSkills(unit) ? " · Skills Q/W/E" : "";
     const placement = slotIndex === null ? "Bench" : `Slot ${getFormationSlotLabel(slotIndex)}`;
     return `${unit.displayName} · ${formatProgression(unit)} · ${this.getFinalStatsSummary(unit)} · ${role}${required}${skills} · ${placement}`;
   }
@@ -430,7 +430,7 @@ export class FormationScene extends Phaser.Scene {
   private getOwnedUnitDetails(unit: OwnedRosterUnit, slotIndex: number | null): string {
     const role = unit.unitRole === "MAIN_CHARACTER" ? "Main Character" : "Mercenary";
     const required = unit.unitRole === "MAIN_CHARACTER" ? " · Required" : "";
-    const skills = this.hasSkills(unit) ? " · Skills Q/W" : "";
+    const skills = this.hasSkills(unit) ? " · Skills Q/W/E" : "";
     const placement = slotIndex === null ? "Bench" : `Slot ${getFormationSlotLabel(slotIndex)}`;
     return `${formatProgression(unit)}\n${role}${required}${skills} · ${placement}`;
   }
@@ -439,7 +439,7 @@ export class FormationScene extends Phaser.Scene {
     if (unit.unitRole === "MAIN_CHARACTER") {
       return `${formatProgression(unit)}\nRequired`;
     }
-    return `${formatProgression(unit)}\n${this.hasSkills(unit) ? "Skills Q/W" : "Mercenary"}`;
+    return `${formatProgression(unit)}\n${this.hasSkills(unit) ? "Skills Q/W/E" : "Mercenary"}`;
   }
 
   private hasSkills(unit: OwnedRosterUnit): boolean {

@@ -5,7 +5,23 @@ export type BattleTeam = "ALLY" | "ENEMY";
 export type BattleUnitState = "IDLE" | "MOVING" | "CHASING" | "ATTACKING" | "DEAD";
 export type BattleOutcome = "VICTORY" | "DEFEAT";
 export type AllyCommandMode = "NONE" | "MOVE" | "ATTACK_MOVE" | "FOCUS_ATTACK" | "LOCAL_ENGAGE" | "AUTO_HUNT";
-export type UnitSkillId = "whirlwind" | "first-aid";
+export type BasicAttackStyle = "MELEE" | "PROJECTILE";
+export type ProjectileVisualType = "ARROW" | "MAGIC_BOLT";
+export type BasicAttackProc = {
+  type: "ARCANE_BURST";
+  chance: number;
+  radius: number;
+  damageMultiplier: number;
+};
+export type BasicAttackProfile =
+  | { style: "MELEE" }
+  | {
+      style: "PROJECTILE";
+      projectileType: ProjectileVisualType;
+      projectileSpeed: number;
+      proc?: BasicAttackProc;
+    };
+export type UnitSkillId = "whirlwind" | "first-aid" | "meteor";
 
 export type BattlePosition = {
   x: number;
@@ -63,6 +79,7 @@ export type RTSBattleUnit = {
   attackElapsedMs: number;
   moveSpeed: number;
   attackRange: number;
+  basicAttack: BasicAttackProfile;
   collisionRadius: number;
   position: BattlePosition;
   /** Fixed defense anchor for local aggro/leash checks; never an automatic return destination. */

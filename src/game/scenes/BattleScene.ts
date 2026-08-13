@@ -63,6 +63,9 @@ import type {
   UnitSkillId,
 } from "../rtsBattleTypes";
 import { getUnitSkillDefinition } from "../unitSkills";
+import { UNIT_SKILL_IDS } from "../unitSkills";
+import { calculateProcDamage, shouldTriggerProc, isValidProjectileSpeed } from "../rtsAttackProfiles";
+import { advanceProjectile, isPositionInRadius, resolveProjectileImpact, type ActiveProjectile } from "../rtsProjectiles";
 import {
   calculateBattleEndBonusExperience,
   calculateProgressionStats,
@@ -125,6 +128,12 @@ type PointerPosition = {
 
 type CombatState = "RUNNING" | "VICTORY" | "DEFEAT";
 
+type ProjectileVisual = {
+  data: ActiveProjectile;
+  image: Phaser.GameObjects.Image;
+  trail?: Phaser.GameObjects.Arc;
+};
+
 export class BattleScene extends Phaser.Scene {
   private returnStarted = false;
   private combatState: CombatState = "RUNNING";
@@ -163,6 +172,12 @@ export class BattleScene extends Phaser.Scene {
   private readonly controlGroupTexts = new Map<ControlGroupIndex, Phaser.GameObjects.Text>();
   private readonly allyBySlot = new Map<number, RTSBattleUnit>();
   private readonly delayedEvents = new Set<Phaser.Time.TimerEvent>();
+  private readonly activeProjectiles = new Map<string, ProjectileVisual>();
+  private projectileSequence = 0;
+  private meteorTargetMode = false;
+  private meteorPreview?: Phaser.GameObjects.Arc;
+  private readonly meteorEffects = new Set<Phaser.GameObjects.GameObject>();
+  private readonly meteorTweens = new Set<Phaser.Tweens.Tween>();
   private dragStart: PointerPosition | null = null;
   private dragEnd: PointerPosition | null = null;
   private isDragging = false;
@@ -203,6 +218,8 @@ export class BattleScene extends Phaser.Scene {
       ? "whirlwind"
       : event.code === this.keyBindingState.firstAidCode
       ? "first-aid"
+      : event.code === this.keyBindingState.meteorCode
+      ? "meteor"
       : null;
     if (skillId) {
       event.preventDefault();
@@ -272,6 +289,7 @@ export class BattleScene extends Phaser.Scene {
       this.normalizeCompletedMoveCommand(ally);
     }
     this.updateAllies(safeDelta);
+    this.updateProjectiles(safeDelta);
     if (this.combatState === "RUNNING") {
       this.updateEnemies(safeDelta);
     }
@@ -287,8 +305,8 @@ export class BattleScene extends Phaser.Scene {
     return this.delayedEvents.size;
   }
 
-  public getDiagnosticsSnapshot(): { uiUpdates: number; managedTimers: number } {
-    return { uiUpdates: this.uiUpdateCount, managedTimers: this.getManagedTimerCount() };
+  public getDiagnosticsSnapshot(): { uiUpdates: number; managedTimers: number; activeProjectiles: number } {
+    return { uiUpdates: this.uiUpdateCount, managedTimers: this.getManagedTimerCount(), activeProjectiles: this.activeProjectiles.size };
   }
 
   private updateUiIfDue(deltaMs: number): void {
@@ -327,7 +345,10 @@ export class BattleScene extends Phaser.Scene {
     this.directExperienceByRosterUnitId.clear();
     this.bonusExperienceByRosterUnitId.clear();
     this.lootItems = [];
+    this.clearProjectiles();
     this.units.clear();
+    this.activeProjectiles.clear();
+    this.meteorTargetMode = false;
     this.unitVisuals.clear();
     this.slotVisuals.clear();
     this.selectedUnitIds.clear();
@@ -435,6 +456,7 @@ export class BattleScene extends Phaser.Scene {
       attackElapsedMs: 0,
       moveSpeed: definition.moveSpeed,
       attackRange: definition.attackRange,
+      basicAttack: definition.basicAttack,
       collisionRadius: definition.collisionRadius,
       position,
       guardPosition: { x: position.x, y: position.y },
@@ -481,6 +503,7 @@ export class BattleScene extends Phaser.Scene {
       attackElapsedMs: 0,
       moveSpeed: enemyDefinition.moveSpeed,
       attackRange: enemyDefinition.attackRange,
+      basicAttack: { style: "MELEE" },
       collisionRadius: enemyDefinition.collisionRadius,
       position,
       guardPosition: { x: position.x, y: position.y },
@@ -531,7 +554,7 @@ export class BattleScene extends Phaser.Scene {
       fontSize: "10px",
       fontStyle: "bold",
     });
-    this.add.text(280, 57, `Whirlwind: ${getKeyCodeLabel(this.keyBindingState.whirlwindCode)} · First Aid: ${getKeyCodeLabel(this.keyBindingState.firstAidCode)}`, {
+    this.add.text(280, 57, `Whirlwind: ${getKeyCodeLabel(this.keyBindingState.whirlwindCode)} · First Aid: ${getKeyCodeLabel(this.keyBindingState.firstAidCode)} · Meteor: ${getKeyCodeLabel(this.keyBindingState.meteorCode)}`, {
       color: "#e9ddff",
       fontFamily: "Segoe UI, sans-serif",
       fontSize: "10px",
@@ -632,7 +655,7 @@ export class BattleScene extends Phaser.Scene {
 
     this.skillPanel.background.setVisible(true);
     this.skillPanel.ownerText.setText(`${owner.displayName} Skills`).setVisible(true);
-    for (const skillId of ["whirlwind", "first-aid"] as const) {
+    for (const skillId of UNIT_SKILL_IDS) {
       const button = this.skillPanel.buttons.get(skillId);
       const definition = getUnitSkillDefinition(skillId);
       if (!button || !definition || !owner.skills.includes(skillId)) {
@@ -651,7 +674,7 @@ export class BattleScene extends Phaser.Scene {
       const enabled = remainingMs <= 0 && !fullHp;
       const keyLabel = skillId === "whirlwind"
         ? getKeyCodeLabel(this.keyBindingState.whirlwindCode)
-        : getKeyCodeLabel(this.keyBindingState.firstAidCode);
+        : skillId === "first-aid" ? getKeyCodeLabel(this.keyBindingState.firstAidCode) : getKeyCodeLabel(this.keyBindingState.meteorCode);
       button.visual.setLabel(`[${keyLabel}] ${definition.name} · ${status}`);
       button.visual.setTone("purple");
       button.visual.setEnabled(enabled);
@@ -673,6 +696,11 @@ export class BattleScene extends Phaser.Scene {
     const definition = getUnitSkillDefinition(skillId);
     if (!caster || !definition || !caster.skills.includes(skillId) ||
       this.getSkillCooldownRemainingMs(caster, skillId) > 0) {
+      return;
+    }
+
+    if (definition.effectType === "GROUND_AREA_DAMAGE") {
+      this.beginMeteorTargeting(caster, definition);
       return;
     }
 
@@ -757,7 +785,11 @@ export class BattleScene extends Phaser.Scene {
   private showSkillEffect(position: BattlePosition, radius: number, color: number): void {
     const effect = this.add.arc(position.x, position.y, radius, 0, 360, false, color, 0.08)
       .setStrokeStyle(2, color, 0.55);
-    this.scheduleDelayed(240, () => effect.destroy());
+    this.meteorEffects.add(effect);
+    this.scheduleDelayed(240, () => {
+      effect.destroy();
+      this.meteorEffects.delete(effect);
+    });
   }
 
   private addArenaInteraction(): void {
@@ -880,10 +912,8 @@ export class BattleScene extends Phaser.Scene {
       fontStyle: "bold",
     }).setVisible(false);
     const buttons = new Map<UnitSkillId, SkillButtonVisual>();
-    ([
-      { skillId: "whirlwind" as const, x: 680 },
-      { skillId: "first-aid" as const, x: 820 },
-    ]).forEach(({ skillId, x }) => {
+    UNIT_SKILL_IDS.forEach((skillId, index) => {
+      const x = 610 + index * 128;
       const visual = addCommonButton(this, x, 443, 126, "", () => this.useSelectedSkill(skillId), {
         color: UI_THEME.colors.purple,
         height: 25,
@@ -1255,8 +1285,167 @@ export class BattleScene extends Phaser.Scene {
     unit.attackElapsedMs += deltaMs;
     if (unit.attackElapsedMs >= unit.attackIntervalMs) {
       unit.attackElapsedMs = 0;
-      this.applyDamage(unit, target);
+      this.performBasicAttack(unit, target);
     }
+  }
+
+  private beginMeteorTargeting(caster: RTSBattleUnit, definition: Extract<ReturnType<typeof getUnitSkillDefinition>, { effectType: "GROUND_AREA_DAMAGE" }>): void {
+    this.meteorTargetMode = true;
+    this.meteorPreview?.destroy();
+    this.meteorPreview = this.add.arc(caster.position.x, caster.position.y, definition.effectRadius, 0, 360, false, 0xc4b5fd, 0.14)
+      .setStrokeStyle(2, 0xc4b5fd, 0.75).setDepth(7);
+    this.addAttackLog("Meteor targeting: left-click ground to cast, right-click or Escape to cancel.");
+    this.markVisualStateDirty();
+  }
+
+  private cancelMeteorTargeting(refreshUi = true): void {
+    this.meteorTargetMode = false;
+    this.meteorPreview?.destroy();
+    this.meteorPreview = undefined;
+    this.addAttackLog("Meteor targeting cancelled.");
+    if (refreshUi) this.updateUi();
+  }
+
+  private confirmMeteorTarget(position: BattlePosition): void {
+    const caster = this.getSingleSelectedSkillOwner();
+    const definition = getUnitSkillDefinition("meteor");
+    if (!caster || !definition || definition.effectType !== "GROUND_AREA_DAMAGE" || !caster.skills.includes("meteor") ||
+      this.getSkillCooldownRemainingMs(caster, "meteor") > 0) {
+      this.cancelMeteorTargeting();
+      return;
+    }
+    const targetPosition = constrainToArena(position, definition.effectRadius);
+    this.meteorTargetMode = false;
+    this.meteorPreview?.destroy();
+    this.meteorPreview = undefined;
+    caster.skillReadyAtMs.meteor = this.combatTimeMs + definition.cooldownMs;
+    const rune = this.add.arc(targetPosition.x, targetPosition.y, definition.effectRadius, 0, 360, false, 0x8b5cf6, 0.12)
+      .setStrokeStyle(2, 0xc4b5fd, 0.8).setDepth(7);
+    this.meteorEffects.add(rune);
+    this.addAttackLog("Meteor cast at the selected ground position.");
+    this.scheduleDelayed(definition.castDelayMs, () => {
+      if (this.combatState !== "RUNNING") return;
+      const orb = this.add.circle(targetPosition.x, targetPosition.y - 150, 9, 0xc4b5fd, 0.95).setDepth(8);
+      this.meteorEffects.add(orb);
+      this.tweens.add({
+        targets: orb,
+        y: targetPosition.y,
+        duration: 180,
+        ease: "Quad.in",
+        onComplete: () => {
+          orb.destroy();
+          this.meteorEffects.delete(orb);
+          for (const target of this.getAliveUnits("ENEMY")) {
+            if (!isPositionInRadius(target.position, targetPosition, definition.effectRadius)) continue;
+            target.currentHp = Math.max(0, target.currentHp - calculatePhysicalDamage(definition.damage, target.defense));
+            this.flashUnit(target, target.currentHp === 0 ? 0xef7185 : 0xc4b5fd);
+            if (target.currentHp === 0) this.markUnitDead(target, caster);
+          }
+          this.showSkillEffect(targetPosition, definition.effectRadius, 0xc4b5fd);
+          rune.destroy();
+          this.meteorEffects.delete(rune);
+          this.checkBattleOutcome();
+        },
+      });
+    });
+    this.updateUi();
+  }
+
+  private performBasicAttack(attacker: RTSBattleUnit, target: RTSBattleUnit): void {
+    if (attacker.basicAttack.style === "PROJECTILE") {
+      const speed = attacker.basicAttack.projectileSpeed;
+      if (!isValidProjectileSpeed(speed)) return;
+      this.launchProjectile(attacker, target, speed, attacker.basicAttack.projectileType);
+      this.playAttackFeedback(attacker);
+      return;
+    }
+    this.applyDamage(attacker, target);
+  }
+
+  private launchProjectile(attacker: RTSBattleUnit, target: RTSBattleUnit, speed: number, projectileType: ActiveProjectile["projectileType"]): void {
+    const id = `projectile-${++this.projectileSequence}`;
+    const data: ActiveProjectile = {
+      id,
+      ownerUnitId: attacker.battleUnitId,
+      targetUnitId: target.battleUnitId,
+      projectileType,
+      speed,
+      basicDamage: attacker.attackDamage,
+      damage: calculatePhysicalDamage(attacker.attackDamage, target.defense),
+      position: { ...attacker.position },
+      impactApplied: false,
+    };
+    const image = this.add.image(data.position.x, data.position.y, projectileType === "ARROW" ? "visual-projectile-arrow" : "visual-projectile-magic-bolt")
+      .setDisplaySize(projectileType === "ARROW" ? 22 : 16, projectileType === "ARROW" ? 11 : 16)
+      .setDepth(8);
+    this.activeProjectiles.set(id, { data, image });
+  }
+
+  private updateProjectiles(deltaMs: number): void {
+    if (this.combatState !== "RUNNING") {
+      this.clearProjectiles();
+      return;
+    }
+    for (const [id, visual] of this.activeProjectiles) {
+      const target = this.units.get(visual.data.targetUnitId);
+      if (!target?.isAlive) {
+        this.destroyProjectile(id);
+        continue;
+      }
+      const result = advanceProjectile(visual.data, target.position, deltaMs);
+      if (!result.valid) {
+        this.destroyProjectile(id);
+        continue;
+      }
+      visual.image.setPosition(result.projectile.position.x, result.projectile.position.y);
+      if (result.projectile.projectileType === "ARROW") {
+        visual.image.setRotation(Math.atan2(target.position.y - result.projectile.position.y, target.position.x - result.projectile.position.x));
+      }
+      if (result.reachedTarget && resolveProjectileImpact(visual.data, target.isAlive)) {
+        this.resolveProjectileDamage(visual.data, target);
+        this.destroyProjectile(id);
+      }
+    }
+  }
+
+  private resolveProjectileDamage(projectile: ActiveProjectile, target: RTSBattleUnit): void {
+    if (this.combatState !== "RUNNING" || !target.isAlive) return;
+    const attacker = this.units.get(projectile.ownerUnitId);
+    if (!attacker || attacker.team !== "ALLY") return;
+    target.currentHp = Math.max(0, target.currentHp - projectile.damage);
+    target.lastAttackerId = attacker.battleUnitId;
+    target.lastAttackedAt = this.combatTimeMs;
+    this.flashUnit(target, target.currentHp === 0 ? 0xef7185 : 0xffffff);
+    this.addAttackLog(`${attacker.displayName} projectile hit ${target.displayName} for ${projectile.damage}.`);
+    if (target.currentHp === 0) this.markUnitDead(target, attacker);
+    if (target.isAlive && projectile.projectileType === "MAGIC_BOLT" && attacker.basicAttack.style === "PROJECTILE" && attacker.basicAttack.proc &&
+      shouldTriggerProc(attacker.basicAttack.proc.chance, Math.random())) {
+      this.applyArcaneBurst(attacker, target.position, attacker.basicAttack.proc, projectile.basicDamage);
+    }
+  }
+
+  private applyArcaneBurst(attacker: RTSBattleUnit, center: BattlePosition, proc: NonNullable<Extract<RTSBattleUnit["basicAttack"], { style: "PROJECTILE" }>["proc"]>, basicDamage: number): void {
+    const damage = calculateProcDamage(basicDamage, proc);
+    if (damage <= 0) return;
+    for (const target of this.getAliveUnits("ENEMY")) {
+      if (!isPositionInRadius(target.position, center, proc.radius)) continue;
+      target.currentHp = Math.max(0, target.currentHp - calculatePhysicalDamage(damage, target.defense));
+      this.flashUnit(target, target.currentHp === 0 ? 0xef7185 : 0xc4b5fd);
+      if (target.currentHp === 0) this.markUnitDead(target, attacker);
+    }
+    this.showSkillEffect(center, proc.radius, 0xc4b5fd);
+  }
+
+  private destroyProjectile(id: string): void {
+    const visual = this.activeProjectiles.get(id);
+    if (!visual) return;
+    visual.image.destroy();
+    visual.trail?.destroy();
+    this.activeProjectiles.delete(id);
+  }
+
+  private clearProjectiles(): void {
+    for (const id of [...this.activeProjectiles.keys()]) this.destroyProjectile(id);
   }
 
   private getAttackApproachPosition(
@@ -1688,6 +1877,11 @@ export class BattleScene extends Phaser.Scene {
   private handleUnitPointerDown(unitId: string, pointer: Phaser.Input.Pointer): void {
     pointer.event?.stopPropagation();
     this.suppressArenaPointer = true;
+    if (this.meteorTargetMode) {
+      if (pointer.button === 2) this.cancelMeteorTargeting();
+      else if (pointer.button === 0) this.confirmMeteorTarget(this.constrainPointer(pointer));
+      return;
+    }
     const unit = this.units.get(unitId);
     if (!unit?.isAlive || this.combatState !== "RUNNING") {
       return;
@@ -1706,6 +1900,14 @@ export class BattleScene extends Phaser.Scene {
     }
 
     const position = this.constrainPointer(pointer);
+    if (this.meteorTargetMode) {
+      if (pointer.button === 2) {
+        this.cancelMeteorTargeting();
+      } else if (pointer.button === 0) {
+        this.confirmMeteorTarget(position);
+      }
+      return;
+    }
     if (pointer.button === 2) {
       this.issueMoveCommand(position);
       return;
@@ -1719,6 +1921,11 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private handlePointerMove(pointer: Phaser.Input.Pointer): void {
+    if (this.meteorTargetMode) {
+      const position = this.constrainPointer(pointer);
+      this.meteorPreview?.setPosition(position.x, position.y);
+      return;
+    }
     if (!this.dragStart || !pointer.isDown || pointer.button !== 0) {
       return;
     }
@@ -1928,7 +2135,7 @@ export class BattleScene extends Phaser.Scene {
     }
     return unit.unitRole === "MAIN_CHARACTER"
       ? "Hero"
-      : unit.displayName === "Skill Merc" ? "Skill Merc" : `M${(unit.slotIndex ?? 0)}`;
+      : unit.displayName === "Skill Merc" || unit.displayName === "Mage" ? unit.displayName : `M${(unit.slotIndex ?? 0)}`;
   }
 
   private getSelectionInfoLabel(unit: RTSBattleUnit): string {
@@ -1952,9 +2159,16 @@ export class BattleScene extends Phaser.Scene {
     this.input.keyboard?.off("keydown", this.handleBattleKeyDown, this);
     for (const timer of this.delayedEvents) this.time.removeEvent(timer);
     this.delayedEvents.clear();
+    this.clearProjectiles();
+    this.cancelMeteorTargeting(false);
   }
 
   private cleanupVisualEffects(): void {
+    this.clearProjectiles();
+    this.meteorEffects.forEach((effect) => effect.destroy());
+    this.meteorEffects.clear();
+    this.meteorTweens.forEach((tween) => tween.stop());
+    this.meteorTweens.clear();
     for (const visual of this.unitVisuals.values()) {
       visual.attackTween?.stop();
       visual.hitTween?.stop();
